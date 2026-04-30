@@ -1,0 +1,288 @@
+{
+  "id": "git-remote-repository",
+  "title": "Remote Repository (GitHub/GitLab)",
+  "icon": "☁️",
+  "difficulty": "Intermediate",
+  "duration": "50 min",
+  "description": "Learn to work with remote repositories on GitHub/GitLab, including push, pull, fork, clone, and managing upstream connections.",
+  "prerequisites": ["git-advanced-branching"],
+  "nextTopics": [],
+  "content": {
+    "comicStory": {
+      "title": "The Cloud Code Kingdom",
+      "panels": [
+        {
+          "image": "👨💻💻",
+          "text": "Dev had been coding alone on his laptop. His friend asked: 'What if your laptop crashes?'"
+        },
+        {
+          "image": "😰💔",
+          "text": "Dev panicked: 'All my code would be lost! How do teams share code?'"
+        },
+        {
+          "image": "☁️✨",
+          "text": "Git Master appeared: 'Welcome to the Cloud Code Kingdom - Remote Repositories!'"
+        },
+        {
+          "image": "🏰📦",
+          "text": "'GitHub and GitLab are cloud castles where your code lives safely online.'"
+        },
+        {
+          "image": "🔗🌐",
+          "text": "'First, connect your local repo to remote: git remote add origin <URL>'"
+        },
+        {
+          "image": "⬆️📤",
+          "text": "'Use git push to upload your commits to the cloud. Your code is now safe!'"
+        },
+        {
+          "image": "👥🤝",
+          "text": "'Your team can now see your code! They use git pull to download latest changes.'"
+        },
+        {
+          "image": "🍴📋",
+          "text": "'Want to contribute to someone else's project? Fork it - creates your own copy!'"
+        },
+        {
+          "image": "📥💻",
+          "text": "'Then clone your fork to download it locally: git clone <your-fork-URL>'"
+        },
+        {
+          "image": "🔄⬆️",
+          "text": "'Origin is YOUR remote repo. Upstream is the ORIGINAL repo you forked from.'"
+        },
+        {
+          "image": "🔄✅",
+          "text": "'Keep your fork updated: git pull upstream main, then git push origin main'"
+        },
+        {
+          "image": "😊🌍",
+          "text": "Dev smiled: 'Now my code is safe in the cloud and I can collaborate with the world!'"
+        }
+      ]
+    },
+    "deepDive": {
+      "sections": [
+        {
+          "title": "What is a Remote Repository?",
+          "content": "A remote repository is a version of your project hosted on the internet or network, enabling collaboration and backup.\n\n**Popular Remote Hosting Services:**\n- **GitHub**: Most popular, owned by Microsoft\n- **GitLab**: Open-source alternative with CI/CD\n- **Bitbucket**: Atlassian's solution, integrates with Jira\n- **Azure Repos**: Microsoft's enterprise solution\n\n**Why Use Remote Repositories?**\n1. **Backup**: Code stored safely in cloud\n2. **Collaboration**: Multiple developers work together\n3. **Access**: Work from anywhere, any device\n4. **Sharing**: Share code with team or world\n5. **CI/CD**: Integrate with automated pipelines\n6. **Code Review**: Pull requests and reviews\n\n**Local vs Remote:**\n```\nLocal Repository (Your Computer)\n    ↕️ push/pull\nRemote Repository (GitHub/GitLab)\n    ↕️ push/pull\nTeammate's Local Repository\n```\n\n**Key Concepts:**\n- **Origin**: Default name for your primary remote\n- **Upstream**: Original repo you forked from\n- **Push**: Upload local commits to remote\n- **Pull**: Download and merge remote changes\n- **Fetch**: Download remote changes without merging"
+        },
+        {
+          "title": "Adding and Managing Remotes",
+          "content": "Connect your local repository to remote repositories.\n\n**Add Remote:**\n```bash\ngit remote add origin https://github.com/username/repo.git\n```\n\n**View Remotes:**\n```bash\ngit remote -v\n# origin  https://github.com/username/repo.git (fetch)\n# origin  https://github.com/username/repo.git (push)\n```\n\n**Add Multiple Remotes:**\n```bash\ngit remote add origin https://github.com/you/repo.git\ngit remote add upstream https://github.com/original/repo.git\n```\n\n**Rename Remote:**\n```bash\ngit remote rename origin new-origin\n```\n\n**Change Remote URL:**\n```bash\ngit remote set-url origin https://github.com/username/new-repo.git\n```\n\n**Remove Remote:**\n```bash\ngit remote remove origin\n```\n\n**Show Remote Details:**\n```bash\ngit remote show origin\n```\n\n**HTTPS vs SSH:**\n\n**HTTPS URL:**\n```\nhttps://github.com/username/repo.git\n```\n- Easier to set up\n- Requires username/password or token\n\n**SSH URL:**\n```\ngit@github.com:username/repo.git\n```\n- More secure\n- Requires SSH key setup\n- No password needed after setup"
+        },
+        {
+          "title": "Push - Uploading to Remote",
+          "content": "Push uploads your local commits to the remote repository.\n\n**Basic Push:**\n```bash\ngit push origin main\n```\n\n**First Time Push (Set Upstream):**\n```bash\ngit push -u origin main\n# -u sets upstream tracking\n# After this, just use: git push\n```\n\n**Push All Branches:**\n```bash\ngit push --all origin\n```\n\n**Push Tags:**\n```bash\ngit push --tags\n```\n\n**Force Push (Dangerous!):**\n```bash\ngit push --force origin main\n# Overwrites remote history - use with caution!\n```\n\n**Safer Force Push:**\n```bash\ngit push --force-with-lease origin main\n# Fails if remote has changes you don't have\n```\n\n**Push New Branch:**\n```bash\ngit checkout -b feature-branch\ngit push -u origin feature-branch\n```\n\n**Delete Remote Branch:**\n```bash\ngit push origin --delete branch-name\n```\n\n**Common Push Errors:**\n\n**Error: Updates were rejected**\n```\nSolution: Pull first, then push\ngit pull origin main\ngit push origin main\n```\n\n**Error: No upstream branch**\n```\nSolution: Set upstream\ngit push -u origin branch-name\n```"
+        },
+        {
+          "title": "Pull & Fetch - Downloading from Remote",
+          "content": "Pull and fetch download changes from remote repository.\n\n**Git Pull (Fetch + Merge):**\n```bash\ngit pull origin main\n# Downloads and merges changes\n```\n\n**Git Fetch (Download Only):**\n```bash\ngit fetch origin\n# Downloads changes but doesn't merge\n```\n\n**Pull vs Fetch:**\n\n**Pull = Fetch + Merge**\n```bash\ngit pull origin main\n# Equivalent to:\ngit fetch origin\ngit merge origin/main\n```\n\n**When to Use Fetch:**\n- Want to see changes before merging\n- Need to review remote changes\n- Working on sensitive code\n\n**Fetch Workflow:**\n```bash\ngit fetch origin\ngit log origin/main  # View remote commits\ngit diff origin/main  # See differences\ngit merge origin/main  # Merge when ready\n```\n\n**Pull with Rebase:**\n```bash\ngit pull --rebase origin main\n# Creates linear history instead of merge commit\n```\n\n**Pull All Branches:**\n```bash\ngit fetch --all\n```\n\n**Prune Deleted Remote Branches:**\n```bash\ngit fetch --prune\n# Removes local references to deleted remote branches\n```\n\n**Best Practice:**\n```bash\n# Before starting work\ngit pull origin main\n\n# After completing work\ngit push origin main\n```"
+        },
+        {
+          "title": "Fork vs Clone",
+          "content": "Fork and clone are different ways to copy repositories.\n\n**Clone:**\nDownloads a repository to your local machine.\n\n```bash\ngit clone https://github.com/username/repo.git\n```\n\n**What Clone Does:**\n1. Creates local copy of repository\n2. Sets up 'origin' remote automatically\n3. Downloads all branches and history\n4. Checks out default branch\n\n**Clone Specific Branch:**\n```bash\ngit clone -b branch-name https://github.com/username/repo.git\n```\n\n**Shallow Clone (Faster):**\n```bash\ngit clone --depth 1 https://github.com/username/repo.git\n# Downloads only latest commit, not full history\n```\n\n**Fork:**\nCreates your own copy of someone else's repository on GitHub/GitLab.\n\n**Fork Workflow:**\n1. Click 'Fork' button on GitHub\n2. Creates copy under your account\n3. Clone your fork locally\n4. Make changes and push to your fork\n5. Create Pull Request to original repo\n\n**Fork vs Clone Comparison:**\n\n| Aspect | Fork | Clone |\n|--------|------|-------|\n| Location | GitHub/GitLab | Local machine |\n| Purpose | Contribute to others' projects | Work on any repo |\n| Ownership | Your copy on GitHub | Local copy only |\n| Connection | Linked to original | Direct connection |\n\n**Complete Fork Workflow:**\n```bash\n# 1. Fork on GitHub (click Fork button)\n\n# 2. Clone your fork\ngit clone https://github.com/YOUR-USERNAME/repo.git\ncd repo\n\n# 3. Add upstream remote\ngit remote add upstream https://github.com/ORIGINAL-OWNER/repo.git\n\n# 4. Verify remotes\ngit remote -v\n# origin    https://github.com/YOUR-USERNAME/repo.git\n# upstream  https://github.com/ORIGINAL-OWNER/repo.git\n```"
+        },
+        {
+          "title": "Upstream & Origin - Managing Multiple Remotes",
+          "content": "Understanding origin and upstream is crucial for contributing to open-source projects.\n\n**Origin:**\nYour primary remote repository (usually your fork).\n\n**Upstream:**\nThe original repository you forked from.\n\n**Visual Representation:**\n```\nOriginal Repo (upstream)\n    ↓ fork\nYour Fork (origin)\n    ↓ clone\nLocal Repository\n```\n\n**Setting Up Fork Workflow:**\n```bash\n# Clone your fork\ngit clone https://github.com/you/repo.git\ncd repo\n\n# Add upstream\ngit remote add upstream https://github.com/original/repo.git\n\n# Verify\ngit remote -v\n```\n\n**Syncing Fork with Upstream:**\n```bash\n# Fetch upstream changes\ngit fetch upstream\n\n# Merge upstream changes into your main\ngit checkout main\ngit merge upstream/main\n\n# Push updates to your fork\ngit push origin main\n```\n\n**Complete Contribution Workflow:**\n```bash\n# 1. Sync with upstream\ngit fetch upstream\ngit checkout main\ngit merge upstream/main\n\n# 2. Create feature branch\ngit checkout -b feature-branch\n\n# 3. Make changes and commit\ngit add .\ngit commit -m \"Add new feature\"\n\n# 4. Push to your fork\ngit push origin feature-branch\n\n# 5. Create Pull Request on GitHub\n# Go to your fork and click \"New Pull Request\"\n```\n\n**Keep Fork Updated:**\n```bash\n# Quick sync command\ngit fetch upstream && git checkout main && git merge upstream/main && git push origin main\n```\n\n**Rebase on Upstream:**\n```bash\ngit fetch upstream\ngit rebase upstream/main\ngit push origin main --force-with-lease\n```\n\n**Best Practices:**\n1. Always sync before starting new work\n2. Never commit directly to main\n3. Create feature branches for changes\n4. Keep your fork updated regularly\n5. Use descriptive branch names"
+        }
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is the difference between git pull and git fetch?",
+        "answer": "Git fetch downloads changes from remote but doesn't merge them into your working branch. Git pull does both - it fetches changes AND merges them automatically. Fetch is safer when you want to review changes before merging. Pull = Fetch + Merge."
+      },
+      {
+        "question": "What is the difference between fork and clone?",
+        "answer": "Fork creates a copy of someone else's repository under your GitHub/GitLab account (server-side copy). Clone downloads a repository to your local machine (local copy). You fork to contribute to others' projects, then clone your fork to work locally."
+      },
+      {
+        "question": "What are origin and upstream in Git?",
+        "answer": "Origin is the default name for your primary remote repository (usually your fork). Upstream refers to the original repository you forked from. When contributing to open-source, you push to origin (your fork) and pull from upstream (original repo) to stay updated."
+      },
+      {
+        "question": "When should you use git push --force?",
+        "answer": "Use force push very carefully, only when you've rewritten history (like after rebase) and need to update remote. NEVER force push to shared branches. Prefer --force-with-lease which fails if remote has changes you don't have, preventing accidental overwrites."
+      },
+      {
+        "question": "How do you keep your fork synchronized with the original repository?",
+        "answer": "Add the original repo as upstream: 'git remote add upstream <original-url>'. Then regularly: 'git fetch upstream', 'git checkout main', 'git merge upstream/main', 'git push origin main'. This pulls updates from original repo and pushes them to your fork."
+      },
+      {
+        "question": "What is the difference between HTTPS and SSH URLs for Git?",
+        "answer": "HTTPS URLs (https://github.com/user/repo.git) are easier to set up but require username/password or token for each push. SSH URLs (git@github.com:user/repo.git) require initial SSH key setup but then work without passwords. SSH is more secure and convenient for frequent pushes."
+      }
+    ],
+    "codingChallenge": {
+      "title": "Complete Remote Repository Workflow",
+      "description": "Practice working with remote repositories, fork workflow, and managing multiple remotes.",
+      "difficulty": "Intermediate",
+      "tasks": [
+        {
+          "step": 1,
+          "instruction": "Create a new repository on GitHub (use GitHub website)",
+          "command": "# On GitHub:\n# 1. Click '+' → New repository\n# 2. Name: git-remote-practice\n# 3. Click 'Create repository'"
+        },
+        {
+          "step": 2,
+          "instruction": "Create local repository and connect to remote",
+          "command": "mkdir git-remote-practice && cd git-remote-practice\ngit init\necho '# Git Remote Practice' > README.md\ngit add README.md\ngit commit -m 'Initial commit'"
+        },
+        {
+          "step": 3,
+          "instruction": "Add remote and push to GitHub",
+          "command": "git remote add origin https://github.com/YOUR-USERNAME/git-remote-practice.git\ngit branch -M main\ngit push -u origin main"
+        },
+        {
+          "step": 4,
+          "instruction": "Verify remote connection",
+          "command": "git remote -v\ngit remote show origin"
+        },
+        {
+          "step": 5,
+          "instruction": "Create and push a new branch",
+          "command": "git checkout -b feature-branch\necho 'New feature' > feature.txt\ngit add feature.txt\ngit commit -m 'Add feature'\ngit push -u origin feature-branch"
+        },
+        {
+          "step": 6,
+          "instruction": "Make changes on GitHub (edit README.md via web interface)",
+          "command": "# On GitHub:\n# 1. Open README.md\n# 2. Click edit (pencil icon)\n# 3. Add a line: 'Edited on GitHub'\n# 4. Commit changes"
+        },
+        {
+          "step": 7,
+          "instruction": "Fetch changes without merging",
+          "command": "git fetch origin\ngit log origin/main\ngit diff main origin/main"
+        },
+        {
+          "step": 8,
+          "instruction": "Pull changes from remote",
+          "command": "git checkout main\ngit pull origin main"
+        },
+        {
+          "step": 9,
+          "instruction": "Simulate fork workflow - add second remote",
+          "command": "# Simulate upstream remote\ngit remote add upstream https://github.com/ANOTHER-USER/repo.git\ngit remote -v"
+        },
+        {
+          "step": 10,
+          "instruction": "Practice syncing with upstream",
+          "command": "# If upstream existed:\ngit fetch upstream\ngit checkout main\ngit merge upstream/main\ngit push origin main"
+        },
+        {
+          "step": 11,
+          "instruction": "Delete remote branch",
+          "command": "git push origin --delete feature-branch\ngit branch -d feature-branch"
+        },
+        {
+          "step": 12,
+          "instruction": "Clone repository to different location",
+          "command": "cd ..\ngit clone https://github.com/YOUR-USERNAME/git-remote-practice.git cloned-repo\ncd cloned-repo\ngit remote -v"
+        }
+      ],
+      "verification": "Run 'git remote -v' to see configured remotes. Check GitHub to verify pushed commits and branches."
+    },
+    "quiz": [
+      {
+        "question": "What does 'git remote add origin <URL>' do?",
+        "options": [
+          "Downloads repository from URL",
+          "Connects local repo to remote repository at URL",
+          "Creates a new branch",
+          "Pushes code to URL"
+        ],
+        "correctAnswer": 1,
+        "explanation": "This command adds a remote repository connection named 'origin' pointing to the specified URL. It doesn't download or upload anything, just establishes the connection."
+      },
+      {
+        "question": "What is the difference between git pull and git fetch?",
+        "options": [
+          "No difference, they're the same",
+          "Pull downloads and merges, fetch only downloads",
+          "Fetch downloads and merges, pull only downloads",
+          "Pull is faster than fetch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git fetch downloads changes from remote but doesn't merge them. Git pull downloads AND merges changes automatically. Pull = Fetch + Merge."
+      },
+      {
+        "question": "What does 'origin' typically refer to in Git?",
+        "options": [
+          "The first commit",
+          "The main branch",
+          "The default remote repository",
+          "The original author"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Origin is the conventional default name for the primary remote repository. It's automatically set when you clone a repository."
+      },
+      {
+        "question": "What is a fork in GitHub/GitLab?",
+        "options": [
+          "A branch in your repository",
+          "A copy of someone else's repository under your account",
+          "A merge conflict",
+          "A command line tool"
+        ],
+        "correctAnswer": 1,
+        "explanation": "A fork creates a complete copy of someone else's repository under your GitHub/GitLab account, allowing you to freely experiment and contribute back via pull requests."
+      },
+      {
+        "question": "What does 'git push -u origin main' do?",
+        "options": [
+          "Pulls from main branch",
+          "Pushes to main and sets upstream tracking",
+          "Creates a new branch",
+          "Deletes the main branch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "The -u flag sets upstream tracking, linking your local main branch to origin/main. After this, you can use just 'git push' without specifying remote and branch."
+      },
+      {
+        "question": "What is 'upstream' in a fork workflow?",
+        "options": [
+          "Your fork repository",
+          "The original repository you forked from",
+          "The main branch",
+          "The latest commit"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Upstream refers to the original repository you forked from. You add it as a remote to pull updates from the original project into your fork."
+      },
+      {
+        "question": "Which command downloads a repository to your local machine?",
+        "options": [
+          "git fork",
+          "git download",
+          "git clone",
+          "git pull"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Git clone downloads a complete copy of a repository to your local machine, including all files, branches, and commit history."
+      },
+      {
+        "question": "When should you use 'git push --force'?",
+        "options": [
+          "Every time you push",
+          "Only when you've rewritten history and understand the risks",
+          "When you want to push faster",
+          "Never, it's always dangerous"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Force push should only be used when you've rewritten history (like after rebase) and understand it will overwrite remote history. Never use on shared branches. Prefer --force-with-lease for safety."
+      },
+      {
+        "question": "How do you sync your fork with the original repository?",
+        "options": [
+          "git sync upstream",
+          "git fetch upstream, merge, then push to origin",
+          "git pull origin",
+          "Forks sync automatically"
+        ],
+        "correctAnswer": 1,
+        "explanation": "To sync a fork: fetch from upstream (git fetch upstream), merge into your branch (git merge upstream/main), then push to your fork (git push origin main)."
+      }
+    ]
+  }
+}

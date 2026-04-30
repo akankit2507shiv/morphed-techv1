@@ -1,0 +1,11 @@
+node_modules/
+*.log
+.env
+.DS_Store
+*.db
+server.pid
+*.bak*
+*-backup*
+*-old*
+test-*.html
+debug-*.html

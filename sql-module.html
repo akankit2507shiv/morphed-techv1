@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Syllabus - Morphed Tech</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 61, 129, 0.5), transparent 35%),
+        radial-gradient(circle at 82% 6%, rgba(0, 212, 255, 0.45), transparent 32%),
+        radial-gradient(circle at 72% 82%, rgba(124, 60, 255, 0.48), transparent 38%),
+        linear-gradient(135deg, #050816 0%, #0b1020 48%, #070812 100%);
+      background-attachment: fixed;
+      min-height: 100vh; 
+    }
+    .gradient-text { background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .topic-card { background: rgba(18, 22, 37, 0.82); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; transition: all 0.3s; cursor: pointer; }
+    .topic-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(255,61,129,0.4); border-color: rgba(255,61,129,0.4); }
+    .topic-card.done { border-color: rgba(184,255,60,0.4); }
+  </style>
+</head>
+<body class="text-white">
+
+  <header class="bg-dark/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <a href="student-dashboard.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center font-bold text-xl">M</div>
+          <span class="text-2xl font-extrabold gradient-text">MORPHED TECH</span>
+        </a>
+        <div class="flex items-center gap-3">
+          <button onclick="goBackToSyllabus()" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
+            ← Back to Dashboard
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-sm mt-3 text-gray-400">
+        <a href="student-dashboard.html" class="hover:text-white transition">🏠 Dashboard</a>
+        <span>/</span>
+        <span class="text-white font-medium">🗄️ SQL Syllabus</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-white mb-2"><span id="studentName"></span>'s SQL Dashboard</h1>
+      <p class="text-gray-300 mb-4">Master SQL with 16 comprehensive topics — from core concepts to AI-powered future-ready engineering</p>
+      <div class="flex items-center gap-6 text-sm text-gray-400">
+        <span>📚 16 Topics</span>
+        <span>⏱️ Interview Ready</span>
+        <span>🎯 Real-World Scenarios</span>
+        <span id="progressLabel" class="text-accent font-semibold"></span>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="topicsGrid"></div>
+
+  </main>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) { alert('Please login first'); window.location.href = 'student-login.html'; }
+
+    // Set student name
+    document.getElementById('studentName').textContent = user.name || 'Student';
+
+    const TOPICS = [
+      // 🏗️ FOUNDATION
+      { id: 'database-basics', title: 'Database Basics (Foundation)', desc: 'What is Database, DBMS vs RDBMS, Tables, Rows, Columns, Keys, Constraints', icon: '🗄️', color: 'from-gray-500 to-gray-600', diff: 'Foundation', duration: '45 min', interviewQ: 8 },
+      { id: 'sql-basic-queries', title: 'SQL Basic Queries', desc: 'SELECT, WHERE, DISTINCT, ORDER BY, LIMIT, Aliases - fundamental data retrieval', icon: '🔍', color: 'from-indigo-500 to-indigo-600', diff: 'Foundation', duration: '60 min', interviewQ: 10 },
+      { id: 'sql-filtering', title: 'SQL Filtering', desc: 'AND, OR, NOT, IN, BETWEEN, LIKE, Wildcards, NULL - advanced data filtering', icon: '🎯', color: 'from-purple-500 to-purple-600', diff: 'Foundation', duration: '75 min', interviewQ: 12 },
+      { id: 'sql-functions', title: 'SQL Functions (Aggregate Functions)', desc: 'COUNT, SUM, AVG, MIN, MAX - data summarization for business insights', icon: '📊', color: 'from-green-500 to-green-600', diff: 'Foundation', duration: '90 min', interviewQ: 15 },
+      { id: 'sql-data-manipulation', title: 'SQL Data Manipulation (DML)', desc: 'INSERT, UPDATE, DELETE - managing data lifecycle in business applications', icon: '✏️', color: 'from-red-500 to-red-600', diff: 'Foundation', duration: '80 min', interviewQ: 12 },
+      { id: 'sql-table-operations', title: 'SQL Table Operations (DDL)', desc: 'CREATE, ALTER, DROP, TRUNCATE - database structure management', icon: '🏗️', color: 'from-orange-500 to-orange-600', diff: 'Foundation', duration: '85 min', interviewQ: 14 },
+      
+      // 🔥 INTERMEDIATE (HIGH INTERVIEW IMPORTANCE)
+      { id: 'sql-joins', title: 'SQL Joins (High Interview Importance)', desc: 'INNER, LEFT, RIGHT, FULL, SELF, CROSS - combining data from multiple tables', icon: '🔗', color: 'from-blue-500 to-blue-600', diff: 'Intermediate', duration: '120 min', interviewQ: 18 },
+      { id: 'sql-aggregation', title: 'SQL Aggregation (GROUP BY & HAVING)', desc: 'GROUP BY, HAVING - summarize millions of records into business insights for reporting', icon: '📊', color: 'from-teal-500 to-teal-600', diff: 'Intermediate', duration: '100 min', interviewQ: 16 },
+      { id: 'sql-subqueries', title: 'SQL Subqueries (Nested Queries)', desc: 'Single Row, Multi Row, Correlated - complex filtering where one result depends on another', icon: '🔍', color: 'from-cyan-500 to-cyan-600', diff: 'Intermediate', duration: '110 min', interviewQ: 15 },
+      
+      // 🚀 ADVANCED
+      { id: 'sql-cte', title: 'Common Table Expressions (CTE)', desc: 'Basic, Multiple, Recursive CTEs - simplify complex queries with readable temporary blocks', icon: '📦', color: 'from-violet-500 to-violet-600', diff: 'Advanced', duration: '95 min', interviewQ: 14 },
+      { id: 'sql-window-functions', title: 'SQL Window Functions', desc: 'ROW_NUMBER, RANK, DENSE_RANK, LEAD, LAG - rankings and comparisons while keeping all rows', icon: '🪟', color: 'from-fuchsia-500 to-fuchsia-600', diff: 'Advanced', duration: '115 min', interviewQ: 17 },
+      { id: 'sql-optimization', title: 'SQL Optimization Basics', desc: 'Indexing, Query Performance, Avoid SELECT *, Filter Early - essential for production speed', icon: '⚡', color: 'from-yellow-500 to-yellow-600', diff: 'Advanced', duration: '100 min', interviewQ: 12 },
+      
+      // 🏢 DATA ENGINEERING
+      { id: 'data-warehousing', title: 'Data Warehousing Concepts', desc: 'Fact/Dimension tables, Star/Snowflake schema, SCD Type 1/2, Incremental loading - enterprise analytics structure', icon: '🏢', color: 'from-emerald-500 to-emerald-600', diff: 'Data Engineering', duration: '70 min', interviewQ: 8 },
+      
+      // 🎯 INTERVIEW PRACTICE
+      { id: 'real-sql-scenarios', title: 'Real SQL Scenarios', desc: 'Duplicate removal, Top N salary, Missing records, Customer analysis, Sales trends - practical interview problems', icon: '🎯', color: 'from-rose-500 to-rose-600', diff: 'Interview Practice', duration: '80 min', interviewQ: 12 },
+      { id: 'sql-interview-prep', title: 'SQL Interview Preparation', desc: 'Theory questions, Live coding, Scenario solving, Karat/Product company questions - complete interview mastery', icon: '🏆', color: 'from-amber-500 to-amber-600', diff: 'Interview Mastery', duration: '90 min', interviewQ: 15 },
+      
+      // 🤖 FUTURE READY
+      { id: 'ai-future-sql', title: 'AI + Future SQL', desc: 'Prompt to SQL, AI tools (ChatGPT, Copilot), Validation skills - 10x faster with AI assistance', icon: '🤖', color: 'from-cyan-500 to-blue-600', diff: 'Future Ready', duration: '60 min', interviewQ: 10 }
+    ];
+
+    const diffColor = { 
+      Foundation: 'text-xs font-bold px-2 py-1 rounded-full',
+      Core: 'text-xs font-bold px-2 py-1 rounded-full', 
+      Intermediate: 'text-xs font-bold px-2 py-1 rounded-full', 
+      Advanced: 'text-xs font-bold px-2 py-1 rounded-full',
+      'Data Engineering': 'text-xs font-bold px-2 py-1 rounded-full',
+      Analytics: 'text-xs font-bold px-2 py-1 rounded-full',
+      Performance: 'text-xs font-bold px-2 py-1 rounded-full',
+      'Interview Practice': 'text-xs font-bold px-2 py-1 rounded-full',
+      'Interview Mastery': 'text-xs font-bold px-2 py-1 rounded-full',
+      'Future Ready': 'text-xs font-bold px-2 py-1 rounded-full'
+    };
+
+    const diffStyle = {
+      Foundation: 'background: rgba(255,255,255,0.1); color: #a7b0c3;',
+      Core: 'background: linear-gradient(135deg, #00d4ff, #2563EB); color: white;',
+      Intermediate: 'background: linear-gradient(135deg, #ffbf3c, #ff3d81); color: white;',
+      Advanced: 'background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;',
+      'Data Engineering': 'background: linear-gradient(135deg, #7c3cff, #00d4ff); color: white;',
+      Analytics: 'background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;',
+      Performance: 'background: linear-gradient(135deg, #ffbf3c, #ff3d81); color: white;',
+      'Interview Practice': 'background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;',
+      'Interview Mastery': 'background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;',
+      'Future Ready': 'background: linear-gradient(135deg, #00d4ff, #7c3cff); color: white;'
+    };
+
+    function render() {
+      const progress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+      const done = TOPICS.filter(t => progress[t.id]).length;
+      document.getElementById('progressLabel').textContent = `${done} / ${TOPICS.length} completed`;
+
+      document.getElementById('topicsGrid').innerHTML = TOPICS.map((t, i) => `
+        <div class="topic-card p-6 ${progress[t.id] ? 'done' : ''}" onclick="openTopic('${t.id}')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 bg-gradient-to-br ${t.color} rounded-xl flex items-center justify-center text-3xl shadow-lg">${t.icon}</div>
+            <div class="flex flex-col items-end gap-2">
+              ${progress[t.id] ? '<span class="text-2xl">✅</span>' : ''}
+              <span class="${diffColor[t.diff]}" style="${diffStyle[t.diff]}">${t.diff}</span>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h3 class="text-base font-bold text-white mb-2 leading-tight">${t.title}</h3>
+            <p class="text-sm text-gray-400 line-clamp-2">${t.desc}</p>
+          </div>
+          <div class="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-white/10">
+            <span>⏱️ ${t.duration}</span>
+            <span>💬 ${t.interviewQ} Qs</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderFiltered(filteredTopics) {
+      const progress = JSON.parse(localStorage.getItem('userProgress') || '{}');
+      const done = filteredTopics.filter(t => progress[t.id]).length;
+      document.getElementById('progressLabel').textContent = `${done} / ${filteredTopics.length} unlocked`;
+
+      document.getElementById('topicsGrid').innerHTML = filteredTopics.map((t, i) => `
+        <div class="topic-card p-6 ${progress[t.id] ? 'done' : ''}" onclick="openTopic('${t.id}')">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-14 h-14 bg-gradient-to-br ${t.color} rounded-xl flex items-center justify-center text-3xl shadow-lg">${t.icon}</div>
+            <div class="flex flex-col items-end gap-2">
+              ${progress[t.id] ? '<span class="text-2xl">✅</span>' : ''}
+              <span class="${diffColor[t.diff]}" style="${diffStyle[t.diff]}">${t.diff}</span>
+            </div>
+          </div>
+          <div class="mb-4">
+            <h3 class="text-base font-bold text-white mb-2 leading-tight">${t.title}</h3>
+            <p class="text-sm text-gray-400 line-clamp-2">${t.desc}</p>
+          </div>
+          <div class="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-white/10">
+            <span>⏱️ ${t.duration}</span>
+            <span>💬 ${t.interviewQ} Qs</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openTopic(id) {
+      const topic = TOPICS.find(t => t.id === id);
+      const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+      history.unshift({ type: 'sql', title: topic.title, url: `sql-topic.html?topic=${id}`, time: new Date().toISOString() });
+      localStorage.setItem('searchHistory', JSON.stringify(history.slice(0, 50)));
+      window.location.href = `sql-topic.html?topic=${id}`;
+    }
+
+    if (user.role === 'admin') {
+      render();
+    } else {
+      fetch(`${API}/enrollment/status`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.paid) { alert('🔒 Please complete payment to access content'); window.location.href = 'student-dashboard.html'; }
+          else if (d.enrollment && d.enrollment.content_access_granted === 0) { alert('🚫 Access denied. Contact admin.'); window.location.href = 'student-dashboard.html'; }
+          else render();
+        })
+        .catch(() => { alert('Auth failed'); window.location.href = 'student-login.html'; });
+    }
+
+    function goBackToSyllabus() {
+      window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+    }
+  </script>
+</body>
+</html>

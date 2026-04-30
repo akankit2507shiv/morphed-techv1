@@ -1,0 +1,258 @@
+{
+  "id": "git-basics",
+  "title": "Git Basics",
+  "icon": "🚀",
+  "difficulty": "Beginner",
+  "duration": "50 min",
+  "description": "Install, configure, and start working with Git repositories",
+  "prerequisites": ["version-control-fundamentals"],
+  "nextTopics": ["git-workflow-core"],
+  "content": {
+    "comicStory": {
+      "title": "The New Job Chaos",
+      "panels": [
+        {
+          "image": "🏢",
+          "text": "Day 1 at new company. Boss says: 'Copy project files from shared drive.'"
+        },
+        {
+          "image": "😰",
+          "text": "You copy 5GB of files manually. Takes forever. Files are outdated!"
+        },
+        {
+          "image": "🤷",
+          "text": "No idea what changed recently. Start working, accidentally delete important file."
+        },
+        {
+          "image": "😱",
+          "text": "No way to recover! Panic mode activated!"
+        },
+        {
+          "image": "💡",
+          "text": "TWIST: Colleague shows you Git. 'Just run: git clone <url>'"
+        },
+        {
+          "image": "✨",
+          "text": "Get complete project + full history in seconds! Make mistakes? Revert easily! Always in sync!"
+        }
+      ],
+      "twist": "Manual file copying is chaos. Git clone gets you everything instantly!",
+      "lesson": "Git Basics = Your entry ticket to professional development!"
+    },
+    "deepDive": {
+      "whatItIs": "Git Basics are the foundational steps to install Git, configure your identity, create or copy repositories, and start tracking changes. It's like setting up your workspace and learning the essential tools.",
+      "whyItMatters": "Without proper Git setup, you can't track changes, collaborate with teams, or use modern development workflows. Git basics are the entry point to professional software development and data engineering.",
+      "whereUsed": [
+        "Starting new projects: Use git init to create repository",
+        "Joining existing projects: Use git clone to copy from GitHub",
+        "Daily development: Use git status to track changes",
+        "Team collaboration: Configure identity for commit tracking",
+        "All development environments: Windows, macOS, Linux"
+      ],
+      "visualExamples": [
+        {
+          "title": "Installing Git",
+          "description": "Download and set up Git on your system",
+          "diagram": "Windows: Download from git-scm.com\nmacOS: brew install git\nLinux: sudo apt-get install git\n\nVerify: git --version"
+        },
+        {
+          "title": "Configuring Git",
+          "description": "Set your identity for commits",
+          "diagram": "git config --global user.name \"Your Name\"\ngit config --global user.email \"your@email.com\"\n\nVerify: git config --list"
+        },
+        {
+          "title": "git init vs git clone",
+          "description": "Two ways to start with Git",
+          "diagram": "git init:\n- Start NEW project\n- Create repository locally\n- Use: mkdir project && cd project && git init\n\ngit clone:\n- Join EXISTING project\n- Copy from remote (GitHub)\n- Use: git clone https://github.com/user/repo.git"
+        },
+        {
+          "title": "git status",
+          "description": "Check current state of repository",
+          "diagram": "Shows:\n✔ Current branch\n✔ Modified files (red)\n✔ Staged files (green)\n✔ Untracked files\n✔ What needs to be committed"
+        }
+      ],
+      "keyPoints": [
+        "Install Git first: Download from git-scm.com or use package manager",
+        "Configure identity: git config --global user.name and user.email",
+        "git init: Creates new repository (for new projects)",
+        "git clone: Copies existing repository (for joining projects)",
+        "git status: Shows current state (use frequently!)",
+        ".git folder: Contains all repository data (never delete!)",
+        "Git works locally without GitHub (Git ≠ GitHub)"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is the first step to use Git?",
+        "answer": "Install Git on your system.",
+        "explanation": "Download Git from git-scm.com (Windows), use Homebrew on macOS, or apt-get on Linux. Verify with 'git --version'. Without installation, you can't use Git commands!",
+        "memoryTrick": "First step = Install Git 📥"
+      },
+      {
+        "question": "Why configure username and email?",
+        "answer": "Every commit records author information.",
+        "explanation": "Git needs to know who you are. Every commit includes author name and email, which shows in history and helps track who made what changes. Required for collaboration!",
+        "memoryTrick": "Config = Identity for commits 👤"
+      },
+      {
+        "question": "What does git init do?",
+        "answer": "Creates a new Git repository.",
+        "explanation": "Initializes a new repository in your current folder, creating a .git directory. Use for NEW projects. Example: mkdir my-project && cd my-project && git init",
+        "memoryTrick": "git init = New repository 🆕"
+      },
+      {
+        "question": "What does git clone do?",
+        "answer": "Copies an existing repository from remote.",
+        "explanation": "Downloads complete project with full history from GitHub/GitLab. Use for EXISTING projects. Example: git clone https://github.com/user/repo.git",
+        "memoryTrick": "git clone = Copy remote repo 📦"
+      },
+      {
+        "question": "What's the difference between git init and git clone?",
+        "answer": "init creates new project, clone copies existing project.",
+        "explanation": "Use git init when starting YOUR new project. Use git clone when joining EXISTING project from GitHub. init = new, clone = copy.",
+        "memoryTrick": "init = New, clone = Copy 🔄"
+      },
+      {
+        "question": "What does git status show?",
+        "answer": "Current state of repository and files.",
+        "explanation": "Shows: current branch, modified files, staged files, untracked files, and what needs to be committed. Use frequently to know what's happening!",
+        "memoryTrick": "git status = Current state 📊"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Git Basics Workflow",
+      "scenario": "You're starting a new data engineering project. Simulate the Git initialization workflow: create repository, configure user, create files, and check status.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "repository",
+            "columns": ["name", "initialized", "user_name", "user_email", "files"],
+            "sampleData": [
+              ["my-project", true, "Ankit Kumar", "ankit@example.com", ["README.md"]]
+            ]
+          }
+        ]
+      },
+      "problem": "Create a class that simulates Git initialization, configuration, file creation, and status checking.",
+      "expectedOutput": "Initialized repository: my-project\nConfigured user: Ankit Kumar <ankit@example.com>\nCreated file: README.md\nStatus: 1 untracked file",
+      "hints": [
+        "Create a GitRepository class with init, config, create_file, and status methods",
+        "Track initialized state, user info, and files",
+        "Status should show untracked files (not yet tracked by Git)",
+        "Simulate the workflow: init → config → create file → status"
+      ],
+      "solution": "class GitRepository:\n    def __init__(self, name):\n        self.name = name\n        self.initialized = False\n        self.user_name = None\n        self.user_email = None\n        self.files = []\n        self.tracked_files = []\n    \n    def init(self):\n        self.initialized = True\n        print(f\"Initialized repository: {self.name}\")\n    \n    def config(self, name, email):\n        self.user_name = name\n        self.user_email = email\n        print(f\"Configured user: {name} <{email}>\")\n    \n    def create_file(self, filename):\n        self.files.append(filename)\n        print(f\"Created file: {filename}\")\n    \n    def status(self):\n        untracked = [f for f in self.files if f not in self.tracked_files]\n        print(f\"Status: {len(untracked)} untracked file(s)\")\n        for f in untracked:\n            print(f\"  - {f}\")\n\n# Usage\nrepo = GitRepository(\"my-project\")\nrepo.init()\nrepo.config(\"Ankit Kumar\", \"ankit@example.com\")\nrepo.create_file(\"README.md\")\nrepo.status()",
+      "explanation": "This simulates Git basics: init() creates repository, config() sets user identity, create_file() adds files, status() shows untracked files. In real Git: git init, git config, touch file, git status."
+    },
+    "quiz": [
+      {
+        "question": "What's the first step to use Git?",
+        "options": [
+          "Create files",
+          "Install Git on your system",
+          "Push to GitHub",
+          "Create branch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "You must install Git first. Download from git-scm.com, install, and verify with 'git --version'. Without installation, Git commands won't work.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Why configure username and email in Git?",
+        "options": [
+          "For fun",
+          "Every commit records author information",
+          "To delete files",
+          "To speed up Git"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git needs your identity because every commit records who made the change. This shows in history and is required for collaboration. Use: git config --global user.name and user.email",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git init' do?",
+        "options": [
+          "Deletes repository",
+          "Creates new Git repository",
+          "Clones repository",
+          "Shows status"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git init initializes a new repository in your current folder, creating a .git directory. Use for NEW projects you're starting from scratch.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git clone' do?",
+        "options": [
+          "Creates new repo",
+          "Copies existing repository from remote",
+          "Deletes files",
+          "Shows status"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git clone copies an existing repository from remote (like GitHub) to your local machine, including full history. Use for EXISTING projects you're joining.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Difference between 'git init' and 'git clone'?",
+        "options": [
+          "Same thing",
+          "init = new project, clone = copy existing",
+          "init is faster",
+          "clone is older"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git init starts a NEW project locally. git clone copies an EXISTING project from remote. Use init for your projects, clone for others' projects.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What does 'git status' show?",
+        "options": [
+          "Git version",
+          "Current state of repository and files",
+          "User configuration",
+          "Remote URL"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git status shows: current branch, modified files, staged files, untracked files, and what needs to be committed. Use frequently to understand repository state!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "How often should you run 'git status'?",
+        "options": [
+          "Never",
+          "Frequently, before and after changes",
+          "Once a day",
+          "Only when errors occur"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Run git status frequently: before committing, after making changes, when unsure about state. It's free, instant, and helps you understand what's happening!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is the .git folder?",
+        "options": [
+          "Temporary files",
+          "Contains all Git repository data and history",
+          "User settings",
+          "Backup folder"
+        ],
+        "correctAnswer": 1,
+        "explanation": "The .git folder stores all commits, history, and configuration. Created by git init. NEVER delete this folder - you'll lose all history!",
+        "difficulty": "hard"
+      },
+      {
+        "question": "Can you use Git without GitHub?",
+        "options": [
+          "No, GitHub required",
+          "Yes, Git works locally without GitHub",
+          "Only for small projects",
+          "Only with internet"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git is a local version control tool that works without internet. GitHub is a hosting platform for remote repositories. Git ≠ GitHub!",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

@@ -1,0 +1,275 @@
+{
+  "id": "case-statements",
+  "title": "CASE Statements",
+  "icon": "📊",
+  "difficulty": "Beginner",
+  "duration": "40 min",
+  "description": "Conditional logic in SQL",
+  "prerequisites": [],
+  "nextTopics": ["aggregations", "subqueries"],
+  "content": {
+    "comicStory": {
+      "title": "The Teacher's Grading Problem",
+      "panels": [
+        {
+          "image": "👨‍🏫",
+          "text": "Imagine you're a teacher grading students 📊"
+        },
+        {
+          "image": "📝",
+          "text": "Marks: 90 → Grade A, 75 → Grade B, 50 → Grade C, 30 → Fail"
+        },
+        {
+          "image": "😰",
+          "text": "Problem: Numbers alone are hard to understand"
+        },
+        {
+          "image": "🤔",
+          "text": "Solution: Convert marks into meaningful categories"
+        },
+        {
+          "image": "✨",
+          "text": "This is CASE STATEMENT! Apply conditions like IF-ELSE in SQL"
+        },
+        {
+          "image": "💡",
+          "text": "Aha Moment: CASE = 'If this → then that' logic 🔥"
+        }
+      ],
+      "twist": "Raw numbers mean nothing without context. CASE transforms data into insights!",
+      "lesson": "CASE statements apply IF-ELSE logic to transform and categorize data dynamically."
+    },
+    "deepDive": {
+      "whatItIs": "CASE is a conditional expression in SQL used to apply logic like IF-ELSE. It allows you to transform data based on conditions within your queries.",
+      "whyItMatters": "In real companies, raw data needs interpretation. Business rules must be applied, and reporting needs readable output. CASE statements bridge the gap between raw data and business insights.",
+      "whereUsed": [
+        "Data transformation - Convert codes to readable labels",
+        "Business rules - Apply grading, categorization, segmentation",
+        "Data cleaning - Handle NULL values, standardize formats",
+        "Reporting dashboards - Create meaningful categories",
+        "Conditional aggregations - SUM/COUNT with conditions",
+        "ETL pipelines - Transform data during loading"
+      ],
+      "visualExamples": [
+        {
+          "title": "Simple CASE - Direct Value Matching",
+          "description": "Compare one column against specific values",
+          "diagram": "CASE status\n  WHEN 'A' THEN 'Active'\n  WHEN 'I' THEN 'Inactive'\n  ELSE 'Unknown'\nEND"
+        },
+        {
+          "title": "Searched CASE - Conditional Logic (MOST USED)",
+          "description": "Use complex conditions with comparisons",
+          "diagram": "CASE\n  WHEN salary > 100000 THEN 'High'\n  WHEN salary >= 50000 THEN 'Medium'\n  ELSE 'Low'\nEND"
+        },
+        {
+          "title": "CASE with Aggregation",
+          "description": "Conditional counting and summing",
+          "diagram": "SUM(CASE WHEN status='paid' THEN amount ELSE 0 END) as total_paid"
+        },
+        {
+          "title": "Salary Categorization Example",
+          "description": "Convert salary into categories: >100k → High, 50k-100k → Medium, <50k → Low",
+          "diagram": "Input: [120000, 70000, 40000]\nOutput: ['High', 'Medium', 'Low']"
+        }
+      ],
+      "keyPoints": [
+        "CASE works like IF-ELSE in programming",
+        "Searched CASE is most flexible (allows any condition)",
+        "Simple CASE compares one column to values",
+        "Always include ELSE to avoid NULL results",
+        "Can be used in SELECT, WHERE, ORDER BY, aggregations",
+        "Multiple WHEN conditions evaluated top-to-bottom",
+        "First matching condition wins (order matters!)",
+        "CASE must end with END keyword"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "CASE is similar to which programming concept?",
+        "answer": "IF-ELSE statements",
+        "explanation": "CASE works exactly like IF-ELSE logic in programming. You define conditions (WHEN), specify results (THEN), and provide a default (ELSE).",
+        "memoryTrick": "CASE = IF 🔥 (Conditional logic in SQL)"
+      },
+      {
+        "question": "Which type of CASE is most commonly used in real-world scenarios?",
+        "answer": "Searched CASE",
+        "explanation": "Searched CASE allows flexible conditions (>, <, BETWEEN, LIKE, etc.) making it more powerful than Simple CASE which only checks equality.",
+        "memoryTrick": "Search = flexible 🧠 (Use conditions, not just equality)"
+      },
+      {
+        "question": "What happens if no WHEN condition matches and there's no ELSE clause?",
+        "answer": "The result is NULL",
+        "explanation": "Without ELSE, unmatched rows return NULL. This can cause issues in calculations and reports. Always include ELSE for safety!",
+        "memoryTrick": "No ELSE = NULL ❌ (Always provide a default)"
+      },
+      {
+        "question": "What is CASE primarily used for?",
+        "answer": "Applying conditional logic and transforming data",
+        "explanation": "CASE transforms raw data into meaningful categories, applies business rules, and enables conditional calculations - all within SQL queries.",
+        "memoryTrick": "CASE = logic 🔥 (Transform data with conditions)"
+      },
+      {
+        "question": "Can CASE be used inside aggregate functions like SUM?",
+        "answer": "Yes, absolutely!",
+        "explanation": "CASE inside aggregations is powerful: SUM(CASE WHEN status='paid' THEN amount ELSE 0 END) calculates conditional totals.",
+        "memoryTrick": "CASE + SUM = powerful 💪 (Conditional aggregation)"
+      },
+      {
+        "question": "What is the main benefit of CASE statements in reporting?",
+        "answer": "Categorization and readable output",
+        "explanation": "CASE converts raw data (numbers, codes) into human-readable categories (High/Medium/Low, Active/Inactive) making reports understandable.",
+        "memoryTrick": "CASE = categories 📊 (Make data readable)"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Categorize Customer Salary",
+      "scenario": "Your company wants to classify customers based on their salary levels for targeted marketing campaigns. Create salary categories: High (>100k), Medium (50k-100k), and Low (<50k).",
+      "dataset": {
+        "tables": [
+          {
+            "name": "employees",
+            "columns": ["name", "salary"],
+            "sampleData": [
+              ["Ankit", 120000],
+              ["Ravi", 70000],
+              ["Neha", 40000],
+              ["Priya", 95000],
+              ["Amit", 30000]
+            ]
+          }
+        ]
+      },
+      "problem": "Write a query to classify each employee's salary into High, Medium, or Low categories.",
+      "expectedOutput": "name | salary | category\nAnkit | 120000 | High\nRavi | 70000 | Medium\nNeha | 40000 | Low\nPriya | 95000 | Medium\nAmit | 30000 | Low",
+      "hints": [
+        "Step 1: Understand requirement → categorization based on salary ranges",
+        "Step 2: Define conditions (>100k, 50k-100k, <50k)",
+        "Step 3: Use CASE with WHEN conditions",
+        "Step 4: Add ELSE for values below 50k",
+        "Step 5: Use BETWEEN or comparison operators",
+        "Step 6: Give the result column an alias (AS category)"
+      ],
+      "solution": "SELECT \n  name,\n  salary,\n  CASE \n    WHEN salary > 100000 THEN 'High'\n    WHEN salary BETWEEN 50000 AND 100000 THEN 'Medium'\n    ELSE 'Low'\n  END AS category\nFROM employees\nORDER BY salary DESC;",
+      "explanation": "We use Searched CASE to evaluate salary ranges. The conditions are checked top-to-bottom: first >100k (High), then 50k-100k (Medium), and ELSE catches everything below 50k (Low). BETWEEN is inclusive on both ends. The result is aliased as 'category' for clarity."
+    },
+    "quiz": [
+      {
+        "question": "CASE statement is most similar to which concept?",
+        "options": [
+          "Loop structure",
+          "IF-ELSE conditional",
+          "JOIN operation",
+          "GROUP BY clause"
+        ],
+        "correctAnswer": 1,
+        "explanation": "CASE implements conditional logic just like IF-ELSE in programming. It evaluates conditions and returns different results based on which condition is true.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What is CASE primarily used for in SQL?",
+        "options": [
+          "Deleting records",
+          "Applying conditional logic",
+          "Joining tables",
+          "Dropping columns"
+        ],
+        "correctAnswer": 1,
+        "explanation": "CASE is used to apply conditional logic, transform data, and categorize values based on conditions - similar to IF-ELSE statements.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Which type of CASE is most commonly used?",
+        "options": [
+          "Simple CASE",
+          "Searched CASE",
+          "JOIN CASE",
+          "GROUP CASE"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Searched CASE is most flexible because it allows complex conditions (>, <, BETWEEN, LIKE) rather than just equality checks.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What happens if no WHEN condition matches and ELSE is not provided?",
+        "options": [
+          "Query throws an error",
+          "Returns NULL",
+          "Returns 0",
+          "Skips the row"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Without ELSE, unmatched conditions return NULL. This is why it's best practice to always include ELSE to handle unexpected cases.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Can CASE be used inside aggregate functions like SUM?",
+        "options": [
+          "Yes, for conditional aggregation",
+          "No, not allowed",
+          "Sometimes, depends on database",
+          "Never recommended"
+        ],
+        "correctAnswer": 0,
+        "explanation": "CASE inside aggregations is powerful: SUM(CASE WHEN condition THEN value ELSE 0 END) enables conditional calculations.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is the main benefit of CASE in reporting?",
+        "options": [
+          "Joining tables",
+          "Categorization and readable output",
+          "Deleting data",
+          "Dropping tables"
+        ],
+        "correctAnswer": 1,
+        "explanation": "CASE transforms raw data into meaningful categories, making reports human-readable (e.g., converting salary numbers to High/Medium/Low).",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What keyword starts a CASE statement?",
+        "options": [
+          "IF",
+          "CASE",
+          "WHEN",
+          "SELECT"
+        ],
+        "correctAnswer": 1,
+        "explanation": "CASE statement syntax: CASE WHEN condition THEN result ... ELSE default END. It always starts with CASE and ends with END.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What keyword ends a CASE statement?",
+        "options": [
+          "STOP",
+          "END",
+          "FINISH",
+          "CLOSE"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Every CASE statement must end with the END keyword. Forgetting END will cause a syntax error.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Where is CASE commonly used in data engineering?",
+        "options": [
+          "ETL pipelines for data transformation",
+          "Dropping tables",
+          "Deleting records",
+          "Creating indexes"
+        ],
+        "correctAnswer": 0,
+        "explanation": "CASE is heavily used in ETL (Extract, Transform, Load) pipelines to transform and categorize data during the loading process.",
+        "difficulty": "medium"
+      }
+    ]
+  },
+  "interviewAnswer": "CASE statements in SQL are used to implement conditional logic similar to IF-ELSE. They help transform and categorize data dynamically based on conditions and are widely used in reporting, data transformation, and aggregations. Using CASE with aggregations enables powerful conditional analysis in real-world scenarios.",
+  "memoryTricks": [
+    "CASE = IF 🔥 (Conditional logic)",
+    "WHEN = Condition ❓ (What to check)",
+    "THEN = Result ✅ (What to return)",
+    "ELSE = Default ⚠️ (Fallback value)",
+    "END = Close 🧠 (Must end with END)"
+  ],
+  "revision": "CASE = apply IF-ELSE logic to transform data dynamically based on conditions"
+}

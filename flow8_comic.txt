@@ -1,0 +1,95 @@
+    comic: `📖 1
+Your pipeline is automated and monitored! 🎉
+Everything runs smoothly...
+
+But then:
+- Intern accidentally deletes production data 😱
+- AWS bill is $5000 (expected $500) 💸
+- Competitor accesses your S3 bucket 🔓
+- Compliance audit fails ❌
+
+What went wrong?
+
+📖 2
+😰 Problems without Control:
+🔓 Security Issues:
+- Anyone can access S3 data
+- No encryption
+- Public buckets
+
+💸 Cost Issues:
+- Using expensive storage for old data
+- Running large Glue jobs unnecessarily
+- No budget limits
+
+📋 Governance Issues:
+- No data lineage
+- Can't track who accessed what
+- No compliance controls
+
+📖 3
+🤔 Solution
+
+Implement Control System!
+
+3 Pillars:
+1️⃣ Security 🔐
+2️⃣ Cost Optimization 💰
+3️⃣ Governance 📊
+
+📖 4
+🔧 Control System Components:
+
+🔐 Security:
+- IAM Roles → Who can access what
+- S3 Encryption → Protect data at rest
+- VPC → Network isolation
+- KMS → Key management
+
+Example: Only data-team can read S3, only admin can delete
+
+💰 Cost Optimization:
+- S3 Lifecycle → Move old data to Glacier
+- Glue job optimization → Right-size DPUs
+- Redshift pause/resume → Save when not used
+- Budget alerts → Notify if cost > $1000
+
+📊 Governance:
+- AWS Glue Data Catalog → Track metadata
+- CloudTrail → Audit all actions
+- Lake Formation → Fine-grained access
+- Tags → Organize resources
+
+📖 5
+✨ Controlled Pipeline:
+
+Before Controls:
+- Anyone accesses data → Security risk
+- Old data in Standard → High cost
+- No audit trail → Compliance fail
+- Monthly bill: $5000 💸
+
+After Controls:
+- IAM restricts access → Secure ✔
+- Lifecycle moves to Glacier → Cost optimized ✔
+- CloudTrail tracks everything → Compliant ✔
+- Monthly bill: $800 💰
+
+Saved $4200/month!
+
+📖 6
+💡 Aha Moment:
+
+Without Controls = Risky + Expensive 😱
+- Data breaches
+- Unexpected costs
+- Compliance violations
+- No accountability
+
+With Controls = Safe + Optimized 🛡️
+- Data protected
+- Costs under control
+- Audit-ready
+- Production-grade
+
+Real-world: Pipeline + IAM + Encryption + Lifecycle + CloudTrail = Enterprise-Ready!`,

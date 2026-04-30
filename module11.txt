@@ -1,0 +1,565 @@
+,
+
+  "api-handling": {
+    title: "API Handling",
+    icon: "🌐",
+    difficulty: "Real Time Data Integration",
+    duration: "60 min",
+    description: "API integration skills used in modern pipelines, automation systems, and real-world engineering workflows",
+
+    comic: `📞 Food Delivery Call (requests Library)
+
+Customer: "I want to order food"
+*Calls restaurant* → Request sent
+Restaurant: "Here's your order" → Response received
+
+In Python:
+import requests
+response = requests.get('https://api.example.com/data')
+print(response.status_code)  # 200 = Success
+
+You request, system responds! 📞
+
+📦 Courier Box (JSON Response Parsing)
+
+Delivery Person: "Here's your package"
+You: *Opens box* → Checks contents inside
+
+Package Contents (JSON):
+{
+  "name": "Ankit",
+  "items": ["Laptop", "Mouse"],
+  "total": 50000
+}
+
+In Python:
+data = response.json()
+print(data['name'])  # Ankit
+print(data['items'])  # ['Laptop', 'Mouse']
+
+Open response and extract data! 📦
+
+🎯 Aha Moment:
+APIs connect different systems!
+Used in every modern pipeline, automation, and integration! 🚀`,
+
+    deepDive: `🌐 API Handling - Complete Guide
+
+📌 Module Description:
+This module teaches API integration skills used in modern pipelines, automation systems, and real-world engineering workflows.
+
+Category: Real Time Data Integration
+Importance: Extremely High
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 Topic 1: requests Library
+
+Comic Story: Food Delivery Call
+You request food and restaurant sends response.
+
+What It Is:
+requests library is used to call external APIs.
+
+Interview Q&A:
+Q: Why use requests library?
+A: To communicate with external systems through APIs.
+
+Coding Example 1 - GET API data:
+import requests
+
+response = requests.get('https://api.example.com/data')
+print(response.status_code)  # 200 = Success
+print(response.text)          # Raw response
+
+Coding Example 2 - POST request:
+import requests
+
+data = {'name': 'Ankit', 'age': 25}
+response = requests.post('https://api.example.com/users', json=data)
+print(response.status_code)
+
+Coding Example 3 - Headers and authentication:
+headers = {
+    'Authorization': 'Bearer token123',
+    'Content-Type': 'application/json'
+}
+response = requests.get('https://api.example.com/data', headers=headers)
+
+Coding Example 4 - Query parameters:
+params = {'city': 'Pune', 'limit': 10}
+response = requests.get('https://api.example.com/weather', params=params)
+
+Coding Challenge:
+Fetch weather API data
+
+Hint: Use requests.get()
+
+Solution:
+import requests
+
+url = 'https://api.openweathermap.org/data/2.5/weather'
+params = {
+    'q': 'Pune',
+    'appid': 'your_api_key'
+}
+
+response = requests.get(url, params=params)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"Temperature: {data['main']['temp']}")
+else:
+    print(f"Error: {response.status_code}")
+
+Quiz:
+Q: Which library calls APIs?
+A: requests
+
+Memory Trick: Request = Ask system
+
+Interview Question:
+Q: GET vs POST?
+A: GET retrieves data (read-only), POST sends data to create/update. GET uses URL params, POST uses request body.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 Topic 2: JSON Response Parsing
+
+Comic Story: Courier Box
+You open package and check contents.
+
+What It Is:
+Most APIs return JSON data which must be parsed.
+
+Coding Example 1 - Parse JSON response:
+import requests
+
+response = requests.get('https://api.example.com/users')
+data = response.json()  # Convert to Python dict
+
+print(data['name'])
+print(data['email'])
+
+Coding Example 2 - Loop through API records:
+response = requests.get('https://api.example.com/users')
+users = response.json()
+
+for user in users:
+    print(f"ID: {user['id']}, Name: {user['name']}")
+
+Coding Example 3 - Handle nested JSON:
+data = {
+    'user': {
+        'name': 'Ankit',
+        'address': {
+            'city': 'Pune',
+            'zip': '411001'
+        }
+    }
+}
+
+print(data['user']['name'])           # Ankit
+print(data['user']['address']['city']) # Pune
+
+Coding Example 4 - Extract specific fields:
+response = requests.get('https://api.example.com/products')
+products = response.json()
+
+# Extract only names and prices
+for product in products:
+    name = product.get('name', 'Unknown')
+    price = product.get('price', 0)
+    print(f"{name}: ${price}")
+
+Coding Challenge:
+Extract customer emails from API response
+
+Hint: Understand dictionary/list structure first
+
+Solution:
+import requests
+
+response = requests.get('https://api.example.com/customers')
+customers = response.json()
+
+emails = []
+for customer in customers:
+    email = customer.get('email')
+    if email:
+        emails.append(email)
+
+print(emails)
+
+# Or using list comprehension
+emails = [c['email'] for c in customers if 'email' in c]
+print(emails)
+
+Interview Question:
+Q: How do you handle nested JSON responses?
+A: Access nested keys using multiple brackets: data['user']['address']['city']. Use .get() for safe access to avoid KeyError.
+
+Memory Trick: JSON = Dictionary + List structure
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Top Interview Questions:
+
+1. GET vs POST
+   Answer: GET retrieves data (read-only), appears in URL. POST sends data to create/update, data in request body. 
+   Example: GET /users?id=1, POST /users with body {"name":"Ankit"}.
+
+2. How to handle API failures?
+   Answer: Check status_code (200=success, 404=not found, 500=server error). Use try-except for network errors.
+   Example: if response.status_code == 200: process() else: log_error().
+
+3. How to parse nested JSON?
+   Answer: Use multiple brackets for nested access: data['user']['address']['city']. Use .get() for safe access.
+   Example: city = data.get('user', {}).get('address', {}).get('city', 'Unknown').
+
+4. How to secure APIs?
+   Answer: Use authentication (API keys, OAuth tokens), HTTPS, rate limiting, input validation.
+   Example: headers = {'Authorization': 'Bearer token123'}.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏢 Real Project Usage:
+
+Many teams pull customer data from REST APIs and load it into S3 before processing in AWS Glue.
+
+Example - API to S3 Pipeline:
+import requests
+import json
+import boto3
+from datetime import datetime
+
+# Fetch data from API
+def fetch_api_data():
+    url = 'https://api.example.com/customers'
+    headers = {'Authorization': 'Bearer token123'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=30)
+        
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"API Error: {response.status_code}")
+            return None
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Network Error: {e}")
+        return None
+
+# Transform data
+def transform_data(raw_data):
+    transformed = []
+    
+    for record in raw_data:
+        transformed_record = {
+            'customer_id': record.get('id'),
+            'name': record.get('name'),
+            'email': record.get('email'),
+            'city': record.get('address', {}).get('city'),
+            'created_at': record.get('created_at'),
+            'processed_date': datetime.now().isoformat()
+        }
+        transformed.append(transformed_record)
+    
+    return transformed
+
+# Upload to S3
+def upload_to_s3(data, bucket, key):
+    s3 = boto3.client('s3')
+    
+    json_data = json.dumps(data, indent=2)
+    
+    s3.put_object(
+        Bucket=bucket,
+        Key=key,
+        Body=json_data,
+        ContentType='application/json'
+    )
+    
+    print(f"Uploaded to s3://{bucket}/{key}")
+
+# Main pipeline
+def main():
+    # Fetch
+    raw_data = fetch_api_data()
+    
+    if raw_data:
+        # Transform
+        transformed_data = transform_data(raw_data)
+        
+        # Load to S3
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        s3_key = f"raw/customers_{timestamp}.json"
+        
+        upload_to_s3(transformed_data, 'my-data-bucket', s3_key)
+        
+        print(f"Pipeline completed: {len(transformed_data)} records processed")
+
+if __name__ == '__main__':
+    main()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 Final Revision Formula:
+
+API Formula:
+Request → Receive → Parse → Transform → Store
+
+📞 Request = requests.get/post()
+📥 Receive = response.status_code
+📦 Parse = response.json()
+🔄 Transform = Extract and clean data
+💾 Store = Upload to S3/Database
+
+Master API handling → Build modern integrations! 🚀`,
+
+    types: `🌐 API Handling - Quick Reference
+
+📞 requests Library:
+import requests
+
+# GET request
+response = requests.get('https://api.example.com/data')
+print(response.status_code)  # 200
+print(response.text)          # Raw text
+print(response.json())        # JSON data
+
+# POST request
+data = {'name': 'Ankit', 'age': 25}
+response = requests.post(url, json=data)
+
+# Headers
+headers = {'Authorization': 'Bearer token123'}
+response = requests.get(url, headers=headers)
+
+# Query parameters
+params = {'city': 'Pune', 'limit': 10}
+response = requests.get(url, params=params)
+
+# Timeout
+response = requests.get(url, timeout=30)
+
+📦 JSON Parsing:
+# Parse response
+data = response.json()
+
+# Access data
+print(data['name'])
+print(data['user']['email'])
+
+# Safe access
+email = data.get('email', 'default@example.com')
+city = data.get('user', {}).get('address', {}).get('city')
+
+# Loop through list
+for item in data:
+    print(item['id'])
+
+# Extract fields
+names = [user['name'] for user in data]
+
+🛡️ Error Handling:
+try:
+    response = requests.get(url, timeout=30)
+    
+    if response.status_code == 200:
+        data = response.json()
+    elif response.status_code == 404:
+        print("Not found")
+    else:
+        print(f"Error: {response.status_code}")
+        
+except requests.exceptions.Timeout:
+    print("Request timeout")
+except requests.exceptions.RequestException as e:
+    print(f"Error: {e}")
+
+🔑 Status Codes:
+200 - Success
+201 - Created
+400 - Bad Request
+401 - Unauthorized
+404 - Not Found
+500 - Server Error`,
+
+    qa: [
+      {
+        q: "What is requests library?",
+        a: "requests is Python library for making HTTP requests to APIs. Example: requests.get('url') fetches data, requests.post('url', json=data) sends data. Used for API integration and web scraping."
+      },
+      {
+        q: "What is GET request?",
+        a: "GET retrieves data from server (read-only). Data passed in URL parameters. Example: requests.get('https://api.example.com/users?id=1'). Used for fetching data without modifying server."
+      },
+      {
+        q: "What is POST request?",
+        a: "POST sends data to server to create/update resources. Data in request body. Example: requests.post(url, json={'name':'Ankit'}). Used for creating users, submitting forms, uploading data."
+      },
+      {
+        q: "Difference between GET and POST?",
+        a: "GET retrieves data (read-only), data in URL. POST sends data (create/update), data in body. GET is cacheable and bookmarkable, POST is not. GET for fetching, POST for submitting."
+      },
+      {
+        q: "How to parse JSON response?",
+        a: "Use response.json() to convert JSON to Python dictionary. Example: data = response.json(); print(data['name']). Access nested data: data['user']['address']['city']."
+      },
+      {
+        q: "How to handle API failures?",
+        a: "Check response.status_code (200=success, 404=not found, 500=error). Use try-except for network errors. Example: if response.status_code == 200: process() else: log_error()."
+      },
+      {
+        q: "How to handle nested JSON?",
+        a: "Use multiple brackets: data['user']['address']['city']. Use .get() for safe access: data.get('user', {}).get('address', {}).get('city', 'Unknown'). Prevents KeyError."
+      },
+      {
+        q: "How to add headers to request?",
+        a: "Pass headers dict to requests. Example: headers = {'Authorization': 'Bearer token123'}; requests.get(url, headers=headers). Used for authentication, content type."
+      },
+      {
+        q: "How to secure APIs?",
+        a: "Use authentication (API keys, OAuth tokens), HTTPS, rate limiting, input validation, timeout. Example: headers = {'Authorization': 'Bearer token'}; requests.get(url, headers=headers, timeout=30)."
+      },
+      {
+        q: "Where is API handling used in data engineering?",
+        a: "Fetch data from REST APIs, load to S3/databases, real-time data ingestion, third-party integrations (Salesforce, Stripe), webhook processing, microservices communication."
+      }
+    ],
+
+    coding: {
+      title: "API Handling - Coding Challenges",
+      scenario: "Practice API integration for data pipelines",
+      question: "Fetch data from API using GET request",
+      input: "url = 'https://api.example.com/users'",
+      expectedOutput: "Status code and JSON data",
+      hint: "Use requests.get() and response.json()",
+      solution: "import requests\n\nurl = 'https://api.example.com/users'\nresponse = requests.get(url)\n\nprint(f'Status: {response.status_code}')\nif response.status_code == 200:\n    data = response.json()\n    print(data)",
+      note: "Always check status_code before parsing JSON to avoid errors.",
+      thinkingApproach: [
+        "Import requests library",
+        "Make GET request to URL",
+        "Check status code (200 = success)",
+        "Parse JSON response",
+        "Handle errors appropriately"
+      ],
+      questions: [
+        {
+          q: "1. Fetch data from API using GET request",
+          answer: "import requests\n\nurl = 'https://api.example.com/users'\nresponse = requests.get(url)\n\nprint(f'Status: {response.status_code}')\nif response.status_code == 200:\n    data = response.json()\n    print(data)"
+        },
+        {
+          q: "2. Send POST request with JSON data",
+          answer: "import requests\n\nurl = 'https://api.example.com/users'\ndata = {'name': 'Ankit', 'age': 25}\n\nresponse = requests.post(url, json=data)\nprint(f'Status: {response.status_code}')"
+        },
+        {
+          q: "3. Add authentication header to request",
+          answer: "import requests\n\nurl = 'https://api.example.com/data'\nheaders = {'Authorization': 'Bearer token123'}\n\nresponse = requests.get(url, headers=headers)\nprint(response.status_code)"
+        },
+        {
+          q: "4. Parse JSON response and extract name",
+          answer: "import requests\n\nresponse = requests.get('https://api.example.com/user')\ndata = response.json()\n\nprint(data['name'])\nprint(data['email'])"
+        },
+        {
+          q: "5. Loop through API records",
+          answer: "import requests\n\nresponse = requests.get('https://api.example.com/users')\nusers = response.json()\n\nfor user in users:\n    print(f\"ID: {user['id']}, Name: {user['name']}\")"
+        },
+        {
+          q: "6. Extract customer emails from API response",
+          answer: "import requests\n\nresponse = requests.get('https://api.example.com/customers')\ncustomers = response.json()\n\nemails = [c['email'] for c in customers if 'email' in c]\nprint(emails)"
+        },
+        {
+          q: "7. Handle nested JSON response",
+          answer: "data = {\n    'user': {\n        'name': 'Ankit',\n        'address': {'city': 'Pune'}\n    }\n}\n\nprint(data['user']['name'])\nprint(data['user']['address']['city'])"
+        },
+        {
+          q: "8. Handle API errors with status code check",
+          answer: "import requests\n\nresponse = requests.get('https://api.example.com/data')\n\nif response.status_code == 200:\n    data = response.json()\n    print(data)\nelif response.status_code == 404:\n    print('Not found')\nelse:\n    print(f'Error: {response.status_code}')"
+        },
+        {
+          q: "9. Add query parameters to request",
+          answer: "import requests\n\nurl = 'https://api.example.com/weather'\nparams = {'city': 'Pune', 'limit': 10}\n\nresponse = requests.get(url, params=params)\nprint(response.json())"
+        },
+        {
+          q: "10. Handle request timeout",
+          answer: "import requests\n\ntry:\n    response = requests.get('https://api.example.com/data', timeout=30)\n    print(response.json())\nexcept requests.exceptions.Timeout:\n    print('Request timeout')\nexcept requests.exceptions.RequestException as e:\n    print(f'Error: {e}')"
+        }
+      ]
+    },
+
+    quiz: [
+      { q: "Which library calls APIs?", options: ["urllib", "requests", "http", "api"], answer: 1 },
+      { q: "GET request is for?", options: ["Sending data", "Retrieving data", "Deleting data", "Updating data"], answer: 1 },
+      { q: "POST request is for?", options: ["Retrieving data", "Sending data", "Reading data", "Viewing data"], answer: 1 },
+      { q: "How to parse JSON?", options: ["response.parse()", "response.json()", "response.data()", "response.dict()"], answer: 1 },
+      { q: "Status code 200 means?", options: ["Error", "Success", "Not found", "Timeout"], answer: 1 },
+      { q: "Status code 404 means?", options: ["Success", "Not found", "Error", "Created"], answer: 1 },
+      { q: "How to add headers?", options: ["headers param", "head param", "auth param", "token param"], answer: 0 },
+      { q: "Nested JSON access?", options: ["data.user.name", "data['user']['name']", "data->user->name", "data::user::name"], answer: 1 },
+      { q: "Safe JSON access?", options: ["data['key']", "data.get('key')", "data->key", "data::key"], answer: 1 },
+      { q: "API authentication uses?", options: ["Cookies", "Headers", "URL", "Body"], answer: 1 }
+    ],
+
+    interview: "API Handling: Essential for modern data integration. requests library calls external APIs. Comic: Food delivery call - you request, restaurant responds. Example: requests.get('url') fetches data, requests.post(url, json=data) sends data. GET retrieves data (read-only, URL params), POST sends data (create/update, request body). JSON Response Parsing extracts data from API. Comic: Courier box - open package and check contents. Example: data = response.json(); print(data['name']). Access nested: data['user']['address']['city']. Use .get() for safe access. Top questions: GET vs POST (GET retrieves, POST sends), Handle failures (check status_code, try-except), Parse nested JSON (multiple brackets, .get()), Secure APIs (authentication headers, HTTPS, timeout). Real usage: Pull data from REST APIs, load to S3, process in AWS Glue. Fetch customer data, transform, upload to S3. Status codes: 200=success, 404=not found, 500=server error. Memory: Request=Ask system, JSON=Dictionary+List. Formula: Request → Receive → Parse → Transform → Store. Master API handling for integrations.",
+
+    memory: `🌐 API Handling - Memory Map
+
+📞 requests Library = Ask System
+Comic: Food delivery call
+import requests
+response = requests.get('https://api.example.com/data')
+print(response.status_code)  # 200 = Success
+
+# POST request
+data = {'name': 'Ankit'}
+requests.post(url, json=data)
+Memory: Request = Ask system
+
+📦 JSON Parsing = Open Package
+Comic: Courier box
+data = response.json()
+print(data['name'])
+print(data['user']['address']['city'])  # Nested
+
+# Safe access
+email = data.get('email', 'default')
+Memory: JSON = Dictionary + List
+
+🎯 API Formula:
+Request → Receive → Parse → Transform → Store
+
+📊 Top Interview Questions:
+1. GET vs POST? GET retrieves, POST sends
+2. Handle failures? Check status_code, try-except
+3. Parse nested JSON? Multiple brackets, .get()
+4. Secure APIs? Headers, HTTPS, timeout
+
+✅ Real Usage:
+Pull data from REST APIs
+Load to S3
+Process in AWS Glue
+Third-party integrations
+Real-time data ingestion
+
+🔑 Status Codes:
+200 - Success
+201 - Created
+400 - Bad Request
+401 - Unauthorized
+404 - Not Found
+500 - Server Error
+
+📋 Quick Reference:
+requests.get() → Fetch data
+requests.post() → Send data
+response.json() → Parse JSON
+response.status_code → Check status
+headers → Authentication
+params → Query parameters
+timeout → Prevent hanging`,
+
+    revision: "API Handling: requests library calls APIs (food delivery call). Example: requests.get('url') fetches, requests.post(url, json=data) sends. GET retrieves data (read-only, URL params), POST sends data (create/update, body). JSON parsing extracts data (courier box): data = response.json(); print(data['name']). Nested access: data['user']['address']['city']. Safe: data.get('key', 'default'). Top questions: GET vs POST (retrieve vs send), Handle failures (status_code, try-except), Parse nested (brackets, .get()), Secure (headers, HTTPS). Real usage: Pull from REST APIs, load to S3, process in Glue. Status codes: 200=success, 404=not found, 500=error. Memory: Request=Ask, JSON=Dict+List. Formula: Request → Receive → Parse → Transform → Store. Master for integrations."
+  }

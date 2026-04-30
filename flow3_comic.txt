@@ -1,0 +1,73 @@
+    comic: `📖 1
+You're a Data Engineer at an e-commerce company 🛒
+Raw data arrives daily from multiple sources:
+- Orders (CSV) - 1M records
+- Users (JSON) - 500K records
+- Products (Parquet) - 100K records
+
+All stored in S3 raw/ folder
+
+📖 2
+😰 Problem with Raw Data:
+- NULL values in critical columns (amount, user_id)
+- Duplicate orders (same order_id multiple times)
+- Wrong data types (dates as strings)
+- Inconsistent formats (USD vs EUR)
+- Need to join 3 datasets
+- Business needs clean data for analytics! 📊
+
+📖 3
+🤔 Solution
+
+Use AWS Glue + PySpark for Data Processing!
+
+What is Data Processing?
+Transform raw → clean → business-ready data
+
+📖 4
+⚙️ PySpark Transformations:
+
+1️⃣ Filter: Remove invalid records
+   df.filter("amount > 0")
+
+2️⃣ Drop Nulls: Clean missing data
+   df.dropna()
+
+3️⃣ Remove Duplicates:
+   df.dropDuplicates(["order_id"])
+
+4️⃣ Join: Combine datasets
+   orders.join(users, "user_id")
+
+5️⃣ Aggregate: Calculate metrics
+   df.groupBy("category").sum("amount")
+
+📖 5
+✨ Complete ETL Flow:
+
+S3 (raw/) → Glue Job → PySpark Transformations → S3 (curated/)
+
+Before: 1M messy records
+After: 950K clean, deduplicated, joined records
+
+Result:
+✔ No nulls
+✔ No duplicates
+✔ Proper data types
+✔ Ready for analytics
+✔ Athena can query it!
+
+📖 6
+💡 Aha Moment:
+
+Raw data = Garbage 🗑️
+- Can't use for analytics
+- Full of errors
+- Business can't trust it
+
+Processed data = Gold 💰
+- Clean and reliable
+- Ready for insights
+- Powers dashboards
+
+Real-world: S3 raw → Glue + PySpark → S3 curated → Athena → QuickSight`,

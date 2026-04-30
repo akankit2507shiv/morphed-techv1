@@ -1,0 +1,77 @@
+    // 🎭 COMIC STORY
+    comic: `📖 1
+Imagine you're building an ETL pipeline 🏗️
+You have 100 CSV files in S3 with different structures
+sales_2024.csv, users.csv, orders.csv...
+
+How do you know what columns each file has? 🤔
+
+📖 2
+😰 Problem
+- Don't know schema (columns, data types)
+- Need to manually check each file
+- Schema changes frequently
+- Need to run ETL jobs daily
+- No automation, everything manual! 😫
+
+📖 3
+🤔 Solution
+
+Use AWS Glue Components!
+
+3 Key Components:
+1️⃣ Crawler 🔍
+2️⃣ Data Catalog 📚
+3️⃣ Trigger ⏰
+
+📖 4
+🔧 How They Work:
+
+🔍 Crawler:
+- Scans S3 files automatically
+- Detects schema (columns, types)
+- Creates tables in Data Catalog
+- Example: Finds "user_id (int), name (string)"
+
+📚 Data Catalog:
+- Central metadata repository
+- Stores table definitions
+- Used by Glue, Athena, Redshift
+- Like a library index 📖
+
+⏰ Trigger:
+- Schedules jobs (daily, hourly)
+- Event-based execution
+- Chains multiple jobs
+- Example: "Run ETL every day at 2 AM"
+
+📖 5
+✨ Complete Flow:
+
+Step 1: Crawler scans S3 → detects schema
+Step 2: Catalog stores metadata
+Step 3: Glue Job reads from Catalog
+Step 4: Trigger runs job automatically
+Step 5: Repeat daily! 🔄
+
+Result:
+✔ No manual schema detection
+✔ Automated pipeline
+✔ Schema changes handled automatically
+✔ Jobs run on schedule
+
+📖 6
+💡 Aha Moment:
+
+Without Components = Manual work 😵
+- Check schema manually
+- Update code for changes
+- Run jobs manually
+
+With Components = Fully Automated 🚀
+- Crawler finds schema 🕵️
+- Catalog stores metadata 📚
+- Trigger runs jobs ⏰
+
+Real-world: S3 → Crawler → Catalog → Glue Job (Trigger) → Redshift`,
+

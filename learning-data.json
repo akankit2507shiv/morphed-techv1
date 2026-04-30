@@ -1,0 +1,646 @@
+{
+  "technologies": [
+    {
+      "id": "sql",
+      "name": "SQL Mastery",
+      "icon": "🗄️",
+      "description": "Master SQL from basics to advanced queries",
+      "duration": "12 hours",
+      "topics": 19,
+      "level": "Beginner to Advanced",
+      "status": "active"
+    },
+    {
+      "id": "python",
+      "name": "Python for Data Engineering",
+      "icon": "🐍",
+      "description": "Python fundamentals and data manipulation",
+      "duration": "12 hours",
+      "topics": 14,
+      "level": "Beginner to Intermediate",
+      "status": "active"
+    },
+    {
+      "id": "pyspark",
+      "name": "PySpark",
+      "icon": "⚡",
+      "description": "Big data processing with Apache Spark",
+      "duration": "15 hours",
+      "topics": 15,
+      "level": "Intermediate to Advanced",
+      "status": "coming-soon"
+    },
+    {
+      "id": "aws",
+      "name": "AWS Data Engineering",
+      "icon": "☁️",
+      "description": "AWS services for data engineering",
+      "duration": "10 hours",
+      "topics": 10,
+      "level": "Intermediate",
+      "status": "coming-soon"
+    },
+    {
+      "id": "databricks",
+      "name": "Databricks",
+      "icon": "🧱",
+      "description": "Unified analytics platform",
+      "duration": "8 hours",
+      "topics": 8,
+      "level": "Intermediate",
+      "status": "coming-soon"
+    },
+    {
+      "id": "git",
+      "name": "Git & GitHub",
+      "icon": "📚",
+      "description": "Version control and collaboration",
+      "duration": "4 hours",
+      "topics": 6,
+      "level": "Beginner",
+      "status": "coming-soon"
+    }
+  ],
+  "syllabusData": {
+    "sql": [
+      {
+        "id": "joins",
+        "title": "SQL Joins",
+        "icon": "🔗",
+        "difficulty": "Beginner",
+        "duration": "45 min",
+        "description": "Combine data from multiple tables"
+      },
+      {
+        "id": "window-functions",
+        "title": "Window Functions",
+        "icon": "🪟",
+        "difficulty": "Intermediate",
+        "duration": "60 min",
+        "description": "Calculations across rows"
+      },
+      {
+        "id": "cte",
+        "title": "CTE",
+        "icon": "📝",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Common Table Expressions"
+      },
+      {
+        "id": "subqueries",
+        "title": "Subqueries",
+        "icon": "📦",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Query inside another query"
+      },
+      {
+        "id": "aggregations",
+        "title": "Aggregations",
+        "icon": "➕",
+        "difficulty": "Beginner",
+        "duration": "45 min",
+        "description": "SUM, COUNT, AVG summarize data"
+      },
+      {
+        "id": "ranking-functions",
+        "title": "Ranking Functions",
+        "icon": "🏆",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "ROW_NUMBER, RANK, DENSE_RANK"
+      },
+      {
+        "id": "data-cleaning",
+        "title": "Data Cleaning",
+        "icon": "🧹",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "Fix nulls, duplicates, formatting"
+      },
+      {
+        "id": "deduplication",
+        "title": "Deduplication",
+        "icon": "🎭",
+        "difficulty": "Intermediate",
+        "duration": "45 min",
+        "description": "Remove duplicate records"
+      },
+      {
+        "id": "scd",
+        "title": "SCD Type 1 & 2",
+        "icon": "🔄",
+        "difficulty": "Advanced",
+        "duration": "70 min",
+        "description": "Track historical data changes"
+      },
+      {
+        "id": "query-optimization",
+        "title": "Query Optimization",
+        "icon": "⚡",
+        "difficulty": "Advanced",
+        "duration": "65 min",
+        "description": "Make queries lightning fast"
+      },
+      {
+        "id": "incremental-load",
+        "title": "Incremental Load",
+        "icon": "📔",
+        "difficulty": "Advanced",
+        "duration": "60 min",
+        "description": "Load only new/changed data"
+      },
+      {
+        "id": "data-validation",
+        "title": "Data Validation",
+        "icon": "✅",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Ensure data quality with constraints"
+      },
+      {
+        "id": "handling-nulls",
+        "title": "Handling NULLs",
+        "icon": "🍱",
+        "difficulty": "Intermediate",
+        "duration": "45 min",
+        "description": "Master NULL handling techniques"
+      },
+      {
+        "id": "set-operations",
+        "title": "Set Operations",
+        "icon": "🎨",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "UNION, INTERSECT, EXCEPT"
+      },
+      {
+        "id": "case-statements",
+        "title": "CASE Statements",
+        "icon": "📊",
+        "difficulty": "Beginner",
+        "duration": "40 min",
+        "description": "Conditional logic in SQL"
+      },
+      {
+        "id": "data-warehousing",
+        "title": "Data Warehousing Concepts",
+        "icon": "🏢",
+        "difficulty": "Advanced",
+        "duration": "70 min",
+        "description": "Fact/Dimension tables, Star/Snowflake schema, SCD, Incremental loading"
+      },
+      {
+        "id": "real-sql-scenarios",
+        "title": "Real SQL Scenarios",
+        "icon": "🎯",
+        "difficulty": "Advanced",
+        "duration": "80 min",
+        "description": "Duplicate removal, Top N salary, Missing records, Customer/Sales analysis"
+      },
+      {
+        "id": "sql-interview-prep",
+        "title": "SQL Interview Preparation",
+        "icon": "🏆",
+        "difficulty": "Advanced",
+        "duration": "90 min",
+        "description": "Theory questions, Live coding, Scenario solving, Karat/Product company questions"
+      },
+      {
+        "id": "ai-future-sql",
+        "title": "AI + Future SQL",
+        "icon": "🤖",
+        "difficulty": "Advanced",
+        "duration": "60 min",
+        "description": "Prompt to SQL, AI tools (ChatGPT, Copilot), Validation skills for future-ready engineering"
+      }
+    ],
+    "python": [
+      {
+        "id": "python-lists",
+        "title": "Python Lists",
+        "icon": "📋",
+        "difficulty": "Beginner",
+        "duration": "50 min",
+        "description": "Ordered, mutable collection of items"
+      },
+      {
+        "id": "python-basics",
+        "title": "Python Basics",
+        "icon": "📝",
+        "difficulty": "Beginner",
+        "duration": "50 min",
+        "description": "Variables, data types, operators"
+      },
+      {
+        "id": "data-structures",
+        "title": "Data Structures",
+        "icon": "📦",
+        "difficulty": "Beginner",
+        "duration": "60 min",
+        "description": "Lists, tuples, dictionaries, sets"
+      },
+      {
+        "id": "functions",
+        "title": "Functions & Modules",
+        "icon": "⚙️",
+        "difficulty": "Beginner",
+        "duration": "45 min",
+        "description": "Reusable code blocks"
+      },
+      {
+        "id": "file-handling",
+        "title": "File Handling",
+        "icon": "📁",
+        "difficulty": "Beginner",
+        "duration": "40 min",
+        "description": "Read and write files"
+      },
+      {
+        "id": "pandas-basics",
+        "title": "Pandas Basics",
+        "icon": "🐼",
+        "difficulty": "Intermediate",
+        "duration": "70 min",
+        "description": "DataFrames and Series"
+      },
+      {
+        "id": "data-manipulation",
+        "title": "Data Manipulation",
+        "icon": "🔧",
+        "difficulty": "Intermediate",
+        "duration": "65 min",
+        "description": "Filter, sort, group data"
+      },
+      {
+        "id": "data-cleaning-python",
+        "title": "Data Cleaning",
+        "icon": "🧹",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "Handle missing values"
+      },
+      {
+        "id": "numpy",
+        "title": "NumPy",
+        "icon": "🔢",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Numerical computing"
+      },
+      {
+        "id": "api-requests",
+        "title": "API & Requests",
+        "icon": "🌐",
+        "difficulty": "Intermediate",
+        "duration": "45 min",
+        "description": "Fetch data from APIs"
+      },
+      {
+        "id": "error-handling",
+        "title": "Error Handling",
+        "icon": "⚠️",
+        "difficulty": "Beginner",
+        "duration": "35 min",
+        "description": "Try-except blocks"
+      },
+      {
+        "id": "oop",
+        "title": "Object-Oriented Programming",
+        "icon": "🎯",
+        "difficulty": "Intermediate",
+        "duration": "60 min",
+        "description": "Classes and objects"
+      },
+      {
+        "id": "python-best-practices",
+        "title": "Best Practices",
+        "icon": "✨",
+        "difficulty": "Intermediate",
+        "duration": "40 min",
+        "description": "Clean code principles"
+      }
+    ],
+    "pyspark": [
+      {
+        "id": "spark-intro",
+        "title": "Introduction to Spark",
+        "icon": "🚀",
+        "difficulty": "Beginner",
+        "duration": "50 min",
+        "description": "What is Apache Spark?"
+      },
+      {
+        "id": "rdd-basics",
+        "title": "RDD Basics",
+        "icon": "💾",
+        "difficulty": "Beginner",
+        "duration": "60 min",
+        "description": "Resilient Distributed Datasets"
+      },
+      {
+        "id": "dataframe-basics",
+        "title": "DataFrame Basics",
+        "icon": "📊",
+        "difficulty": "Beginner",
+        "duration": "55 min",
+        "description": "Structured data processing"
+      },
+      {
+        "id": "spark-sql",
+        "title": "Spark SQL",
+        "icon": "🗄️",
+        "difficulty": "Intermediate",
+        "duration": "65 min",
+        "description": "SQL queries in Spark"
+      },
+      {
+        "id": "transformations",
+        "title": "Transformations",
+        "icon": "🔄",
+        "difficulty": "Intermediate",
+        "duration": "70 min",
+        "description": "Map, filter, flatMap"
+      },
+      {
+        "id": "actions",
+        "title": "Actions",
+        "icon": "⚡",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Collect, count, reduce"
+      },
+      {
+        "id": "joins-spark",
+        "title": "Joins in Spark",
+        "icon": "🔗",
+        "difficulty": "Intermediate",
+        "duration": "60 min",
+        "description": "Broadcast and shuffle joins"
+      },
+      {
+        "id": "aggregations-spark",
+        "title": "Aggregations",
+        "icon": "📈",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "GroupBy and aggregate functions"
+      },
+      {
+        "id": "window-spark",
+        "title": "Window Functions",
+        "icon": "🪟",
+        "difficulty": "Advanced",
+        "duration": "70 min",
+        "description": "Partitioning and ordering"
+      },
+      {
+        "id": "udf",
+        "title": "User Defined Functions",
+        "icon": "⚙️",
+        "difficulty": "Advanced",
+        "duration": "60 min",
+        "description": "Custom functions in Spark"
+      },
+      {
+        "id": "partitioning",
+        "title": "Partitioning",
+        "icon": "📦",
+        "difficulty": "Advanced",
+        "duration": "65 min",
+        "description": "Data partitioning strategies"
+      },
+      {
+        "id": "caching",
+        "title": "Caching & Persistence",
+        "icon": "💾",
+        "difficulty": "Advanced",
+        "duration": "50 min",
+        "description": "Optimize performance"
+      },
+      {
+        "id": "spark-streaming",
+        "title": "Spark Streaming",
+        "icon": "🌊",
+        "difficulty": "Advanced",
+        "duration": "75 min",
+        "description": "Real-time data processing"
+      },
+      {
+        "id": "optimization-spark",
+        "title": "Performance Optimization",
+        "icon": "🚀",
+        "difficulty": "Advanced",
+        "duration": "70 min",
+        "description": "Tuning Spark jobs"
+      },
+      {
+        "id": "spark-best-practices",
+        "title": "Best Practices",
+        "icon": "✨",
+        "difficulty": "Advanced",
+        "duration": "55 min",
+        "description": "Production-ready code"
+      }
+    ],
+    "aws": [
+      {
+        "id": "aws-intro",
+        "title": "AWS Introduction",
+        "icon": "☁️",
+        "difficulty": "Beginner",
+        "duration": "40 min",
+        "description": "Cloud computing basics"
+      },
+      {
+        "id": "s3",
+        "title": "Amazon S3",
+        "icon": "🪣",
+        "difficulty": "Beginner",
+        "duration": "60 min",
+        "description": "Object storage service"
+      },
+      {
+        "id": "glue",
+        "title": "AWS Glue",
+        "icon": "🔗",
+        "difficulty": "Intermediate",
+        "duration": "70 min",
+        "description": "ETL service"
+      },
+      {
+        "id": "athena",
+        "title": "Amazon Athena",
+        "icon": "🔍",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "Query data in S3"
+      },
+      {
+        "id": "redshift",
+        "title": "Amazon Redshift",
+        "icon": "🗄️",
+        "difficulty": "Intermediate",
+        "duration": "65 min",
+        "description": "Data warehouse"
+      },
+      {
+        "id": "lambda",
+        "title": "AWS Lambda",
+        "icon": "⚡",
+        "difficulty": "Intermediate",
+        "duration": "60 min",
+        "description": "Serverless computing"
+      },
+      {
+        "id": "kinesis",
+        "title": "Amazon Kinesis",
+        "icon": "🌊",
+        "difficulty": "Advanced",
+        "duration": "70 min",
+        "description": "Real-time data streaming"
+      },
+      {
+        "id": "emr",
+        "title": "Amazon EMR",
+        "icon": "🚀",
+        "difficulty": "Advanced",
+        "duration": "65 min",
+        "description": "Big data processing"
+      },
+      {
+        "id": "rds",
+        "title": "Amazon RDS",
+        "icon": "💾",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "Relational databases"
+      },
+      {
+        "id": "iam",
+        "title": "IAM & Security",
+        "icon": "🔐",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Access management"
+      }
+    ],
+    "databricks": [
+      {
+        "id": "databricks-intro",
+        "title": "Databricks Introduction",
+        "icon": "🧱",
+        "difficulty": "Beginner",
+        "duration": "45 min",
+        "description": "Unified analytics platform"
+      },
+      {
+        "id": "notebooks",
+        "title": "Notebooks",
+        "icon": "📓",
+        "difficulty": "Beginner",
+        "duration": "50 min",
+        "description": "Interactive development"
+      },
+      {
+        "id": "delta-lake",
+        "title": "Delta Lake",
+        "icon": "🏞️",
+        "difficulty": "Intermediate",
+        "duration": "70 min",
+        "description": "ACID transactions"
+      },
+      {
+        "id": "databricks-sql",
+        "title": "Databricks SQL",
+        "icon": "🗄️",
+        "difficulty": "Intermediate",
+        "duration": "60 min",
+        "description": "SQL analytics"
+      },
+      {
+        "id": "workflows",
+        "title": "Workflows",
+        "icon": "🔄",
+        "difficulty": "Intermediate",
+        "duration": "55 min",
+        "description": "Job orchestration"
+      },
+      {
+        "id": "unity-catalog",
+        "title": "Unity Catalog",
+        "icon": "📚",
+        "difficulty": "Advanced",
+        "duration": "65 min",
+        "description": "Data governance"
+      },
+      {
+        "id": "autoloader",
+        "title": "Auto Loader",
+        "icon": "📥",
+        "difficulty": "Intermediate",
+        "duration": "50 min",
+        "description": "Incremental data ingestion"
+      },
+      {
+        "id": "databricks-optimization",
+        "title": "Performance Optimization",
+        "icon": "⚡",
+        "difficulty": "Advanced",
+        "duration": "60 min",
+        "description": "Optimize Databricks jobs"
+      }
+    ],
+    "git": [
+      {
+        "id": "git-intro",
+        "title": "Git Introduction",
+        "icon": "📚",
+        "difficulty": "Beginner",
+        "duration": "35 min",
+        "description": "Version control basics"
+      },
+      {
+        "id": "git-basics",
+        "title": "Git Basics",
+        "icon": "📝",
+        "difficulty": "Beginner",
+        "duration": "45 min",
+        "description": "Add, commit, push"
+      },
+      {
+        "id": "branching",
+        "title": "Branching",
+        "icon": "🌿",
+        "difficulty": "Beginner",
+        "duration": "50 min",
+        "description": "Create and merge branches"
+      },
+      {
+        "id": "github",
+        "title": "GitHub",
+        "icon": "🐙",
+        "difficulty": "Beginner",
+        "duration": "40 min",
+        "description": "Remote repositories"
+      },
+      {
+        "id": "pull-requests",
+        "title": "Pull Requests",
+        "icon": "🔀",
+        "difficulty": "Intermediate",
+        "duration": "45 min",
+        "description": "Code review workflow"
+      },
+      {
+        "id": "git-best-practices",
+        "title": "Best Practices",
+        "icon": "✨",
+        "difficulty": "Intermediate",
+        "duration": "40 min",
+        "description": "Professional workflows"
+      }
+    ]
+  }
+}

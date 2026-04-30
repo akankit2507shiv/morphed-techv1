@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>My Dashboard - Morphed Tech v2.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: radial-gradient(circle at 8% 12%, rgba(255,61,129,0.15) 0%, transparent 35%),
+                  radial-gradient(circle at 82% 6%, rgba(0,212,255,0.12) 0%, transparent 30%),
+                  radial-gradient(circle at 72% 82%, rgba(124,60,255,0.13) 0%, transparent 40%),
+                  linear-gradient(180deg, #050816 0%, #0b1020 50%, #070812 100%); 
+      min-height: 100vh; 
+    }
+    .gradient-text { 
+      background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); 
+      -webkit-background-clip: text; 
+      -webkit-text-fill-color: transparent; 
+      background-clip: text; 
+    }
+    .glass-card { 
+      background: rgba(255,255,255,0.03); 
+      border: 1px solid rgba(255,255,255,0.08); 
+      border-radius: 1.25rem; 
+      backdrop-filter: blur(10px);
+    }
+    .glass-card:hover { 
+      background: rgba(255,255,255,0.05); 
+      border-color: rgba(255,255,255,0.15);
+    }
+    .glow-text {
+      text-shadow: 0 0 20px rgba(255,61,129,0.5), 0 0 40px rgba(124,60,255,0.3);
+    }
+    .locked-card {
+      filter: blur(2px);
+      opacity: 0.5;
+      pointer-events: none;
+      position: relative;
+    }
+    .expandable { display: none; }
+    .expandable.active { display: block; }
+    .tab-nav { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; }
+    .tab-nav button { padding: 0.75rem 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #9CA3AF; font-weight: 600; transition: all 0.3s; white-space: nowrap; }
+    .tab-nav button.active { background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white; border-color: transparent; }
+    .tab-content-inner { display: none; }
+    .tab-content-inner.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="text-white">
+
+  <!-- Header -->
+  <header class="bg-dark/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold gradient-text">MORPHED TECH</h1>
+      <div class="flex items-center gap-4">
+        <span id="headerName" class="text-gray-300 text-sm font-medium"></span>
+        <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition text-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Welcome Section -->
+    <div class="mb-8">
+      <h2 class="text-4xl font-black text-white mb-2">
+        Welcome back, Champion 👑 <span id="welcomeName" class="gradient-text"></span>!
+      </h2>
+      <p class="text-gray-400 text-lg">Track your Data Engineering journey with focus, discipline, and consistency.</p>
+    </div>
+
+    <!-- Mindset Hero Section -->
+    <div class="glass-card p-10 mb-8 text-center">
+      <h3 class="text-3xl md:text-5xl font-black gradient-text glow-text mb-4">
+        Stay Calm. Stay Disciplined. Stay Consistent.
+      </h3>
+      <p class="text-2xl md:text-4xl font-black text-white mb-2">
+        DO NOT QUIT.
+      </p>
+      <p class="text-xl md:text-2xl font-bold text-white mb-6">
+        RESULTS COME TO THOSE WHO STAY.
+      </p>
+      <div class="inline-block px-8 py-4 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-xl mb-4">
+        <p class="text-xl font-bold gradient-text">DFQ → Discipline • Focus • Quality</p>
+      </div>
+      <p class="text-sm text-gray-400 mt-4">No excuses. Just execution.</p>
+    </div>
+
+    <!-- Primary Action Cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <div onclick="toggleSection('resume')" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
+        <div class="text-5xl mb-4">📝</div>
+        <h3 class="text-2xl font-bold text-white mb-2">Build Resume First</h3>
+        <p class="text-gray-400 mb-4">Structure your resume to guide the interview</p>
+        <span class="text-primary font-semibold">Learn How →</span>
+      </div>
+      
+      <div onclick="toggleSection('interview')" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
+        <div class="text-5xl mb-4">🎤</div>
+        <h3 class="text-2xl font-bold text-white mb-2">Interview Preparation Flow</h3>
+        <p class="text-gray-400 mb-4">Control your interview in first 3 minutes</p>
+        <span class="text-primary font-semibold">Master It →</span>
+      </div>
+    </div>
+
+    <!-- Expandable Section: Resume -->
+    <div id="section-resume" class="expandable glass-card p-8 mb-8">
+      <button onclick="toggleSection('resume')" class="float-right text-gray-400 hover:text-white text-2xl">×</button>
+      <h3 class="text-3xl font-bold gradient-text mb-2">📝 Build a Resume That Controls the Interview</h3>
+      <p class="text-gray-400 mb-6">Follow this 5-step system to create an interview-ready resume</p>
+      
+      <!-- Progress Indicator -->
+      <div class="flex items-center gap-2 mb-6">
+        <div class="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div id="resume-progress" class="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300" style="width: 20%"></div>
+        </div>
+        <span id="resume-step-text" class="text-sm text-gray-400">Step 1/5</span>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button onclick="showResumeTab(1)" id="resume-tab-1" class="active">1️⃣ Structure</button>
+        <button onclick="showResumeTab(2)" id="resume-tab-2">2️⃣ Project Writing</button>
+        <button onclick="showResumeTab(3)" id="resume-tab-3">3️⃣ Examples <span id="resume-lock-3">🔒</span></button>
+        <button onclick="showResumeTab(4)" id="resume-tab-4">4️⃣ Mistakes <span id="resume-lock-4">🔒</span></button>
+        <button onclick="showResumeTab(5)" id="resume-tab-5">5️⃣ Checklist <span id="resume-lock-5">🔒</span></button>
+        <button onclick="showResumeTab(6)" id="resume-tab-6">6️⃣ Model Resume <span id="resume-lock-6">🔒</span></button>
+      </div>
+
+      <!-- Tab 1: Resume Structure -->
+      <div id="resume-content-1" class="tab-content-inner active">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-white mb-4">Resume Structure</h4>
+            <div class="space-y-4 text-gray-300">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">1️⃣</span>
+                <div>
+                  <p class="font-bold text-white">Name + Contact</p>
+                  <p class="text-sm text-gray-400">Keep it simple and professional</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">2️⃣</span>
+                <div>
+                  <p class="font-bold text-white">Skills</p>
+                  <p class="text-sm text-gray-400">SQL, Python, AWS, PySpark, Kafka, Airflow</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">3️⃣</span>
+                <div>
+                  <p class="font-bold text-white">Projects (MOST IMPORTANT)</p>
+                  <p class="text-sm text-gray-400">This is 60% of your resume value</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">4️⃣</span>
+                <div>
+                  <p class="font-bold text-white">Experience</p>
+                  <p class="text-sm text-gray-400">Company, role, duration</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">5️⃣</span>
+                <div>
+                  <p class="font-bold text-white">Education</p>
+                  <p class="text-sm text-gray-400">Degree, college, year</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <p class="text-xl font-bold text-yellow-300 mb-2">💡 Golden Rule</p>
+            <p class="text-gray-300">“Your resume should guide what interviewer asks you.”</p>
+          </div>
+
+          <button onclick="showResumeTab(2)" class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+            Next: Project Writing →
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Project Writing -->
+      <div id="resume-content-2" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-white mb-4">Project Writing Template</h4>
+            <div class="space-y-4 text-sm">
+              <div class="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="font-bold text-blue-300 mb-2">Project Name:</p>
+                <p class="text-white">“End-to-End ETL Pipeline”</p>
+              </div>
+              <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="font-bold text-purple-300 mb-2">Problem Statement:</p>
+                <p class="text-white">“Company had 20GB daily data with no processing system”</p>
+              </div>
+              <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-4">
+                <p class="font-bold text-green-300 mb-2">Your Responsibility:</p>
+                <p class="text-white">“Designed and implemented automated pipeline”</p>
+              </div>
+              <div class="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg p-4">
+                <p class="font-bold text-orange-300 mb-2">Solution:</p>
+                <p class="text-white">“Used S3 + PySpark + Airflow + Redshift”</p>
+              </div>
+              <div class="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p class="font-bold text-yellow-300 mb-2">Tech Stack:</p>
+                <p class="text-white">“Python, SQL, AWS S3, PySpark, Airflow, Redshift”</p>
+              </div>
+              <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 rounded-lg p-4">
+                <p class="font-bold text-primary mb-2">Outcome:</p>
+                <p class="text-white">“Reduced processing time by 60% and automated daily reporting”</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
+            <p class="text-lg font-bold text-blue-300 mb-2">📌 Pro Tip</p>
+            <p class="text-gray-300">“Keep explanation simple and logical. Avoid complex words.”</p>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showResumeTab(1)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showResumeTab(3)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Examples →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Resume Examples -->
+      <div id="resume-content-3" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-blue-300 mb-4">👶 Beginner Example</h4>
+            <div class="space-y-2 text-sm text-gray-300">
+              <p><strong class="text-white">Project:</strong> Student Data Analysis Pipeline</p>
+              <p><strong class="text-white">Problem:</strong> College had 10K student records in CSV files</p>
+              <p><strong class="text-white">Solution:</strong> Built Python script to clean and load data into MySQL</p>
+              <p><strong class="text-white">Tech:</strong> Python, Pandas, MySQL</p>
+              <p><strong class="text-white">Result:</strong> Automated data processing and reduced manual work by 70%</p>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-purple-300 mb-4">💼 Experienced Example</h4>
+            <div class="space-y-2 text-sm text-gray-300">
+              <p><strong class="text-white">Project:</strong> Real-time Streaming Data Pipeline</p>
+              <p><strong class="text-white">Problem:</strong> E-commerce platform needed real-time analytics on 1M+ daily events</p>
+              <p><strong class="text-white">Solution:</strong> Designed Kafka + PySpark Streaming + Delta Lake architecture</p>
+              <p><strong class="text-white">Tech:</strong> Kafka, PySpark, Delta Lake, AWS S3, Databricks</p>
+              <p><strong class="text-white">Result:</strong> Achieved sub-second latency and processed 50K events/sec</p>
+            </div>
+          </div>
+
+          <div class="bg-primary/10 border border-primary/30 rounded-xl p-6 text-center">
+            <p class="text-2xl font-black gradient-text">🎯 Projects section = 60% of your resume value</p>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showResumeTab(2)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showResumeTab(4)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Mistakes →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Common Mistakes -->
+      <div id="resume-content-4" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-red-300 mb-6">❌ Common Mistakes to Avoid</h4>
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">❌</span>
+                <div>
+                  <p class="font-bold text-white">Too much theory</p>
+                  <p class="text-sm text-gray-400">Don't write paragraphs. Keep it crisp and action-oriented.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">❌</span>
+                <div>
+                  <p class="font-bold text-white">No project explanation</p>
+                  <p class="text-sm text-gray-400">Just listing project names is useless. Explain problem + solution.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">❌</span>
+                <div>
+                  <p class="font-bold text-white">Copy-paste resumes</p>
+                  <p class="text-sm text-gray-400">Recruiters can spot generic resumes. Make it personal.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">❌</span>
+                <div>
+                  <p class="font-bold text-white">No measurable outcome</p>
+                  <p class="text-sm text-gray-400">Always add results: "Reduced time by 60%", "Processed 1M records"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showResumeTab(3)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showResumeTab(5)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Checklist →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Final Checklist -->
+      <div id="resume-content-5" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-green-300 mb-6">✅ Final Resume Checklist</h4>
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">✅</span>
+                <div>
+                  <p class="font-bold text-white">1–2 pages only</p>
+                  <p class="text-sm text-gray-400">Keep it concise. No one reads 5-page resumes.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">✅</span>
+                <div>
+                  <p class="font-bold text-white">Strong project explanation</p>
+                  <p class="text-sm text-gray-400">Problem + Solution + Outcome format</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">✅</span>
+                <div>
+                  <p class="font-bold text-white">Clear tech stack</p>
+                  <p class="text-sm text-gray-400">List all technologies you've used in projects</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">✅</span>
+                <div>
+                  <p class="font-bold text-white">Easy to speak in interview</p>
+                  <p class="text-sm text-gray-400">You should be able to explain every line confidently</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 rounded-xl p-8 text-center">
+            <p class="text-2xl font-black text-white mb-4">🎯 You are already ahead of 80% candidates.</p>
+            <p class="text-lg text-gray-300 mb-6">Now finish the system.</p>
+            <button onclick="showResumeTab(6)" class="px-12 py-4 bg-gradient-to-r from-primary via-secondary to-accent text-white text-xl font-black rounded-xl hover:scale-105 transition-transform duration-300 shadow-2xl">
+              Next: Model Resume →
+            </button>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showResumeTab(4)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showResumeTab(6)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Model Resume →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: Model Resume (15-25 LPA) -->
+      <div id="resume-content-6" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border-2 border-green-500/40 rounded-xl p-6 text-center">
+            <h4 class="text-3xl font-black gradient-text mb-3">🎯 Complete Model Resume</h4>
+            <p class="text-xl text-white mb-2">For 15-25 LPA Data Engineer Role</p>
+            <p class="text-gray-400">Study this format and adapt it to your experience</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <iframe src="resume-model-15-25lpa.html" style="width: 100%; height: 800px; border: none; border-radius: 8px; background: white;"></iframe>
+          </div>
+
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-blue-300 mb-4">💡 Key Takeaways from This Resume</h4>
+            <div class="space-y-3 text-gray-300">
+              <p>✅ <strong class="text-white">3 Strong Projects</strong> - Each with clear problem, solution, and measurable outcome</p>
+              <p>✅ <strong class="text-white">Modern Tech Stack</strong> - Kafka, PySpark, Delta Lake, Databricks (high-demand skills)</p>
+              <p>✅ <strong class="text-white">Quantifiable Results</strong> - 90% improvement, 80K events/sec, 75% reduction</p>
+              <p>✅ <strong class="text-white">2+ Years Experience</strong> - Shows career progression from Junior to Data Engineer</p>
+              <p>✅ <strong class="text-white">Certifications</strong> - AWS and Databricks add credibility</p>
+              <p>✅ <strong class="text-white">Clean Format</strong> - Easy to read, professional, ATS-friendly</p>
+            </div>
+          </div>
+
+          <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-yellow-300 mb-4">🔑 How to Adapt This Resume</h4>
+            <div class="space-y-3 text-sm text-gray-300">
+              <p><strong class="text-white">Step 1:</strong> Replace projects with your own (use projects from this platform)</p>
+              <p><strong class="text-white">Step 2:</strong> Keep the same format - Problem → Responsibility → Solution → Outcome</p>
+              <p><strong class="text-white">Step 3:</strong> Add numbers wherever possible (data size, time saved, performance improvement)</p>
+              <p><strong class="text-white">Step 4:</strong> Update tech stack based on what you've learned</p>
+              <p><strong class="text-white">Step 5:</strong> Keep it 1-2 pages maximum</p>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 rounded-xl p-8 text-center">
+            <p class="text-2xl font-black text-white mb-4">🎯 You now have the complete blueprint!</p>
+            <p class="text-lg text-gray-300 mb-6">Use this model to build your own interview-winning resume.</p>
+            <button onclick="toggleSection('resume'); toggleSection('interview');" class="px-12 py-4 bg-gradient-to-r from-primary via-secondary to-accent text-white text-xl font-black rounded-xl hover:scale-105 transition-transform duration-300 shadow-2xl">
+              🚀 Now Master Interview Skills →
+            </button>
+          </div>
+
+          <button onclick="showResumeTab(5)" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+            ← Back to Checklist
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expandable Section: Interview -->
+    <div id="section-interview" class="expandable glass-card p-8 mb-8">
+      <button onclick="toggleSection('interview')" class="float-right text-gray-400 hover:text-white text-2xl">×</button>
+      <h3 class="text-3xl font-bold gradient-text mb-2">🎤 Master Your Interview in First 3 Minutes</h3>
+      <p class="text-gray-400 mb-6">Follow this 5-step system to control the interview flow</p>
+      
+      <!-- Progress Indicator -->
+      <div class="flex items-center gap-2 mb-6">
+        <div class="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div id="interview-progress" class="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300" style="width: 20%"></div>
+        </div>
+        <span id="interview-step-text" class="text-sm text-gray-400">Step 1/5</span>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tab-nav">
+        <button onclick="showInterviewTab(1)" id="interview-tab-1" class="active">1️⃣ Introduction</button>
+        <button onclick="showInterviewTab(2)" id="interview-tab-2">2️⃣ Project Story</button>
+        <button onclick="showInterviewTab(3)" id="interview-tab-3">3️⃣ Scenario Q&A <span id="interview-lock-3">🔒</span></button>
+        <button onclick="showInterviewTab(4)" id="interview-tab-4">4️⃣ STAR Method <span id="interview-lock-4">🔒</span></button>
+        <button onclick="showInterviewTab(5)" id="interview-tab-5">5️⃣ Complete Example <span id="interview-lock-5">🔒</span></button>
+      </div>
+
+      <!-- Tab 1: Introduction Mastery -->
+      <div id="interview-content-1" class="tab-content-inner active">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-white mb-4">🎤 Introduction Structure (3 Minutes)</h4>
+            <p class="text-gray-400 mb-4">"Control the interview by nailing your introduction. This sets the tone."</p>
+            <div class="space-y-3">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="font-bold text-blue-300">1️⃣ Experience Summary</p>
+                <p class="text-sm text-gray-300">"I have X years of experience in Data Engineering"</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="font-bold text-purple-300">2️⃣ Tech Stack</p>
+                <p class="text-sm text-gray-300">"I work primarily with SQL, Python, PySpark, and AWS"</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                <p class="font-bold text-green-300">3️⃣ Recent Project Overview</p>
+                <p class="text-sm text-gray-300">"Recently, I worked on building an end-to-end ETL pipeline"</p>
+              </div>
+              <div class="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                <p class="font-bold text-orange-300">4️⃣ Problem Statement</p>
+                <p class="text-sm text-gray-300">"Where we handled around 20GB daily data"</p>
+              </div>
+              <div class="bg-pink-500/10 border border-pink-500/30 rounded-lg p-4">
+                <p class="font-bold text-pink-300">5️⃣ Your Responsibility</p>
+                <p class="text-sm text-gray-300">"My role was to design and implement the pipeline"</p>
+              </div>
+              <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4">
+                <p class="font-bold text-cyan-300">6️⃣ Solution & Tools</p>
+                <p class="text-sm text-gray-300">"I used S3, PySpark, Airflow, and Redshift"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-white mb-4">✍️ Practice Your Introduction</h4>
+            <textarea id="introText" class="w-full h-40 bg-white/5 border border-white/10 rounded-lg p-4 text-white" placeholder="Write your introduction here..."></textarea>
+            <div class="flex gap-4 mt-4">
+              <button onclick="copyIntroTemplate()" class="flex-1 py-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-semibold rounded-lg transition">
+                📋 Copy Template
+              </button>
+              <button onclick="startIntroTimer()" class="flex-1 py-3 bg-green-500/20 hover:bg-green-500/30 text-green-300 font-semibold rounded-lg transition">
+                ⏱️ Start 3-Min Timer
+              </button>
+            </div>
+            <div class="mt-4 text-center">
+              <span id="introTimer" class="text-3xl font-bold gradient-text">3:00</span>
+            </div>
+          </div>
+
+          <button onclick="showInterviewTab(2)" class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+            Next: Project Story →
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Project Story -->
+      <div id="interview-content-2" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-white mb-4">📖 How to Tell Your Project Story</h4>
+            <p class="text-gray-400 mb-6">"After introduction, interviewer will ask: 'Tell me about this project in detail'"</p>
+            <div class="space-y-4">
+              <div class="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="font-bold text-blue-300 mb-2">1️⃣ Problem</p>
+                <p class="text-sm text-gray-300">"Company was processing 2M daily events manually, taking 6 hours"</p>
+              </div>
+              <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="font-bold text-purple-300 mb-2">2️⃣ Data Size & Complexity</p>
+                <p class="text-sm text-gray-300">"We had 50GB daily data from 5 different sources (APIs, databases, files)"</p>
+              </div>
+              <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-4">
+                <p class="font-bold text-green-300 mb-2">3️⃣ Architecture</p>
+                <p class="text-sm text-gray-300">"I designed a streaming architecture: Kafka → PySpark → Delta Lake → Databricks"</p>
+              </div>
+              <div class="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-lg p-4">
+                <p class="font-bold text-orange-300 mb-2">4️⃣ Tools & Tech Stack</p>
+                <p class="text-sm text-gray-300">"Used Kafka for ingestion, PySpark for transformation, Delta Lake for storage"</p>
+              </div>
+              <div class="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p class="font-bold text-yellow-300 mb-2">5️⃣ Your Specific Role</p>
+                <p class="text-sm text-gray-300">"I was responsible for designing schema, writing PySpark jobs, and optimizing performance"</p>
+              </div>
+              <div class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/30 rounded-lg p-4">
+                <p class="font-bold text-pink-300 mb-2">6️⃣ Challenges & Optimization</p>
+                <p class="text-sm text-gray-300">"Initially had latency issues. Optimized by partitioning data and using Z-ordering"</p>
+              </div>
+              <div class="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30 rounded-lg p-4">
+                <p class="font-bold text-primary mb-2">7️⃣ Outcome & Impact</p>
+                <p class="text-sm text-gray-300">"Reduced processing time from 6 hours to 10 minutes. Achieved 90% cost reduction"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <p class="text-lg font-bold text-yellow-300 mb-2">💡 Golden Rule</p>
+            <p class="text-gray-300">"Always end with measurable outcomes: time saved, cost reduced, performance improved"</p>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showInterviewTab(1)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showInterviewTab(3)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Scenario Q&A →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Scenario Questions -->
+      <div id="interview-content-3" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-orange-300 mb-4">🔥 Common Scenario Questions</h4>
+            <p class="text-gray-400 mb-6">"Interviewer will test your problem-solving skills with real scenarios"</p>
+            <div class="space-y-4">
+              <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p class="font-bold text-white mb-2">Q: "What if your pipeline suddenly fails in production?"</p>
+                <p class="text-sm text-gray-400 mb-3">Answer using 4-step formula:</p>
+                <div class="space-y-2 text-sm">
+                  <p class="text-blue-300">1️⃣ <strong>Understand:</strong> Check logs, identify error type</p>
+                  <p class="text-purple-300">2️⃣ <strong>Fix:</strong> Apply immediate fix (restart, rollback)</p>
+                  <p class="text-green-300">3️⃣ <strong>Optimize:</strong> Add monitoring, alerts, retry logic</p>
+                  <p class="text-orange-300">4️⃣ <strong>Monitor:</strong> Set up CloudWatch/Datadog alerts</p>
+                </div>
+              </div>
+
+              <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p class="font-bold text-white mb-2">Q: "How would you handle duplicate records?"</p>
+                <p class="text-sm text-gray-300 mt-2">"I would use window functions with ROW_NUMBER() to identify duplicates, then filter based on timestamp or unique key"</p>
+              </div>
+
+              <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p class="font-bold text-white mb-2">Q: "Pipeline is slow. How do you optimize?"</p>
+                <p class="text-sm text-gray-300 mt-2">"First, check data skew. Then optimize partitioning, use broadcast joins for small tables, cache intermediate results, and tune Spark configurations"</p>
+              </div>
+
+              <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+                <p class="font-bold text-white mb-2">Q: "How do you ensure data quality?"</p>
+                <p class="text-sm text-gray-300 mt-2">"Implement validation checks: null checks, schema validation, range checks, and use Great Expectations or custom data quality framework"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
+            <p class="text-lg font-bold text-blue-300 mb-2">📌 Pro Tip</p>
+            <p class="text-gray-300">"Always structure answers: Understand → Fix → Optimize → Monitor"</p>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showInterviewTab(2)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showInterviewTab(4)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: STAR Method →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: STAR Method -->
+      <div id="interview-content-4" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6">
+            <h4 class="text-2xl font-bold text-purple-300 mb-4">⭐ STAR Method for Behavioral Questions</h4>
+            <p class="text-gray-400 mb-6">"Use this framework for questions like: 'Tell me about a challenging situation'"</p>
+            <div class="space-y-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="font-bold text-blue-300 mb-2">S - Situation</p>
+                <p class="text-sm text-gray-300">"Our ETL pipeline was taking 8 hours to process daily data, causing delays in reporting"</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="font-bold text-purple-300 mb-2">T - Task</p>
+                <p class="text-sm text-gray-300">"I was assigned to optimize the pipeline and reduce processing time to under 2 hours"</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                <p class="font-bold text-green-300 mb-2">A - Action</p>
+                <p class="text-sm text-gray-300">"I analyzed bottlenecks, implemented partitioning strategy, optimized Spark configurations, and added parallel processing"</p>
+              </div>
+              <div class="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4">
+                <p class="font-bold text-orange-300 mb-2">R - Result</p>
+                <p class="text-sm text-gray-300">"Reduced processing time from 8 hours to 1.5 hours (81% improvement), saved $5K monthly in compute costs"</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-white mb-4">🎯 Common Behavioral Questions</h4>
+            <div class="space-y-3 text-sm text-gray-300">
+              <p>• "Tell me about a time you faced a technical challenge"</p>
+              <p>• "Describe a situation where you had to work under pressure"</p>
+              <p>• "How did you handle a disagreement with a team member?"</p>
+              <p>• "Tell me about a project you're most proud of"</p>
+              <p>• "Describe a time you failed and what you learned"</p>
+            </div>
+          </div>
+
+          <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+            <p class="text-lg font-bold text-yellow-300 mb-2">💡 Remember</p>
+            <p class="text-gray-300">"Always quantify results: percentages, time saved, cost reduced, performance improved"</p>
+          </div>
+
+          <div class="flex gap-4">
+            <button onclick="showInterviewTab(3)" class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+              ← Back
+            </button>
+            <button onclick="showInterviewTab(5)" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+              Next: Complete Example →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Complete Interview Example -->
+      <div id="interview-content-5" class="tab-content-inner">
+        <div class="space-y-6">
+          <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border-2 border-green-500/40 rounded-xl p-6 text-center">
+            <h4 class="text-3xl font-black gradient-text mb-3">🎯 Complete 30-Minute Interview Flow</h4>
+            <p class="text-xl text-white mb-2">Watch how a real interview flows from start to finish</p>
+            <p class="text-gray-400">Study this example and practice with your own projects</p>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <iframe src="interview-complete-example.html" style="width: 100%; height: 800px; border: none; border-radius: 8px; background: white;"></iframe>
+          </div>
+
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
+            <h4 class="text-xl font-bold text-blue-300 mb-4">💡 Key Takeaways</h4>
+            <div class="space-y-3 text-gray-300">
+              <p>✅ <strong class="text-white">First 3 minutes matter most</strong> - Control the flow with strong introduction</p>
+              <p>✅ <strong class="text-white">Tell stories, not theory</strong> - Use real project examples with numbers</p>
+              <p>✅ <strong class="text-white">Structure your answers</strong> - Use STAR method and 4-step formula</p>
+              <p>✅ <strong class="text-white">Show problem-solving</strong> - Explain how you handle challenges</p>
+              <p>✅ <strong class="text-white">Be confident, not arrogant</strong> - Show expertise with humility</p>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 rounded-xl p-8 text-center">
+            <p class="text-2xl font-black text-white mb-4">🎯 You are already ahead of 80% candidates.</p>
+            <p class="text-lg text-gray-300 mb-6">Now go practice and crush your interviews!</p>
+            <button onclick="toggleSection('interview')" class="px-12 py-4 bg-gradient-to-r from-primary via-secondary to-accent text-white text-xl font-black rounded-xl hover:scale-105 transition-transform duration-300 shadow-2xl">
+              🚀 I'm Interview Ready
+            </button>
+          </div>
+
+          <button onclick="showInterviewTab(4)" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg transition">
+            ← Back to STAR Method
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use Platform -->
+    <div class="glass-card p-8 mb-8">
+      <h3 class="text-3xl font-bold text-white mb-6">📚 How to Use This Platform</h3>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Freshers -->
+        <div class="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-6">
+          <h4 class="text-2xl font-bold text-blue-300 mb-4">👶 FRESHERS</h4>
+          <ul class="space-y-3 text-gray-300">
+            <li>1️⃣ Start with basics (SQL → Python)</li>
+            <li>2️⃣ Complete all topics</li>
+            <li>3️⃣ Then do projects</li>
+            <li>4️⃣ Focus on understanding + explanation</li>
+            <li>5️⃣ Practice speaking answers</li>
+          </ul>
+        </div>
+
+        <!-- Experienced -->
+        <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6">
+          <h4 class="text-2xl font-bold text-purple-300 mb-4">💼 EXPERIENCED (2+ YEARS)</h4>
+          <ul class="space-y-3 text-gray-300">
+            <li>1️⃣ Go directly to Projects</li>
+            <li>2️⃣ Pick 1 project</li>
+            <li>3️⃣ Study 2–3 times deeply</li>
+          </ul>
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <p class="text-sm font-semibold text-white mb-2">Learn:</p>
+            <p class="text-sm text-gray-400">Architecture • Tools • Data flow • Code</p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <p class="text-sm font-semibold text-white mb-2">Practice explaining:</p>
+            <p class="text-sm text-gray-400">Problem • Solution • Scaling • Optimization</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 text-center">
+        <p class="text-xl font-bold text-yellow-300">
+          "Master 2–3 projects deeply instead of learning everything shallow."
+        </p>
+      </div>
+    </div>
+
+    <!-- My Stack -->
+    <div class="glass-card p-6 mb-8">
+      <h3 class="text-2xl font-bold text-white mb-4">🧠 My Stack</h3>
+      <div id="myStack" class="flex flex-wrap gap-3">
+        <!-- Will be populated dynamically -->
+      </div>
+    </div>
+
+    <!-- My Courses (Admin Controlled) -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-3xl font-bold text-white">🎓 My Courses</h3>
+          <p class="text-gray-400 text-sm mt-1">Access controlled by admin</p>
+        </div>
+      </div>
+      
+      <div id="coursesList" class="grid md:grid-cols-3 gap-6">
+        <!-- Will be populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Existing Dashboard Stats -->
+    <div class="glass-card p-8">
+      <h3 class="text-2xl font-bold text-white mb-6">📊 Your Progress</h3>
+      
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+          <div class="text-3xl mb-2">🗄️</div>
+          <p class="text-gray-400 text-sm">SQL Topics Done</p>
+          <p id="sqlDone" class="text-3xl font-bold text-white mt-1">0 / 15</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+          <div class="text-3xl mb-2">🐍</div>
+          <p class="text-gray-400 text-sm">Python Topics Done</p>
+          <p id="pyDone" class="text-3xl font-bold text-white mt-1">0 / 14</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+          <div class="text-3xl mb-2">🎯</div>
+          <p class="text-gray-400 text-sm">Overall Progress</p>
+          <p id="overallPct" class="text-3xl font-bold text-accent mt-1">0%</p>
+        </div>
+      </div>
+
+      <div id="enrollmentStatus"></div>
+    </div>
+
+  </main>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) window.location.href = 'student-login.html';
+
+    document.getElementById('headerName').textContent = user.name || '';
+    document.getElementById('welcomeName').textContent = user.name || '';
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'student-login.html';
+    }
+
+    function toggleSection(sectionName) {
+      const section = document.getElementById('section-' + sectionName);
+      section.classList.toggle('active');
+    }
+
+    const SQL_TOPICS = ['joins','window-functions','cte','subqueries','aggregations','ranking-functions','data-cleaning','deduplication','scd','query-optimization','incremental-load','data-validation','handling-nulls','set-operations','case-statements'];
+    const PY_TOPICS = ['python-lists','python-list-comprehension','python-dictionaries','python-functions','python-mutable-immutable','python-file-handling','python-json','python-exception-handling','python-logging','python-pandas-basics','python-pandas-groupby','python-pandas-merge','python-etl-pipeline','python-generators'];
+
+    function getProgress() {
+      return JSON.parse(localStorage.getItem('userProgress') || '{}');
+    }
+
+    function renderProgress() {
+      const progress = getProgress();
+      const sqlDone = SQL_TOPICS.filter(t => progress[t]).length;
+      const pyDone = PY_TOPICS.filter(t => progress[t]).length;
+      const total = SQL_TOPICS.length + PY_TOPICS.length;
+      const done = sqlDone + pyDone;
+      document.getElementById('sqlDone').textContent = `${sqlDone} / 15`;
+      document.getElementById('pyDone').textContent = `${pyDone} / 14`;
+      document.getElementById('overallPct').textContent = Math.round((done / total) * 100) + '%';
+    }
+
+    async function init() {
+      try {
+        // Load feature access first
+        await loadFeatureAccess();
+        
+        // Get enrollment status
+        const r = await fetch(`${API}/enrollment/status`, { headers: { Authorization: `Bearer ${token}` } });
+        const enrollmentData = await r.json();
+
+        // Get syllabus access
+        let syllabusAccess = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+        if (enrollmentData.paid) {
+          try {
+            const sr = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` } });
+            syllabusAccess = await sr.json();
+          } catch(e) {}
+        }
+
+        // Render My Stack
+        const stackTechs = [];
+        if (syllabusAccess.sql_access) stackTechs.push('SQL');
+        if (syllabusAccess.python_access) stackTechs.push('Python');
+        if (syllabusAccess.pyspark_access) stackTechs.push('PySpark');
+        if (syllabusAccess.aws_access) stackTechs.push('AWS');
+        if (syllabusAccess.databricks_access) stackTechs.push('Delta Lake', 'Databricks');
+        if (syllabusAccess.projects_access) stackTechs.push('Kafka', 'Airflow');
+        if (syllabusAccess.git_access) stackTechs.push('Git');
+
+        const uniqueStack = [...new Set(stackTechs)];
+        document.getElementById('myStack').innerHTML = uniqueStack.length 
+          ? uniqueStack.map(tech => `<span class="px-4 py-2 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg text-white font-semibold">${tech}</span>`).join('')
+          : '<p class="text-gray-400">No courses unlocked yet</p>';
+
+        // Render Courses
+        const courses = [
+          { name: 'SQL Mastery', icon: '🗄️', topics: '15 Topics', access: syllabusAccess.sql_access, url: 'sql-module.html' },
+          { name: 'Python for DE', icon: '🐍', topics: '14 Topics', access: syllabusAccess.python_access, url: 'python-syllabus.html' },
+          { name: 'PySpark', icon: '⚡', topics: '15 Topics', access: syllabusAccess.pyspark_access, url: 'pyspark-syllabus.html' },
+          { name: 'AWS for DE', icon: '☁️', topics: '7 Flows', access: syllabusAccess.aws_access, url: 'aws-syllabus.html' },
+          { name: 'Databricks', icon: '🧱', topics: '8 Topics', access: syllabusAccess.databricks_access, url: 'databricks-syllabus.html' },
+          { name: 'Git & GitHub', icon: '📦', topics: '7 Topics', access: syllabusAccess.git_access, url: 'git-syllabus.html' },
+          { name: 'Real Projects', icon: '🏗️', topics: '7 Projects', access: syllabusAccess.projects_access, url: 'projects-syllabus.html' }
+        ];
+
+        document.getElementById('coursesList').innerHTML = courses.map(course => {
+          if (!enrollmentData.paid) {
+            return `
+              <div class="glass-card p-6 locked-card relative">
+                <div class="absolute top-4 right-4 text-3xl">🔒</div>
+                <div class="text-5xl mb-4">${course.icon}</div>
+                <h4 class="text-xl font-bold text-white mb-2">${course.name}</h4>
+                <p class="text-gray-400 text-sm mb-4">${course.topics}</p>
+                <button disabled class="w-full py-2 bg-gray-500/20 text-gray-500 rounded-lg text-sm font-semibold cursor-not-allowed">
+                  🔒 Locked
+                </button>
+                <p class="text-xs text-gray-500 mt-2 text-center">Complete payment first</p>
+              </div>
+            `;
+          }
+          
+          if (!course.access) {
+            return `
+              <div class="glass-card p-6 locked-card relative">
+                <div class="absolute top-4 right-4 text-3xl">🔒</div>
+                <div class="text-5xl mb-4">${course.icon}</div>
+                <h4 class="text-xl font-bold text-white mb-2">${course.name}</h4>
+                <p class="text-gray-400 text-sm mb-4">${course.topics}</p>
+                <button disabled class="w-full py-2 bg-gray-500/20 text-gray-500 rounded-lg text-sm font-semibold cursor-not-allowed">
+                  🔒 Access Denied
+                </button>
+                <p class="text-xs text-gray-500 mt-2 text-center">Access will be granted by admin</p>
+              </div>
+            `;
+          }
+
+          return `
+            <a href="${course.url}" class="glass-card p-6 hover:scale-105 transition-transform duration-300 cursor-pointer">
+              <div class="text-5xl mb-4">${course.icon}</div>
+              <h4 class="text-xl font-bold text-white mb-2">${course.name}</h4>
+              <p class="text-gray-400 text-sm mb-4">${course.topics}</p>
+              <button class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg text-sm font-semibold hover:shadow-xl transition">
+                Start Learning →
+              </button>
+            </a>
+          `;
+        }).join('');
+
+        // Enrollment Status
+        const statusEl = document.getElementById('enrollmentStatus');
+        if (enrollmentData.paid) {
+          statusEl.innerHTML = `
+            <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-6">
+              <div class="flex items-center gap-4">
+                <span class="text-4xl">✅</span>
+                <div>
+                  <h4 class="text-xl font-bold text-white">Enrolled Successfully</h4>
+                  <p class="text-gray-400 text-sm">You have lifetime access • Course access controlled by admin</p>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          statusEl.innerHTML = `
+            <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
+              <div class="flex items-center gap-4">
+                <span class="text-4xl">⏳</span>
+                <div class="flex-1">
+                  <h4 class="text-xl font-bold text-white">Complete Payment to Unlock</h4>
+                  <p class="text-gray-400 text-sm">Get lifetime access to all courses</p>
+                </div>
+                <a href="payment.html" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+                  Enroll Now →
+                </a>
+              </div>
+            </div>
+          `;
+        }
+
+      } catch(e) {
+        console.error('Init error:', e);
+      }
+      
+      renderProgress();
+    }
+
+    init();
+
+// ==================== RESUME & INTERVIEW TAB FUNCTIONS ====================
+
+// Resume Tab Navigation
+function showResumeTab(tabNum) {
+  // Check if tab is locked (tabs 3-6 require payment)
+  if (tabNum > 2 && !hasFeatureAccess('resume', tabNum)) {
+    showUpgradeModal('resume', tabNum);
+    return;
+  }
+  
+  for(let i=1; i<=6; i++) {
+    document.getElementById('resume-content-'+i).classList.remove('active');
+    document.getElementById('resume-tab-'+i).classList.remove('active');
+  }
+  document.getElementById('resume-content-'+tabNum).classList.add('active');
+  document.getElementById('resume-tab-'+tabNum).classList.add('active');
+  const progress = Math.round((tabNum / 6) * 100);
+  document.getElementById('resume-progress').style.width = progress + '%';
+  document.getElementById('resume-step-text').textContent = 'Step ' + tabNum + '/6';
+}
+
+// Interview Tab Navigation
+function showInterviewTab(tabNum) {
+  // Check if tab is locked (tabs 3-5 require payment)
+  if (tabNum > 2 && !hasFeatureAccess('interview', tabNum)) {
+    showUpgradeModal('interview', tabNum);
+    return;
+  }
+  
+  for(let i=1; i<=5; i++) {
+    document.getElementById('interview-content-'+i).classList.remove('active');
+    document.getElementById('interview-tab-'+i).classList.remove('active');
+  }
+  document.getElementById('interview-content-'+tabNum).classList.add('active');
+  document.getElementById('interview-tab-'+tabNum).classList.add('active');
+  document.getElementById('interview-progress').style.width = (tabNum * 20) + '%';
+  document.getElementById('interview-step-text').textContent = 'Step ' + tabNum + '/5';
+}
+
+// Check feature access from API
+async function loadFeatureAccess() {
+  try {
+    const r = await fetch(`${API}/feature/access`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await r.json();
+    window.featureAccess = data || [];
+    console.log('Feature access loaded:', window.featureAccess);
+    updateLockIcons();
+  } catch(e) {
+    console.error('Failed to load feature access:', e);
+    window.featureAccess = [];
+    updateLockIcons();
+  }
+}
+
+// Check feature access
+function hasFeatureAccess(featureType, tabNumber) {
+  if (tabNumber <= 2) return true; // First 2 tabs always free
+  if (!window.featureAccess || window.featureAccess.length === 0) return false;
+  return window.featureAccess.some(f => f.feature_type === featureType && f.tab_number === tabNumber && f.access_granted === 1);
+}
+
+// Update lock icons
+function updateLockIcons() {
+  console.log('Updating lock icons with feature access:', window.featureAccess);
+  
+  // Resume tabs
+  for (let i = 3; i <= 6; i++) {
+    const lockEl = document.getElementById(`resume-lock-${i}`);
+    if (lockEl) {
+      if (hasFeatureAccess('resume', i)) {
+        lockEl.textContent = '✅';
+        lockEl.style.color = '#10b981';
+      } else {
+        lockEl.textContent = '🔒';
+        lockEl.style.color = '#ef4444';
+      }
+    }
+  }
+  
+  // Interview tabs
+  for (let i = 3; i <= 5; i++) {
+    const lockEl = document.getElementById(`interview-lock-${i}`);
+    if (lockEl) {
+      if (hasFeatureAccess('interview', i)) {
+        lockEl.textContent = '✅';
+        lockEl.style.color = '#10b981';
+      } else {
+        lockEl.textContent = '🔒';
+        lockEl.style.color = '#ef4444';
+      }
+    }
+  }
+}
+
+// Show upgrade modal
+function showUpgradeModal(type, tabNum) {
+  const tabNames = {
+    resume: { 3: 'Examples', 4: 'Mistakes', 5: 'Checklist', 6: 'Model Resume' },
+    interview: { 3: 'Scenario Q&A', 4: 'STAR Method', 5: 'Complete Example' }
+  };
+  
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-gradient-to-br from-dark via-purple-900/40 to-dark border-2 border-primary/40 rounded-2xl max-w-md w-full p-8 relative">
+      <button onclick="this.closest('.fixed').remove()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">×</button>
+      <div class="text-center">
+        <div class="text-6xl mb-4">🔒</div>
+        <h3 class="text-2xl font-black gradient-text mb-3">Premium Content</h3>
+        <p class="text-xl text-white mb-2">${tabNames[type][tabNum]}</p>
+        <p class="text-gray-400 mb-6">This tab is locked. Contact admin to unlock premium content.</p>
+        <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6">
+          <p class="text-yellow-300 text-sm font-semibold mb-2">✨ What You'll Get:</p>
+          <ul class="text-left text-gray-300 text-sm space-y-1">
+            <li>✅ Complete ${type === 'resume' ? 'Resume' : 'Interview'} System</li>
+            <li>✅ Real Examples & Templates</li>
+            <li>✅ Industry Best Practices</li>
+            <li>✅ Lifetime Access</li>
+          </ul>
+        </div>
+        <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white font-bold rounded-lg hover:shadow-xl transition">
+          Got It
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+
+
+// Copy Introduction Template
+function copyIntroTemplate() {
+  const template = `I have 2 years of experience in Data Engineering.
+
+I work primarily with SQL, Python, PySpark, and AWS.
+
+Recently, I worked on building a real-time streaming data pipeline where we handled around 2 million daily events.
+
+My role was to design and implement the end-to-end architecture, ensuring sub-second latency and scalability.
+
+For this, I used Kafka for streaming, PySpark for processing, Delta Lake for storage, and Databricks for analytics.
+
+My latest project was the Real-time Streaming Pipeline, where I solved the challenge of processing 80K events per second with sub-second latency.`;
+  
+  document.getElementById('introText').value = template;
+  alert('✅ Template copied to text area!');
+}
+
+// Start 3-Minute Timer
+let introTimerInterval;
+function startIntroTimer() {
+  clearInterval(introTimerInterval);
+  let seconds = 180;
+  const display = document.getElementById('introTimer');
+  
+  introTimerInterval = setInterval(() => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    display.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    
+    if (seconds <= 0) {
+      clearInterval(introTimerInterval);
+      display.textContent = '⏰ Time Up!';
+      alert('⏰ 3 minutes completed!');
+    }
+    seconds--;
+  }, 1000);
+}
+
+// Render My Access Section
+function renderMyAccess(subtopicAccess, featureAccess) {
+  const container = document.getElementById('myAccess');
+  
+  if ((!subtopicAccess || subtopicAccess.length === 0) && (!featureAccess || featureAccess.length === 0)) {
+    container.innerHTML = `
+      <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 text-center">
+        <p class="text-yellow-300 text-lg font-bold mb-2">🔒 No Additional Access Granted Yet</p>
+        <p class="text-gray-400 text-sm mb-4">You have access to free content. Admin will grant additional access as you progress.</p>
+        <div class="mt-4 space-y-3">
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <p class="text-white font-bold mb-2">🗄️ SQL: First 3 topics (FREE)</p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <button onclick="openModuleTopic('sql', 0)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Joins</button>
+              <button onclick="openModuleTopic('sql', 1)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Aggregations</button>
+              <button onclick="openModuleTopic('sql', 2)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Case Statements</button>
+            </div>
+          </div>
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <p class="text-white font-bold mb-2">🐍 Python: First 6 topics (FREE)</p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <button onclick="openModuleTopic('python', 0)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Lists</button>
+              <button onclick="openModuleTopic('python', 1)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Comprehension</button>
+              <button onclick="openModuleTopic('python', 2)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Dictionaries</button>
+              <button onclick="openModuleTopic('python', 3)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Functions</button>
+              <button onclick="openModuleTopic('python', 4)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Mutable/Immutable</button>
+              <button onclick="openModuleTopic('python', 5)" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ File Handling</button>
+            </div>
+          </div>
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <p class="text-white font-bold mb-2">📝 Resume: First 2 tabs (FREE)</p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <button onclick="toggleSection('resume'); showResumeTab(1);" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Structure</button>
+              <button onclick="toggleSection('resume'); showResumeTab(2);" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Project Writing</button>
+            </div>
+          </div>
+          <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+            <p class="text-white font-bold mb-2">🎤 Interview: First 2 tabs (FREE)</p>
+            <div class="flex flex-wrap gap-2 justify-center">
+              <button onclick="toggleSection('interview'); showInterviewTab(1);" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Introduction</button>
+              <button onclick="toggleSection('interview'); showInterviewTab(2);" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ Project Story</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+
+  // Topic name mappings
+  const SQL_TOPICS = {
+    'topic-1': 'Joins (FREE)',
+    'topic-2': 'Aggregations (FREE)',
+    'topic-3': 'Case Statements (FREE)',
+    'topic-4': 'Window Functions',
+    'topic-5': 'CTE',
+    'topic-6': 'Subqueries',
+    'topic-7': 'Ranking Functions',
+    'topic-8': 'Data Cleaning',
+    'topic-9': 'Deduplication',
+    'topic-10': 'SCD',
+    'topic-11': 'Query Optimization',
+    'topic-12': 'Incremental Load',
+    'topic-13': 'Data Validation',
+    'topic-14': 'Handling Nulls',
+    'topic-15': 'Set Operations'
+  };
+
+  const PYTHON_TOPICS = {
+    'group-2-1': 'JSON',
+    'group-2-2': 'Exception Handling',
+    'group-2-3': 'Logging',
+    'group-2-4': 'Pandas Basics',
+    'group-2-5': 'Pandas GroupBy',
+    'group-2-6': 'Pandas Merge',
+    'group-2-7': 'ETL Pipeline',
+    'group-2-8': 'Generators'
+  };
+
+  const PYSPARK_TOPICS = {
+    'group-1-1': 'PySpark Intro',
+    'group-1-2': 'RDD',
+    'group-1-3': 'DataFrame',
+    'group-2-1': 'Transformations',
+    'group-2-2': 'Actions',
+    'group-2-3': 'Spark SQL',
+    'group-2-4': 'Joins',
+    'group-2-5': 'GroupBy',
+    'group-2-6': 'Window Functions',
+    'group-3-1': 'Partitioning & Bucketing',
+    'group-3-2': 'Optimization',
+    'group-3-3': 'ETL',
+    'group-3-4': 'ETL Pipeline',
+    'group-3-5': 'Performance Tuning',
+    'group-3-6': 'Advanced Partitioning'
+  };
+
+  const PROJECTS_TOPICS = {
+    'group-1-1': 'Batch ETL Pipeline',
+    'group-1-2': 'Real-time Streaming',
+    'group-1-3': 'Data Quality Framework',
+    'group-2-1': 'CDC Pipeline',
+    'group-2-2': 'Data Lake Architecture',
+    'group-2-3': 'ML Pipeline',
+    'group-2-4': 'End-to-End Project'
+  };
+
+  // Group subtopics by module
+  const moduleGroups = {};
+  if (subtopicAccess && subtopicAccess.length > 0) {
+    subtopicAccess.forEach(item => {
+      if (item.access_granted === 1) {
+        if (!moduleGroups[item.module]) moduleGroups[item.module] = [];
+        
+        // Get topic name
+        let topicName = item.group_name;
+        if (item.module === 'sql' && SQL_TOPICS[item.group_name]) {
+          topicName = SQL_TOPICS[item.group_name];
+        } else if (item.module === 'python' && PYTHON_TOPICS[item.group_name]) {
+          topicName = PYTHON_TOPICS[item.group_name];
+        } else if (item.module === 'pyspark' && PYSPARK_TOPICS[item.group_name]) {
+          topicName = PYSPARK_TOPICS[item.group_name];
+        } else if (item.module === 'projects' && PROJECTS_TOPICS[item.group_name]) {
+          topicName = PROJECTS_TOPICS[item.group_name];
+        }
+        
+        moduleGroups[item.module].push(topicName);
+      }
+    });
+  }
+
+  // Render module access
+  const moduleIcons = {
+    sql: '🗄️',
+    python: '🐍',
+    pyspark: '⚡',
+    projects: '🏗️'
+  };
+
+  Object.keys(moduleGroups).forEach(module => {
+    const topics = moduleGroups[module];
+    html += `
+      <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-3xl">${moduleIcons[module] || '📚'}</span>
+          <div>
+            <h4 class="text-lg font-bold text-white">${module.toUpperCase()}</h4>
+            <p class="text-sm text-gray-400">${topics.length} topic(s) unlocked - Click to open</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${topics.map((t, i) => `<button onclick="openModuleTopic('${module}', ${i})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-full text-xs font-semibold cursor-pointer transition">✅ ${t}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  // Render feature access
+  const featureGroups = { resume: [], interview: [] };
+  if (featureAccess && featureAccess.length > 0) {
+    featureAccess.forEach(item => {
+      if (item.access_granted === 1) {
+        featureGroups[item.feature_type].push(item.tab_number);
+      }
+    });
+  }
+
+  if (featureGroups.resume.length > 0) {
+    html += `
+      <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-3xl">📝</span>
+          <div>
+            <h4 class="text-lg font-bold text-white">Resume Builder</h4>
+            <p class="text-sm text-gray-400">${featureGroups.resume.length} tab(s) unlocked</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${featureGroups.resume.map(t => `<span class="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs font-semibold">✅ Tab ${t}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if (featureGroups.interview.length > 0) {
+    html += `
+      <div class="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="text-3xl">🎤</span>
+          <div>
+            <h4 class="text-lg font-bold text-white">Interview Prep</h4>
+            <p class="text-sm text-gray-400">${featureGroups.interview.length} tab(s) unlocked</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${featureGroups.interview.map(t => `<span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-semibold">✅ Tab ${t}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+// Open specific module topic
+function openModuleTopic(module, topicIndex) {
+  const moduleUrls = {
+    sql: 'sql-module.html',
+    python: 'python-syllabus.html',
+    pyspark: 'pyspark-syllabus.html',
+    projects: 'projects-syllabus.html'
+  };
+  
+  if (moduleUrls[module]) {
+    window.location.href = moduleUrls[module];
+  } else {
+    alert('🚧 This module is coming soon!');
+  }
+}
+</script>
+</body>
+</html>

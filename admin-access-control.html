@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Control - Morphed Tech Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #050816 0%, #0b1020 50%, #070812 100%); min-height: 100vh; }
+    .gradient-text { background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: rgba(18, 22, 37, 0.82); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; }
+    .toggle { position:relative; display:inline-block; width:44px; height:24px; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#374151; border-radius:24px; transition:.3s; }
+    .slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.3s; }
+    input:checked + .slider { background: linear-gradient(135deg, #ff3d81, #7c3cff); }
+    input:checked + .slider:before { transform:translateX(20px); }
+    .group-3 { border-left: 3px solid #ff3d81; }
+    .group-6 { border-left: 3px solid #7c3cff; }
+    .group-9 { border-left: 3px solid #00d4ff; }
+  </style>
+</head>
+<body class="text-white">
+
+  <header class="bg-dark/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold gradient-text">🔐 NUMEROLOGY-BASED ACCESS CONTROL</h1>
+      <div class="flex items-center gap-4">
+        <a href="admin-dashboard.html" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm transition">← Back to Dashboard</a>
+        <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Info Banner -->
+    <div class="card p-6 mb-8 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30">
+      <h2 class="text-xl font-bold text-white mb-3">📊 Numerology-Based Sub-Topic Grouping</h2>
+      <div class="grid md:grid-cols-4 gap-4 text-sm">
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">3️⃣</span>
+          <div>
+            <p class="font-bold text-primary">Group of 3 Topics</p>
+            <p class="text-gray-400">Clarity & Foundation</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">6️⃣</span>
+          <div>
+            <p class="font-bold text-secondary">Group of 6 Topics</p>
+            <p class="text-gray-400">Balance & Growth</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">🎯</span>
+          <div>
+            <p class="font-bold text-accent">All Modules</p>
+            <p class="text-gray-400">SQL, Python, PySpark, Projects</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="text-2xl">🎁</span>
+          <div>
+            <p class="font-bold text-green-300">Free Strategy</p>
+            <p class="text-gray-400">SQL (3) + Python (6) + Resume (2) + Interview (2)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Selection -->
+    <div class="card p-6 mb-8">
+      <label class="text-sm text-gray-400 mb-2 block">Select Student</label>
+      <select id="studentSelect" onchange="loadStudentAccess()" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
+        <option value="">Loading students...</option>
+      </select>
+    </div>
+
+    <div id="accessContent" class="hidden">
+
+      <!-- SQL Module -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl">🗄️</div>
+            <div>
+              <h3 class="text-xl font-bold text-white">SQL Mastery</h3>
+              <p class="text-gray-400 text-sm">15 Topics • Individual topic control</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="grantAllSQL()" class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg text-sm transition">Grant All</button>
+            <button onclick="revokeAllSQL()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">Revoke All</button>
+          </div>
+        </div>
+
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div class="grid md:grid-cols-3 gap-3" id="sql-all-topics">
+            <!-- Will be populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Python Module -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-2xl">🐍</div>
+            <div>
+              <h3 class="text-xl font-bold text-white">Python for DE</h3>
+              <p class="text-gray-400 text-sm">14 Topics • Numerology: 6 + 8 pattern</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="grantAllPython()" class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg text-sm transition">Grant All</button>
+            <button onclick="revokeAllPython()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">Revoke All</button>
+          </div>
+        </div>
+
+        <!-- Group 1: First 6 Topics (FREE) -->
+        <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-4 group-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-green-300">🎁 Group 1: Foundation (6 Topics) - FREE</h4>
+            <span class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-bold">Always Free</span>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3">
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">1. Lists</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">2. List Comprehension</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">3. Dictionaries</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">4. Functions</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">5. Mutable/Immutable</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+            <div class="bg-white/5 p-3 rounded-lg">
+              <p class="text-white text-sm mb-2">6. File Handling</p>
+              <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group 2: Last 8 Topics -->
+        <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 group-9">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-purple-300">Group 2: Advanced (8 Topics)</h4>
+            <button onclick="togglePythonGroup2()" class="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="python-group-2">
+            <!-- Will be populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- PySpark Module -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-2xl">⚡</div>
+            <div>
+              <h3 class="text-xl font-bold text-white">PySpark</h3>
+              <p class="text-gray-400 text-sm">15 Topics • Numerology: 3 + 6 + 6 pattern</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="grantAllPySpark()" class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg text-sm transition">Grant All</button>
+            <button onclick="revokeAllPySpark()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">Revoke All</button>
+          </div>
+        </div>
+
+        <!-- Group 1: First 3 Topics -->
+        <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 mb-4 group-3">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-purple-300">Group 1: Foundation (3 Topics)</h4>
+            <button onclick="togglePySparkGroup1()" class="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="pyspark-group-1"></div>
+        </div>
+
+        <!-- Group 2: Next 6 Topics -->
+        <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4 mb-4 group-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-cyan-300">Group 2: Intermediate (6 Topics)</h4>
+            <button onclick="togglePySparkGroup2()" class="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="pyspark-group-2"></div>
+        </div>
+
+        <!-- Group 3: Last 6 Topics -->
+        <div class="bg-pink-500/10 border border-pink-500/30 rounded-xl p-4 group-9">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-pink-300">Group 3: Advanced (6 Topics)</h4>
+            <button onclick="togglePySparkGroup3()" class="px-3 py-1 bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="pyspark-group-3"></div>
+        </div>
+      </div>
+
+      <!-- Projects Module -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center text-2xl">🏗️</div>
+            <div>
+              <h3 class="text-xl font-bold text-white">Real Projects</h3>
+              <p class="text-gray-400 text-sm">7 Projects • Numerology: 3 + 4 pattern</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="grantAllProjects()" class="px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg text-sm transition">Grant All</button>
+            <button onclick="revokeAllProjects()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">Revoke All</button>
+          </div>
+        </div>
+
+        <!-- Group 1: First 3 Projects -->
+        <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4 mb-4 group-3">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-purple-300">Group 1: Core Projects (3 Projects)</h4>
+            <button onclick="toggleProjectsGroup1()" class="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="projects-group-1"></div>
+        </div>
+
+        <!-- Group 2: Last 4 Projects -->
+        <div class="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4 group-6">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-cyan-300">Group 2: Advanced Projects (4 Projects)</h4>
+            <button onclick="toggleProjectsGroup2()" class="px-3 py-1 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 rounded text-xs transition">Toggle All</button>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3" id="projects-group-2"></div>
+        </div>
+      </div>
+
+      <!-- Resume & Interview Features -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-2xl">📝</div>
+          <div>
+            <h3 class="text-xl font-bold text-white">Resume & Interview Features</h3>
+            <p class="text-gray-400 text-sm">Tab-based access control</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Resume Tabs -->
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <h4 class="font-bold text-white mb-4">📝 Resume Builder (6 Tabs)</h4>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                <span class="text-sm text-white">Tab 1: Structure (FREE)</span>
+                <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                <span class="text-sm text-white">Tab 2: Project Writing (FREE)</span>
+                <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="resume-tab-3">
+                <span class="text-sm text-white">Tab 3: Examples</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('resume', 3, this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="resume-tab-4">
+                <span class="text-sm text-white">Tab 4: Mistakes</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('resume', 4, this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="resume-tab-5">
+                <span class="text-sm text-white">Tab 5: Checklist</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('resume', 5, this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="resume-tab-6">
+                <span class="text-sm text-white">Tab 6: Model Resume</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('resume', 6, this.checked)"><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interview Tabs -->
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+            <h4 class="font-bold text-white mb-4">🎤 Interview Prep (5 Tabs)</h4>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                <span class="text-sm text-white">Tab 1: Introduction (FREE)</span>
+                <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                <span class="text-sm text-white">Tab 2: Project Story (FREE)</span>
+                <label class="toggle"><input type="checkbox" checked disabled><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="interview-tab-3">
+                <span class="text-sm text-white">Tab 3: Scenario Q&A</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('interview', 3, this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="interview-tab-4">
+                <span class="text-sm text-white">Tab 4: STAR Method</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('interview', 4, this.checked)"><span class="slider"></span></label>
+              </div>
+              <div class="flex items-center justify-between bg-white/5 rounded-lg p-3" id="interview-tab-5">
+                <span class="text-sm text-white">Tab 5: Complete Example</span>
+                <label class="toggle"><input type="checkbox" onchange="toggleFeature('interview', 5, this.checked)"><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+    let currentUserId = null;
+    let accessData = {};
+
+    // Check authentication
+    if (!token) {
+      alert('Please login first');
+      window.location.href = 'admin-login.html';
+    }
+
+    const SQL_TOPICS = {
+      group2: ['window-functions', 'cte', 'subqueries', 'ranking-functions', 'data-cleaning', 'deduplication'],
+      group3: ['scd', 'query-optimization', 'incremental-load', 'data-validation', 'handling-nulls', 'set-operations']
+    };
+
+    const ALL_SQL_TOPICS = [
+      'joins', 'aggregations', 'case-statements',
+      'window-functions', 'cte', 'subqueries', 'ranking-functions', 'data-cleaning', 'deduplication',
+      'scd', 'query-optimization', 'incremental-load', 'data-validation', 'handling-nulls', 'set-operations'
+    ];
+
+    const PYTHON_TOPICS = {
+      group2: ['python-json', 'python-exception-handling', 'python-logging', 'python-pandas-basics', 'python-pandas-groupby', 'python-pandas-merge', 'python-etl-pipeline', 'python-generators']
+    };
+
+    const PYSPARK_TOPICS = {
+      group1: ['pyspark-intro', 'pyspark-rdd', 'pyspark-dataframe'],
+      group2: ['pyspark-transformations', 'pyspark-actions', 'pyspark-sql', 'pyspark-joins', 'pyspark-groupby', 'pyspark-window'],
+      group3: ['pyspark-partitioning-bucketing', 'pyspark-optimization', 'pyspark-etl', 'pyspark-etl-pipeline', 'pyspark-performance', 'pyspark-partitioning']
+    };
+
+    const PROJECTS_TOPICS = {
+      group1: ['project-1', 'project-2', 'project-3'],
+      group2: ['project-4', 'project-5', 'project-6', 'project-7']
+    };
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'admin-login.html';
+    }
+
+    async function loadStudents() {
+      try {
+        console.log('Loading students with token:', token ? 'exists' : 'missing');
+        const r = await fetch(`${API}/admin/students`, { 
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-cache'
+        });
+        
+        console.log('Response status:', r.status);
+        
+        if (!r.ok) {
+          const errorText = await r.text();
+          console.error('Error response:', errorText);
+          throw new Error(`Failed to load: ${r.status}`);
+        }
+        
+        const students = await r.json();
+        console.log('Students loaded:', students.length);
+        
+        const select = document.getElementById('studentSelect');
+        if (students.length === 0) {
+          select.innerHTML = '<option value="">No students found</option>';
+          return;
+        }
+        select.innerHTML = '<option value="">-- Select a student --</option>' + 
+          students.map(s => `<option value="${s.id}">${s.name} (${s.email})</option>`).join('');
+      } catch(e) {
+        console.error('Error loading students:', e);
+        document.getElementById('studentSelect').innerHTML = `<option value="">Error: ${e.message}</option>`;
+        alert('Failed to load students. Please check console and try logging in again.');
+      }
+    }
+
+    async function loadStudentAccess() {
+      currentUserId = document.getElementById('studentSelect').value;
+      if (!currentUserId) {
+        document.getElementById('accessContent').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('accessContent').classList.remove('hidden');
+
+      try {
+        // Load access data
+        const r = await fetch(`${API}/admin/access/${currentUserId}`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!r.ok) throw new Error('Failed to load access');
+        accessData = await r.json();
+        console.log('Access data loaded:', accessData);
+
+        // Render ALL SQL Topics individually
+        document.getElementById('sql-all-topics').innerHTML = ALL_SQL_TOPICS.map((topic, i) => {
+          const topicKey = `topic-${i+1}`;
+          const checked = hasAccess('sql', topicKey);
+          const isFree = i < 3;
+          return `<div class="bg-white/5 p-3 rounded-lg ${isFree ? 'opacity-50' : ''}">
+            <p class="text-white text-sm mb-2">${i+1}. ${formatTopicName(topic)} ${isFree ? '(FREE)' : ''}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} ${isFree ? 'disabled' : ''} onchange="toggleSubtopic('sql', '${topicKey}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        // Render Python Group 2
+        document.getElementById('python-group-2').innerHTML = PYTHON_TOPICS.group2.map((topic, i) => {
+          const checked = hasAccess('python', `group-2-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+7}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('python', 'group-2-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        // Render PySpark Groups
+        document.getElementById('pyspark-group-1').innerHTML = PYSPARK_TOPICS.group1.map((topic, i) => {
+          const checked = hasAccess('pyspark', `group-1-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+1}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('pyspark', 'group-1-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        document.getElementById('pyspark-group-2').innerHTML = PYSPARK_TOPICS.group2.map((topic, i) => {
+          const checked = hasAccess('pyspark', `group-2-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+4}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('pyspark', 'group-2-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        document.getElementById('pyspark-group-3').innerHTML = PYSPARK_TOPICS.group3.map((topic, i) => {
+          const checked = hasAccess('pyspark', `group-3-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+10}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('pyspark', 'group-3-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        // Render Projects Groups
+        document.getElementById('projects-group-1').innerHTML = PROJECTS_TOPICS.group1.map((topic, i) => {
+          const checked = hasAccess('projects', `group-1-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+1}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('projects', 'group-1-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        document.getElementById('projects-group-2').innerHTML = PROJECTS_TOPICS.group2.map((topic, i) => {
+          const checked = hasAccess('projects', `group-2-${i+1}`);
+          return `<div class="bg-white/5 p-3 rounded-lg">
+            <p class="text-white text-sm mb-2">${i+4}. ${formatTopicName(topic)}</p>
+            <label class="toggle"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubtopic('projects', 'group-2-${i+1}', this.checked)"><span class="slider"></span></label>
+          </div>`;
+        }).join('');
+
+        // Load feature access
+        for (let i = 3; i <= 6; i++) {
+          const checked = hasFeatureAccess('resume', i);
+          const input = document.querySelector(`#resume-tab-${i} input`);
+          if (input) input.checked = checked;
+        }
+        for (let i = 3; i <= 5; i++) {
+          const checked = hasFeatureAccess('interview', i);
+          const input = document.querySelector(`#interview-tab-${i} input`);
+          if (input) input.checked = checked;
+        }
+      } catch(e) {
+        console.error('Error loading access:', e);
+        showToast('❌ Error loading access data');
+      }
+    }
+
+    function hasAccess(module, groupName) {
+      return accessData.subtopics?.some(s => s.module === module && s.group_name === groupName && s.access_granted === 1) || false;
+    }
+
+    function hasFeatureAccess(featureType, tabNumber) {
+      return accessData.features?.some(f => f.feature_type === featureType && f.tab_number === tabNumber && f.access_granted === 1) || false;
+    }
+
+    async function toggleSubtopic(module, groupName, value) {
+      try {
+        const response = await fetch(`${API}/admin/subtopic/${currentUserId}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ module, group_name: groupName, access_granted: value ? 1 : 0 })
+        });
+        if (!response.ok) throw new Error('Failed to update');
+        
+        // Update local cache
+        if (!accessData.subtopics) accessData.subtopics = [];
+        const existing = accessData.subtopics.findIndex(s => s.module === module && s.group_name === groupName);
+        if (existing >= 0) {
+          accessData.subtopics[existing].access_granted = value ? 1 : 0;
+        } else {
+          accessData.subtopics.push({ module, group_name: groupName, access_granted: value ? 1 : 0 });
+        }
+        
+        console.log('Updated access:', module, groupName, value);
+      } catch(e) {
+        console.error('Error toggling subtopic:', e);
+        showToast('❌ Failed to update access');
+      }
+    }
+
+    async function toggleFeature(featureType, tabNumber, value) {
+      try {
+        const response = await fetch(`${API}/admin/feature/${currentUserId}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feature_type: featureType, tab_number: tabNumber, access_granted: value ? 1 : 0 })
+        });
+        if (!response.ok) throw new Error('Failed to update');
+        
+        // Update local cache
+        if (!accessData.features) accessData.features = [];
+        const existing = accessData.features.findIndex(f => f.feature_type === featureType && f.tab_number === tabNumber);
+        if (existing >= 0) {
+          accessData.features[existing].access_granted = value ? 1 : 0;
+        } else {
+          accessData.features.push({ feature_type: featureType, tab_number: tabNumber, access_granted: value ? 1 : 0 });
+        }
+        
+        showToast(`${value ? '✅ Granted' : '🚫 Revoked'} ${featureType} Tab ${tabNumber}`);
+      } catch(e) {
+        console.error('Error toggling feature:', e);
+        showToast('❌ Failed to update access');
+      }
+    }
+
+    async function grantAllSQL() {
+      for (let i = 4; i <= 15; i++) {
+        await toggleSubtopic('sql', `topic-${i}`, true);
+      }
+      await loadStudentAccess();
+      showToast('✅ All SQL topics granted');
+    }
+
+    async function revokeAllSQL() {
+      for (let i = 4; i <= 15; i++) {
+        await toggleSubtopic('sql', `topic-${i}`, false);
+      }
+      await loadStudentAccess();
+      showToast('🚫 All SQL topics revoked');
+    }
+
+    async function grantAllPython() {
+      for (let i = 1; i <= 8; i++) {
+        await toggleSubtopic('python', `group-2-${i}`, true);
+      }
+      loadStudentAccess();
+      showToast('✅ All Python topics granted');
+    }
+
+    async function revokeAllPython() {
+      for (let i = 1; i <= 8; i++) {
+        await toggleSubtopic('python', `group-2-${i}`, false);
+      }
+      loadStudentAccess();
+      showToast('🚫 All Python topics revoked');
+    }
+
+    async function toggleSQLGroup2() {
+      const allChecked = SQL_TOPICS.group2.every((_, i) => hasAccess('sql', `group-2-${i+1}`));
+      for (let i = 1; i <= 6; i++) {
+        await toggleSubtopic('sql', `group-2-${i}`, !allChecked);
+      }
+      loadStudentAccess();
+    }
+
+    async function toggleSQLGroup3() {
+      const allChecked = SQL_TOPICS.group3.every((_, i) => hasAccess('sql', `group-3-${i+1}`));
+      for (let i = 1; i <= 6; i++) {
+        await toggleSubtopic('sql', `group-3-${i}`, !allChecked);
+      }
+      loadStudentAccess();
+    }
+
+    async function togglePythonGroup2() {
+      const allChecked = PYTHON_TOPICS.group2.every((_, i) => hasAccess('python', `group-2-${i+1}`));
+      for (let i = 1; i <= 8; i++) {
+        await toggleSubtopic('python', `group-2-${i}`, !allChecked);
+      }
+      await loadStudentAccess();
+    }
+
+    async function grantAllPySpark() {
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('pyspark', `group-1-${i}`, true);
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-2-${i}`, true);
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-3-${i}`, true);
+      await loadStudentAccess();
+      showToast('✅ All PySpark topics granted');
+    }
+
+    async function revokeAllPySpark() {
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('pyspark', `group-1-${i}`, false);
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-2-${i}`, false);
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-3-${i}`, false);
+      await loadStudentAccess();
+      showToast('🚫 All PySpark topics revoked');
+    }
+
+    async function togglePySparkGroup1() {
+      const allChecked = PYSPARK_TOPICS.group1.every((_, i) => hasAccess('pyspark', `group-1-${i+1}`));
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('pyspark', `group-1-${i}`, !allChecked);
+      await loadStudentAccess();
+    }
+
+    async function togglePySparkGroup2() {
+      const allChecked = PYSPARK_TOPICS.group2.every((_, i) => hasAccess('pyspark', `group-2-${i+1}`));
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-2-${i}`, !allChecked);
+      await loadStudentAccess();
+    }
+
+    async function togglePySparkGroup3() {
+      const allChecked = PYSPARK_TOPICS.group3.every((_, i) => hasAccess('pyspark', `group-3-${i+1}`));
+      for (let i = 1; i <= 6; i++) await toggleSubtopic('pyspark', `group-3-${i}`, !allChecked);
+      await loadStudentAccess();
+    }
+
+    async function grantAllProjects() {
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('projects', `group-1-${i}`, true);
+      for (let i = 1; i <= 4; i++) await toggleSubtopic('projects', `group-2-${i}`, true);
+      await loadStudentAccess();
+      showToast('✅ All Projects granted');
+    }
+
+    async function revokeAllProjects() {
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('projects', `group-1-${i}`, false);
+      for (let i = 1; i <= 4; i++) await toggleSubtopic('projects', `group-2-${i}`, false);
+      await loadStudentAccess();
+      showToast('🚫 All Projects revoked');
+    }
+
+    async function toggleProjectsGroup1() {
+      const allChecked = PROJECTS_TOPICS.group1.every((_, i) => hasAccess('projects', `group-1-${i+1}`));
+      for (let i = 1; i <= 3; i++) await toggleSubtopic('projects', `group-1-${i}`, !allChecked);
+      await loadStudentAccess();
+    }
+
+    async function toggleProjectsGroup2() {
+      const allChecked = PROJECTS_TOPICS.group2.every((_, i) => hasAccess('projects', `group-2-${i+1}`));
+      for (let i = 1; i <= 4; i++) await toggleSubtopic('projects', `group-2-${i}`, !allChecked);
+      await loadStudentAccess();
+    }
+
+    function formatTopicName(slug) {
+      return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.className = 'fixed bottom-6 right-6 px-5 py-3 bg-primary text-white rounded-xl shadow-xl text-sm font-semibold z-50';
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('Page loaded, initializing...');
+      loadStudents();
+    });
+  </script>
+</body>
+</html>

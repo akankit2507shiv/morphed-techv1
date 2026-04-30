@@ -1,0 +1,108 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║        🚀 MORPHED TECH - QUICK DEPLOYMENT GUIDE 🚀          ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 DEPLOYMENT CHECKLIST (15 minutes total)
+
+┌─────────────────────────────────────────────────────────────┐
+│ STEP 1: DEPLOY BACKEND (5 min)                             │
+└─────────────────────────────────────────────────────────────┘
+
+  1. Go to: https://render.com
+  2. Sign up with GitHub
+  3. Click "New +" → "Web Service"
+  4. Connect GitHub repo
+  5. Configure:
+     • Name: morphed-tech-backend
+     • Environment: Node
+     • Build: npm install
+     • Start: npm start
+  6. Add Environment Variables (copy from .env.production)
+  7. Click "Create Web Service"
+  8. ⏰ Wait 5-10 minutes
+  9. ✅ Copy backend URL
+
+┌─────────────────────────────────────────────────────────────┐
+│ STEP 2: UPDATE API URLS (2 min)                            │
+└─────────────────────────────────────────────────────────────┘
+
+  Run this command:
+  
+  ./deploy.sh https://YOUR-BACKEND-URL.onrender.com
+  
+  This updates all HTML files automatically.
+
+┌─────────────────────────────────────────────────────────────┐
+│ STEP 3: DEPLOY FRONTEND (3 min)                            │
+└─────────────────────────────────────────────────────────────┘
+
+  1. Go to: https://vercel.com
+  2. Sign up with GitHub
+  3. Click "Add New" → "Project"
+  4. Import GitHub repo
+  5. Configure:
+     • Framework: Other
+     • Build: (empty)
+     • Output: .
+  6. Click "Deploy"
+  7. ⏰ Wait 2-3 minutes
+  8. ✅ Copy frontend URL
+
+┌─────────────────────────────────────────────────────────────┐
+│ STEP 4: UPDATE CORS (2 min)                                │
+└─────────────────────────────────────────────────────────────┘
+
+  1. Open server.js
+  2. Update CORS with your Vercel URL
+  3. git add server.js
+  4. git commit -m "Update CORS"
+  5. git push
+  6. ⏰ Wait 2-3 minutes for auto-redeploy
+
+╔══════════════════════════════════════════════════════════════╗
+║                    🎉 YOU ARE LIVE! 🎉                      ║
+╚══════════════════════════════════════════════════════════════╝
+
+📱 SHARE THIS URL WITH FRIENDS:
+
+   https://morphed-tech.vercel.app
+
+👨🎓 STUDENT PORTAL:
+   https://morphed-tech.vercel.app/student-login.html
+
+👨💼 ADMIN PORTAL:
+   https://morphed-tech.vercel.app/admin-login.html
+
+🔑 ADMIN CREDENTIALS:
+   Email: !Mahadev007!@gmail.com
+   Password: !Mahakal007!@
+
+╔══════════════════════════════════════════════════════════════╗
+║                    ✅ TEST CHECKLIST                         ║
+╚══════════════════════════════════════════════════════════════╝
+
+  □ Frontend loads without errors
+  □ Student registration works
+  □ Student login works
+  □ Admin login works
+  □ Payment page loads
+  □ Course modules display
+  □ No CORS errors in console
+
+╔══════════════════════════════════════════════════════════════╗
+║                    📚 DOCUMENTATION                          ║
+╚══════════════════════════════════════════════════════════════╝
+
+  • DEPLOYMENT_COMPLETE.md - Full deployment summary
+  • DEPLOYMENT_GUIDE.md - Detailed step-by-step guide
+  • DEPLOY_README.md - Quick reference
+  • deploy.sh - Automated API URL updater
+
+╔══════════════════════════════════════════════════════════════╗
+║                    💰 COST: $0/month                         ║
+║                    ⏱️  TIME: 15 minutes                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+Good luck! 🚀

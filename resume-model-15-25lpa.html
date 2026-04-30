@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Model Resume - 15-25 LPA</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+.resume { background: white; padding: 40px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+.header { text-align: center; border-bottom: 3px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }
+.name { font-size: 32px; font-weight: bold; color: #1e40af; margin-bottom: 10px; }
+.contact { font-size: 14px; color: #666; }
+.section { margin-bottom: 30px; }
+.section-title { font-size: 20px; font-weight: bold; color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; margin-bottom: 15px; }
+.skills { display: flex; flex-wrap: wrap; gap: 10px; }
+.skill-tag { background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 5px; font-size: 13px; font-weight: 600; }
+.project { margin-bottom: 25px; padding: 15px; background: #f8fafc; border-left: 4px solid #3b82f6; }
+.project-title { font-size: 16px; font-weight: bold; color: #1e40af; margin-bottom: 8px; }
+.project-detail { font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 6px; }
+.label { font-weight: bold; color: #475569; }
+.experience { margin-bottom: 20px; }
+.company { font-weight: bold; font-size: 16px; color: #1e40af; }
+.role { font-size: 14px; color: #64748b; margin-bottom: 8px; }
+.duration { font-size: 13px; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="resume">
+  
+  <!-- Header -->
+  <div class="header">
+    <div class="name">RAHUL SHARMA</div>
+    <div class="contact">
+      📧 rahul.sharma@email.com | 📱 +91-9876543210 | 🔗 linkedin.com/in/rahulsharma | 📍 Bangalore, India
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <div class="section">
+    <div class="section-title">💻 TECHNICAL SKILLS</div>
+    <div class="skills">
+      <span class="skill-tag">Python</span>
+      <span class="skill-tag">SQL</span>
+      <span class="skill-tag">PySpark</span>
+      <span class="skill-tag">AWS (S3, Glue, Redshift, Lambda)</span>
+      <span class="skill-tag">Apache Kafka</span>
+      <span class="skill-tag">Apache Airflow</span>
+      <span class="skill-tag">Delta Lake</span>
+      <span class="skill-tag">Databricks</span>
+      <span class="skill-tag">PostgreSQL</span>
+      <span class="skill-tag">Git</span>
+      <span class="skill-tag">Docker</span>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="section">
+    <div class="section-title">🏗️ KEY PROJECTS</div>
+    
+    <div class="project">
+      <div class="project-title">Real-time Streaming Data Pipeline</div>
+      <div class="project-detail"><span class="label">Problem:</span> E-commerce platform needed real-time analytics on 2M+ daily customer events (clicks, purchases, cart actions) to enable instant personalization and fraud detection.</div>
+      <div class="project-detail"><span class="label">Responsibility:</span> Designed and implemented end-to-end streaming architecture from scratch.</div>
+      <div class="project-detail"><span class="label">Solution:</span> Built Kafka → PySpark Streaming → Delta Lake → Databricks pipeline with real-time aggregations and windowing functions.</div>
+      <div class="project-detail"><span class="label">Tech Stack:</span> Apache Kafka, PySpark Streaming, Delta Lake, Databricks, AWS S3, Python</div>
+      <div class="project-detail"><span class="label">Outcome:</span> Achieved sub-second latency, processed 80K events/sec, reduced fraud detection time by 75%</div>
+    </div>
+
+    <div class="project">
+      <div class="project-title">Scalable Batch ETL Pipeline for Data Warehouse</div>
+      <div class="project-detail"><span class="label">Problem:</span> Retail company had 50GB daily sales data from 500+ stores with no centralized reporting system.</div>
+      <div class="project-detail"><span class="label">Responsibility:</span> Built automated ETL pipeline to consolidate data from multiple sources into data warehouse.</div>
+      <div class="project-detail"><span class="label">Solution:</span> Designed S3 → AWS Glue → PySpark → Redshift architecture with incremental loading and SCD Type-2 implementation.</div>
+      <div class="project-detail"><span class="label">Tech Stack:</span> AWS S3, AWS Glue, PySpark, Redshift, Apache Airflow, Python, SQL</div>
+      <div class="project-detail"><span class="label">Outcome:</span> Reduced processing time from 8 hours to 45 minutes (90% improvement), automated daily reporting</div>
+    </div>
+
+    <div class="project">
+      <div class="project-title">Data Quality & Validation Framework</div>
+      <div class="project-detail"><span class="label">Problem:</span> Data pipelines had no quality checks, leading to incorrect reports and business decisions.</div>
+      <div class="project-detail"><span class="label">Responsibility:</span> Implemented comprehensive data quality framework with automated validation rules.</div>
+      <div class="project-detail"><span class="label">Solution:</span> Built Python-based validation engine with Great Expectations, integrated with Airflow for automated checks on schema, nulls, duplicates, and business rules.</div>
+      <div class="project-detail"><span class="label">Tech Stack:</span> Python, Great Expectations, Apache Airflow, PostgreSQL, Slack API</div>
+      <div class="project-detail"><span class="label">Outcome:</span> Detected and prevented 95% of data quality issues before reaching production, reduced data incidents by 80%</div>
+    </div>
+
+  </div>
+
+  <!-- Experience -->
+  <div class="section">
+    <div class="section-title">💼 PROFESSIONAL EXPERIENCE</div>
+    
+    <div class="experience">
+      <div class="company">Tech Solutions Pvt Ltd</div>
+      <div class="role">Data Engineer</div>
+      <div class="duration">Jan 2022 - Present | Bangalore</div>
+      <ul style="margin-top: 10px; color: #475569; font-size: 14px; line-height: 1.8;">
+        <li>Designed and maintained 15+ production data pipelines processing 200GB+ daily data</li>
+        <li>Optimized PySpark jobs reducing execution time by 60% through partitioning and caching strategies</li>
+        <li>Implemented CI/CD pipelines for data workflows using Git, Jenkins, and Docker</li>
+        <li>Collaborated with data analysts and ML engineers to build scalable data infrastructure</li>
+      </ul>
+    </div>
+
+    <div class="experience">
+      <div class="company">DataCorp India</div>
+      <div class="role">Junior Data Engineer</div>
+      <div class="duration">Jul 2020 - Dec 2021 | Pune</div>
+      <ul style="margin-top: 10px; color: #475569; font-size: 14px; line-height: 1.8;">
+        <li>Built ETL pipelines using Python and SQL to process customer data from multiple sources</li>
+        <li>Created automated reports and dashboards using SQL and Python</li>
+        <li>Performed data cleaning, transformation, and validation on large datasets</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Education -->
+  <div class="section">
+    <div class="section-title">🎓 EDUCATION</div>
+    <div style="font-size: 15px; color: #334155;">
+      <div style="font-weight: bold;">Bachelor of Technology in Computer Science</div>
+      <div style="color: #64748b; margin-top: 5px;">XYZ University | 2016 - 2020 | CGPA: 8.2/10</div>
+    </div>
+  </div>
+
+  <!-- Certifications -->
+  <div class="section">
+    <div class="section-title">📜 CERTIFICATIONS</div>
+    <ul style="color: #475569; font-size: 14px; line-height: 1.8;">
+      <li>AWS Certified Data Analytics - Specialty</li>
+      <li>Databricks Certified Data Engineer Associate</li>
+      <li>Apache Spark Developer Certification</li>
+    </ul>
+  </div>
+
+</div>
+
+<div style="text-align: center; margin-top: 30px; padding: 20px; background: white; border-radius: 10px;">
+  <h3 style="color: #1e40af; margin-bottom: 15px;">🎯 Why This Resume Works for 15-25 LPA</h3>
+  <div style="text-align: left; max-width: 700px; margin: 0 auto; color: #475569; line-height: 1.8;">
+    <p><strong>✅ Strong Project Focus:</strong> 3 detailed projects showing real business impact with measurable outcomes</p>
+    <p><strong>✅ Modern Tech Stack:</strong> Kafka, PySpark, Delta Lake, Databricks - all high-demand technologies</p>
+    <p><strong>✅ Quantifiable Results:</strong> Every project has numbers (90% improvement, 80K events/sec, 75% reduction)</p>
+    <p><strong>✅ Problem-Solution Format:</strong> Clear business problem → your responsibility → technical solution → outcome</p>
+    <p><strong>✅ 2+ Years Experience:</strong> Shows progression from Junior to Data Engineer role</p>
+    <p><strong>✅ Certifications:</strong> AWS and Databricks certifications add credibility</p>
+  </div>
+</div>
+
+</body>
+</html>

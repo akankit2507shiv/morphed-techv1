@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Topic - Morphex</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; }
+    .gradient-bg { background:radial-gradient(circle at 8% 12%, rgba(255,61,129,0.15) 0%, transparent 35%),radial-gradient(circle at 82% 6%, rgba(0,212,255,0.12) 0%, transparent 30%),radial-gradient(circle at 72% 82%, rgba(124,60,255,0.13) 0%, transparent 40%),linear-gradient(180deg, #050816 0%, #0b1020 50%, #070812 100%); min-height:100vh; }
+    .gradient-text { background:linear-gradient(135deg,#ff3d81,#7c3cff,#00d4ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .section-card { background:rgba(255,255,255,0.05); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:1rem; padding:2rem; margin-bottom:2rem; }
+    .progress-bar { position:fixed; top:0; left:0; height:4px; background:linear-gradient(90deg,#ff3d81,#7c3cff,#00d4ff); width:0%; transition:width 0.3s ease; z-index:100; }
+    .tab-nav { display:flex; gap:0; overflow-x:auto; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:2rem; scrollbar-width:thin; }
+    .tab-nav::-webkit-scrollbar { height:3px; }
+    .tab-nav::-webkit-scrollbar-thumb { background:rgba(255,61,129,0.5); border-radius:2px; }
+    .tab-btn { padding:0.875rem 1.25rem; font-size:0.875rem; font-weight:600; color:rgba(255,255,255,0.45); cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; transition:all 0.2s; background:none; border-top:none; border-left:none; border-right:none; }
+    .tab-btn:hover { color:rgba(255,255,255,0.8); }
+    .tab-btn.active { color:#00d4ff; border-bottom-color:#ff3d81; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    .service-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:0.75rem; padding:1.5rem; margin-bottom:1rem; }
+    .qa-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:0.75rem; padding:1.25rem; margin-bottom:0.75rem; cursor:pointer; transition:all 0.2s; }
+    .qa-card:hover { background:rgba(255,255,255,0.07); border-color:rgba(255,61,129,0.4); }
+    .ans-hidden { max-height:0; overflow:hidden; opacity:0; transition:all 0.3s; }
+    .ans-visible { max-height:500px; opacity:1; transition:all 0.4s; margin-top:0.75rem; }
+    pre, code { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:0.5rem; padding:0.75rem 1rem; font-size:0.875rem; color:#86efac; display:block; }
+  </style>
+</head>
+<body class="gradient-bg text-white">
+
+  <div class="progress-bar" id="progressBar"></div>
+
+  <header class="bg-dark/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="aws-syllabus.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center font-bold text-xl">M</div>
+        <span class="text-2xl font-extrabold gradient-text">MORPHEX</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-300" id="topicTitle">Loading...</span>
+        <a href="admin-dashboard.html" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-white rounded-lg text-sm font-medium transition">
+          ← Admin Dashboard
+        </a>
+        <a href="aws-syllabus.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition">← AWS Topics</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8">
+
+    <!-- Header Card -->
+    <div class="section-card mb-6">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center text-3xl" id="topicIcon">☁️</div>
+        <div>
+          <h1 class="text-3xl font-bold text-white" id="topicName">Loading...</h1>
+          <p class="text-accent font-semibold mt-1" id="topicTagline"></p>
+          <p class="text-gray-400 text-sm mt-1" id="topicObjective"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('comic',this)">🎭 Comic</button>
+      <button class="tab-btn" onclick="switchTab('deepdive',this)">📚 Deep Dive</button>
+      <button class="tab-btn" onclick="switchTab('types',this)">📋 Types</button>
+      <button class="tab-btn" onclick="switchTab('overview',this)">🎯 Overview</button>
+      <button class="tab-btn" onclick="switchTab('services',this)">⚙️ Services</button>
+      <button class="tab-btn" onclick="switchTab('qa',this)">💬 Q&A</button>
+      <button class="tab-btn" onclick="switchTab('coding',this)">💻 Coding</button>
+      <button class="tab-btn" onclick="switchTab('quiz',this)">🎯 Quiz</button>
+      <button class="tab-btn" onclick="switchTab('practical',this)">🔧 Practical</button>
+      <button class="tab-btn" onclick="switchTab('interview',this)">🎤 Interview</button>
+      <button class="tab-btn" onclick="switchTab('mistakes',this)">⚠️ Mistakes</button>
+      <button class="tab-btn" onclick="switchTab('memory',this)">🧠 Memory</button>
+      <button id="tab-project-btn" class="tab-btn hidden" onclick="switchTab('project',this)">🏆 Architecture</button>
+    </div>
+
+    <!-- 0. COMIC STORY -->
+    <div id="panel-comic" class="tab-panel active section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>🎭</span> Comic Story</h2>
+      <div id="comicContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- 0.5 DEEP DIVE -->
+    <div id="panel-deepdive" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>📚</span> Deep Dive</h2>
+      <div id="deepDiveContainer" class="space-y-3"></div>
+    </div>
+
+    <!-- 0.6 TYPES -->
+    <div id="panel-types" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>📋</span> Types</h2>
+      <div id="typesContainer" class="bg-white/5 border border-white/10 rounded-xl p-6">
+        <pre id="typesContent" class="text-gray-200 leading-relaxed whitespace-pre-wrap" style="background: transparent; border: none; padding: 0;"></pre>
+      </div>
+    </div>
+
+    <!-- 1. OVERVIEW -->
+    <div id="panel-overview" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>🎯</span> Flow Overview</h2>
+
+      <!-- Core Concept -->
+      <div class="bg-primary/10 border border-primary/30 rounded-xl p-5 mb-5">
+        <p class="text-secondary font-semibold text-sm mb-2">🧠 Core Thinking:</p>
+        <p id="coreThinkin" class="text-white text-lg font-bold"></p>
+        <p class="text-secondary font-semibold text-sm mt-3 mb-1">🗺️ AWS Mapping:</p>
+        <p id="coreMapping" class="text-accent font-semibold"></p>
+      </div>
+
+      <!-- Scenario -->
+      <div class="mb-5">
+        <h3 class="text-lg font-bold text-white mb-3">📌 Real-Time Scenario</h3>
+        <div class="bg-white/5 rounded-xl p-5">
+          <p class="text-sm text-gray-400 mb-2">Data Sources:</p>
+          <div id="scenarioSources" class="flex flex-wrap gap-2 mb-4"></div>
+          <p class="text-sm text-gray-400 mb-1">❓ Problem:</p>
+          <p id="scenarioProblem" class="text-white mb-4"></p>
+          <p class="text-sm text-red-400 mb-2">❌ Wrong Approach:</p>
+          <ul id="wrongApproach" class="space-y-1 mb-4"></ul>
+          <p class="text-sm text-green-400 mb-2">✅ Correct Approach:</p>
+          <p id="correctApproach" class="text-green-300 font-semibold"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SERVICES -->
+    <div id="panel-services" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>⚙️</span> AWS Services Used</h2>
+      <div id="servicesContainer"></div>
+    </div>
+
+    <!-- 3. INTERACTIVE Q&A -->
+    <div id="panel-qa" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>💬</span> Interactive Q&A</h2>
+      <div id="qaContainer"></div>
+    </div>
+
+    <!-- 4. CODING CHALLENGE -->
+    <div id="panel-coding" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>💻</span> Coding Challenge</h2>
+      <div id="codingContainer"></div>
+    </div>
+
+    <!-- 5. QUIZ -->
+    <div id="panel-quiz" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>🎯</span> Quiz</h2>
+      <p class="text-gray-400 text-sm mb-5">Test your knowledge with these questions</p>
+      <div id="quizContainer"></div>
+    </div>
+
+    <!-- 3. PRACTICAL -->
+    <div id="panel-practical" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>💻</span> Practical Steps</h2>
+      <div id="practicalContainer"></div>
+    </div>
+
+    <!-- 4. INTERVIEW Q&A -->
+    <div id="panel-interview" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><span>🎤</span> Interview Q&A</h2>
+      <p class="text-gray-400 text-sm mb-5">Click any question to reveal the answer</p>
+      <div id="interviewContainer"></div>
+      <div id="completeBadge" class="hidden mt-6 p-5 bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/40 rounded-xl text-center">
+        <p class="text-2xl font-bold text-white mb-1">🎉 Flow Complete!</p>
+        <p class="text-gray-300 text-sm">You've reviewed all interview questions for this flow</p>
+      </div>
+    </div>
+
+    <!-- 5. MISTAKES -->
+    <div id="panel-mistakes" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>⚠️</span> Common Mistakes</h2>
+      <div id="mistakesContainer"></div>
+    </div>
+
+    <!-- 6. MEMORY -->
+    <div id="panel-memory" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>🧠</span> Memory Trick</h2>
+      <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 mb-5">
+        <p class="text-yellow-300 text-xl font-bold mb-3" id="memoryLine"></p>
+        <p class="text-accent font-semibold text-lg" id="memoryFlow"></p>
+      </div>
+      <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-6">
+        <p class="text-sm font-semibold text-secondary mb-2">🎤 Final Interview Statement:</p>
+        <p id="finalStatement" class="text-gray-200 leading-relaxed" style="white-space:pre-line;"></p>
+      </div>
+    </div>
+
+    <!-- 7. PROJECT ARCHITECTURE -->
+    <div id="panel-project" class="tab-panel section-card">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><span>🏆</span> Pipeline Architecture</h2>
+      <div class="bg-primary/10 border border-primary/30 rounded-xl p-5 mb-6 text-center">
+        <p class="text-secondary font-semibold text-sm mb-2">🗺️ Full Pipeline Flow:</p>
+        <p id="archFlowText" class="text-white font-bold text-lg"></p>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-4">📋 Step-by-Step Breakdown</h3>
+      <div id="stepCardsContainer" class="space-y-3"></div>
+      <div class="mt-6">
+        <h3 class="text-lg font-bold text-white mb-4">🔑 Key Features</h3>
+        <div id="keyFeaturesContainer" class="grid md:grid-cols-2 gap-3"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="aws-content.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const topicId = params.get('topic') || 'aws-flow-1';
+    const topic = awsContent[topicId];
+    const FREE_TOPICS = ['aws-flow-1'];
+    const isFree = FREE_TOPICS.includes(topicId);
+    const token = localStorage.getItem('token');
+    if (!isFree && !token) { window.location.href = 'student-login.html'; }
+
+    if (!topic || topic.ready === false) {
+      document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-400"><div class="text-6xl mb-4">🔒</div><p class="text-2xl font-bold text-white mb-2">Coming Soon</p><p class="text-gray-400 mb-6">This flow is being prepared.</p><a href="aws-syllabus.html" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg">← Back to AWS</a></div>';
+    } else {
+      document.title = topic.title + ' - Morphex';
+      document.getElementById('topicTitle').textContent = topic.title;
+      document.getElementById('topicName').textContent = topic.title;
+      document.getElementById('topicIcon').textContent = topic.icon || '☁️';
+      document.getElementById('topicTagline').textContent = topic.subtitle || '';
+      document.getElementById('topicObjective').textContent = topic.objective || '';
+
+      // Overview
+      document.getElementById('coreThinkin').textContent = topic.coreConcept?.thinking || '';
+      document.getElementById('coreMapping').textContent = topic.coreConcept?.awsMapping || '';
+
+      if (topic.realTimeScenario) {
+        document.getElementById('scenarioSources').innerHTML = (topic.realTimeScenario.sources || []).map(s =>
+          `<span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-semibold">${s}</span>`).join('');
+        document.getElementById('scenarioProblem').textContent = topic.realTimeScenario.problem || '';
+        document.getElementById('wrongApproach').innerHTML = (topic.realTimeScenario.wrongApproach || []).map(w =>
+          `<li class="text-red-300 text-sm">❌ ${w}</li>`).join('');
+        document.getElementById('correctApproach').textContent = topic.realTimeScenario.correctApproach || '';
+      }
+
+      // Services
+      document.getElementById('servicesContainer').innerHTML = (topic.services || []).map(s => `
+        <div class="service-card">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-2xl">${s.icon || '⚙️'}</span>
+            <div>
+              <h3 class="text-lg font-bold text-white">${s.name}</h3>
+              <span class="text-xs px-2 py-0.5 bg-primary/20 text-secondary rounded-full">${s.type}</span>
+            </div>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4 mb-3">
+            <div>
+              <p class="text-xs text-gray-400 mb-2 font-semibold">WHAT IT DOES:</p>
+              <ul class="space-y-1">${(s.whatItDoes||[]).map(w=>`<li class="text-gray-200 text-sm">→ ${w}</li>`).join('')}</ul>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 mb-2 font-semibold">WHY USE:</p>
+              <ul class="space-y-1">${(s.whyUse||[]).map(w=>`<li class="text-gray-200 text-sm">✅ ${w}</li>`).join('')}</ul>
+            </div>
+          </div>
+          <div class="bg-primary/10 border border-primary/20 rounded-lg p-3">
+            <p class="text-xs text-secondary font-semibold mb-1">🎤 Interview Line:</p>
+            <p class="text-gray-200 text-sm italic">"${s.interviewLine}"</p>
+          </div>
+        </div>`).join('');
+
+      // Practical
+      document.getElementById('practicalContainer').innerHTML = (topic.practicalSteps || []).map(s => `
+        <div class="flex items-start gap-4 mb-4 bg-white/5 rounded-xl p-4">
+          <div class="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${s.step}</div>
+          <div class="flex-1">
+            <p class="text-white font-semibold mb-2">${s.action}</p>
+            <code>${s.command}</code>
+          </div>
+        </div>`).join('');
+
+      // Interview Q&A
+      let openedCount = 0;
+      document.getElementById('interviewContainer').innerHTML = (topic.interviewQuestions || []).map((qa, i) => `
+        <div class="qa-card" onclick="toggleQA(${i})">
+          <div class="flex items-start gap-3">
+            <span class="text-lg flex-shrink-0">❓</span>
+            <div class="flex-1">
+              <h4 class="font-semibold text-white text-sm">Q${i+1}: ${qa.question}</h4>
+              <div id="aws-qa-${i}" class="ans-hidden">
+                <div class="bg-green-500/15 border-l-4 border-green-500 rounded p-3 mt-3">
+                  <p class="text-green-300 text-sm leading-relaxed">${qa.answer}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`).join('');
+
+      // Mistakes
+      document.getElementById('mistakesContainer').innerHTML = (topic.commonMistakes || []).map(m => `
+        <div class="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-3">
+          <span class="text-2xl">❌</span>
+          <p class="text-red-300 font-medium">${m}</p>
+        </div>`).join('');
+
+      // Memory
+      document.getElementById('memoryLine').textContent = `💡 "${topic.memoryTrick?.line || ''}"`;
+      document.getElementById('memoryFlow').textContent = `🗺️ Flow: ${topic.memoryTrick?.flow || ''}`;
+      document.getElementById('finalStatement').textContent = topic.finalInterviewStatement || '';
+
+      // Comic Story - Prioritize string format over array
+      if (topic.comic && typeof topic.comic === 'string') {
+        document.getElementById('comicContainer').innerHTML = `
+          <div class="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-xl p-6">
+            <p class="text-white text-base leading-relaxed" style="white-space: pre-line;">${topic.comic}</p>
+          </div>
+        `;
+      } else if (topic.comicStory && topic.comicStory.length > 0) {
+        document.getElementById('comicContainer').innerHTML = `
+          <div class="col-span-full space-y-6">
+            ${topic.comicStory.map((panel, i) => `
+              <div class="flex items-start gap-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-xl p-6">
+                <div class="flex-shrink-0">
+                  <div class="text-4xl mb-2">📖</div>
+                  <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl">${panel.panel}</div>
+                </div>
+                <div class="flex-1">
+                  <p class="text-white text-base leading-relaxed" style="white-space: pre-line;">${panel.text}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        document.getElementById('comicContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No comic story available for this topic</p>';
+      }
+
+      // Deep Dive - Prioritize string format over array
+      if (topic.deepDive && typeof topic.deepDive === 'string') {
+        document.getElementById('deepDiveContainer').innerHTML = `
+          <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+            <p class="text-gray-200 leading-relaxed" style="white-space: pre-line;">${topic.deepDive}</p>
+          </div>
+        `;
+      } else if (topic.deepDive && Array.isArray(topic.deepDive) && topic.deepDive.length > 0) {
+        document.getElementById('deepDiveContainer').innerHTML = topic.deepDive.map((point, i) => `
+          <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-start gap-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${i+1}</div>
+            <p class="text-gray-200 leading-relaxed">${point}</p>
+          </div>`).join('');
+      } else {
+        document.getElementById('deepDiveContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No deep dive content available</p>';
+      }
+
+      // Types
+      if (topic.types) {
+        document.getElementById('typesContent').textContent = topic.types;
+      } else {
+        document.getElementById('typesContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No types information available</p>';
+      }
+
+      // Interactive Q&A
+      if (topic.interactiveQA && topic.interactiveQA.length > 0) {
+        document.getElementById('qaContainer').innerHTML = topic.interactiveQA.map((qa, i) => `
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-4">
+            <p class="text-white font-semibold mb-3">❓ ${qa.question}</p>
+            <p class="text-yellow-300 text-sm mb-3">💡 Hint: ${qa.hint}</p>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              ${qa.options.map((opt, j) => `<button onclick="checkAnswer('${qa.answer}', '${opt}', ${i})" class="qa-option-${i} px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm text-gray-200 transition">${opt}</button>`).join('')}
+            </div>
+            <div id="qa-result-${i}" class="hidden mt-3"></div>
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mt-3">
+              <p class="text-blue-300 text-sm"><strong>Explanation:</strong> ${qa.explanation}</p>
+              <p class="text-purple-300 text-sm mt-2"><strong>🧠 Memory:</strong> ${qa.memoryTrick}</p>
+            </div>
+          </div>`).join('');
+      } else {
+        document.getElementById('qaContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No interactive Q&A available</p>';
+      }
+
+      // Coding Challenge
+      if (topic.codingChallenge) {
+        const cc = topic.codingChallenge;
+        let codingHTML = `
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5">
+            <h3 class="text-xl font-bold text-white mb-3">${cc.title || 'Coding Challenge'}</h3>
+            <p class="text-gray-300 mb-4"><strong>🎯 Scenario:</strong> ${cc.scenario || ''}</p>`;
+        
+        if (cc.thinkingApproach && cc.thinkingApproach.length > 0) {
+          codingHTML += `
+            <div class="mb-4">
+              <p class="text-sm text-gray-400 mb-2"><strong>🧠 Thinking Approach:</strong></p>
+              <ul class="space-y-1">${cc.thinkingApproach.map(t => `<li class="text-gray-200 text-sm">→ ${t}</li>`).join('')}</ul>
+            </div>`;
+        }
+        
+        if (cc.questions && cc.questions.length > 0) {
+          // New format with multiple questions
+          codingHTML += '<div class="space-y-4">';
+          cc.questions.forEach((q, i) => {
+            codingHTML += `
+              <div class="bg-black/40 border border-purple-500/30 rounded-lg p-4">
+                <p class="text-purple-300 font-semibold mb-3">${q.question}</p>
+                <button onclick="toggleCodingSolution(${i})" class="px-4 py-2 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg hover:shadow-xl transition text-sm mb-3">Show Solution</button>
+                <div id="codingSolution-${i}" class="ans-hidden">
+                  <p class="text-xs text-green-400 mb-2">✅ Solution:</p>
+                  <pre class="text-green-300 text-sm bg-black/60 p-3 rounded">${q.answer}</pre>
+                </div>
+              </div>`;
+          });
+          codingHTML += '</div>';
+        } else if (cc.solution) {
+          // Old format with single solution
+          codingHTML += `
+            <p class="text-gray-300 mb-3"><strong>❓ Question:</strong> ${cc.question || ''}</p>
+            <div class="bg-black/40 border border-green-500/30 rounded-lg p-4">
+              <p class="text-xs text-green-400 mb-2">✅ Solution:</p>
+              <pre class="text-green-300 text-sm">${cc.solution}</pre>
+            </div>`;
+        }
+        
+        if (cc.note) {
+          codingHTML += `<p class="text-yellow-300 text-sm mt-4">💡 Note: ${cc.note}</p>`;
+        }
+        
+        codingHTML += '</div>';
+        document.getElementById('codingContainer').innerHTML = codingHTML;
+      } else {
+        document.getElementById('codingContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No coding challenge available</p>';
+      }
+
+      // Quiz
+      if (topic.quiz && topic.quiz.length > 0) {
+        document.getElementById('quizContainer').innerHTML = topic.quiz.map((q, i) => `
+          <div class="bg-white/5 border border-white/10 rounded-xl p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-white font-semibold">Q${i+1}: ${q.question}</p>
+              <span class="px-2 py-1 text-xs rounded-full ${
+                q.difficulty === 'easy' ? 'bg-green-500/20 text-green-300' :
+                q.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                'bg-red-500/20 text-red-300'
+              }">${q.difficulty || 'medium'}</span>
+            </div>
+            <div class="space-y-2 mb-3">
+              ${q.options.map((opt, j) => `
+                <button onclick="checkQuizAnswer(${i}, ${j}, ${q.answer})" class="quiz-option-${i} w-full text-left px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm text-gray-200 transition">
+                  ${String.fromCharCode(65 + j)}. ${opt}
+                </button>`).join('')}
+            </div>
+            <div id="quiz-result-${i}" class="hidden mt-3"></div>
+          </div>`).join('');
+      } else {
+        document.getElementById('quizContainer').innerHTML = '<p class="text-gray-400 text-center py-8">No quiz available</p>';
+      }
+
+      // Show Architecture tab for project
+      if (topic.isProject) {
+        document.getElementById('tab-project-btn').classList.remove('hidden');
+        document.getElementById('archFlowText').textContent = topic.architectureDiagram?.flowText || '';
+        document.getElementById('stepCardsContainer').innerHTML = (topic.stepCards || []).map(s => `
+          <div class="flex items-start gap-4 bg-white/5 rounded-xl p-4">
+            <div class="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">${s.step}</div>
+            <div class="flex-1">
+              <p class="text-white font-semibold mb-1">${s.title}</p>
+              <p class="text-gray-300 text-sm mb-2">${s.description}</p>
+              <div class="flex flex-wrap gap-2">
+                ${s.services.map(sv => `<span class="px-2 py-0.5 bg-primary/20 text-secondary rounded text-xs">${sv}</span>`).join('')}
+                <span class="px-2 py-0.5 bg-green-500/20 text-green-300 rounded text-xs">→ ${s.output}</span>
+              </div>
+            </div>
+          </div>`).join('');
+        document.getElementById('keyFeaturesContainer').innerHTML = (topic.keyFeatures || []).map(f =>
+          `<div class="flex items-center gap-2 bg-white/5 rounded-lg p-3"><span class="text-green-400">✅</span><span class="text-gray-200 text-sm">${f}</span></div>`).join('');
+      }
+
+      window._topicId = topicId;
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + name).classList.add('active');
+
+      // Mark complete when memory tab viewed
+      if (name === 'memory') {
+        const prog = JSON.parse(localStorage.getItem('userProgress') || '{}');
+        prog[window._topicId] = true;
+        localStorage.setItem('userProgress', JSON.stringify(prog));
+      }
+    }
+
+    function toggleQA(i) {
+      const el = document.getElementById(`aws-qa-${i}`);
+      el.classList.toggle('ans-hidden');
+      el.classList.toggle('ans-visible');
+      // Show complete badge after all opened
+      const total = topic?.interviewQuestions?.length || 0;
+      const opened = document.querySelectorAll('.ans-visible').length;
+      if (opened >= total && total > 0) {
+        document.getElementById('completeBadge').classList.remove('hidden');
+      }
+    }
+
+    function toggleCodingSolution(i) {
+      const el = document.getElementById(`codingSolution-${i}`);
+      el.classList.toggle('ans-hidden');
+      el.classList.toggle('ans-visible');
+    }
+
+    function checkAnswer(correct, selected, index) {
+      const resultDiv = document.getElementById(`qa-result-${index}`);
+      resultDiv.classList.remove('hidden');
+      if (correct === selected) {
+        resultDiv.innerHTML = '<div class="bg-lime-500/20 border border-lime-400/40 rounded-lg p-3"><p class="text-lime-300 font-semibold">✅ Correct!</p></div>';
+      } else {
+        resultDiv.innerHTML = `<div class="bg-pink-500/20 border border-pink-500/40 rounded-lg p-3"><p class="text-pink-300 font-semibold">❌ Wrong! Correct answer: ${correct}</p></div>`;
+      }
+    }
+
+    function checkQuizAnswer(qIndex, optIndex, correctIndex) {
+      const resultDiv = document.getElementById(`quiz-result-${qIndex}`);
+      const options = document.querySelectorAll(`.quiz-option-${qIndex}`);
+      
+      // Disable all options
+      options.forEach(opt => opt.disabled = true);
+      
+      resultDiv.classList.remove('hidden');
+      if (optIndex === correctIndex) {
+        options[optIndex].classList.add('bg-lime-500/30', 'border', 'border-lime-400');
+        resultDiv.innerHTML = `<div class="bg-lime-500/20 border border-lime-400/40 rounded-lg p-4"><p class="text-lime-300 font-semibold mb-2">✅ Correct!</p><p class="text-gray-200 text-sm" style="white-space:pre-line;">${topic.quiz[qIndex].explanation}</p></div>`;
+      } else {
+        options[optIndex].classList.add('bg-pink-500/30', 'border', 'border-pink-500');
+        options[correctIndex].classList.add('bg-lime-500/30', 'border', 'border-lime-400');
+        resultDiv.innerHTML = `<div class="bg-pink-500/20 border border-pink-500/40 rounded-lg p-4"><p class="text-pink-300 font-semibold mb-2">❌ Wrong!</p><p class="text-gray-200 text-sm" style="white-space:pre-line;">${topic.quiz[qIndex].explanation}</p></div>`;
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
+    });
+  </script>
+</body>
+</html>

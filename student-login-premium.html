@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Morphed Tech | Premium Data Engineering Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: #0a0118;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PREMIUM ANIMATED BACKGROUND - Aurora Gradient
+    ═══════════════════════════════════════════════════════════════ */
+    .aurora-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: radial-gradient(ellipse at top, #1a0b2e 0%, #0a0118 50%);
+    }
+
+    .aurora-bg::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(167, 139, 250, 0.1) 0%, transparent 50%);
+      animation: aurora 20s ease-in-out infinite;
+    }
+
+    @keyframes aurora {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(120deg); }
+      66% { transform: translate(-20px, 20px) rotate(240deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FLOATING PARTICLES
+    ═══════════════════════════════════════════════════════════════ */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: rgba(167, 139, 250, 0.4);
+      border-radius: 50%;
+      animation: float 15s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       GLASSMORPHISM CARD WITH 3D DEPTH
+    ═══════════════════════════════════════════════════════════════ */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+      transition: left 0.5s;
+    }
+
+    .glass-card:hover::before {
+      left: 100%;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 20px 60px 0 rgba(124, 58, 237, 0.3),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PREMIUM GRADIENT TEXT
+    ═══════════════════════════════════════════════════════════════ */
+    .gradient-text {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 3s ease infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PREMIUM INPUT FIELDS
+    ═══════════════════════════════════════════════════════════════ */
+    .premium-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 15px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      outline: none;
+    }
+
+    .premium-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .premium-input:focus {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+      transform: translateY(-2px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PREMIUM BUTTON WITH 3D EFFECT
+    ═══════════════════════════════════════════════════════════════ */
+    .premium-btn {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 16px 32px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 15px rgba(124, 58, 237, 0.4),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .premium-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .premium-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 25px rgba(124, 58, 237, 0.5),
+        0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .premium-btn:hover::before {
+      left: 100%;
+    }
+
+    .premium-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TAB SYSTEM WITH SMOOTH ANIMATION
+    ═══════════════════════════════════════════════════════════════ */
+    .tab-container {
+      display: flex;
+      gap: 8px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      position: relative;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(6, 182, 212, 0.3));
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+
+    .tab-btn:not(.active):hover {
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FORM PANEL TRANSITIONS
+    ═══════════════════════════════════════════════════════════════ */
+    .form-panel {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-panel.hidden-panel {
+      opacity: 0;
+      transform: translateX(30px);
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+    }
+
+    .form-panel.active-panel {
+      opacity: 1;
+      transform: translateX(0);
+      position: relative;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LOGO WITH GLOW EFFECT
+    ═══════════════════════════════════════════════════════════════ */
+    .logo-glow {
+      filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.5));
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.5)); }
+      50% { filter: drop-shadow(0 0 30px rgba(124, 58, 237, 0.8)); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MESSAGE BOX
+    ═══════════════════════════════════════════════════════════════ */
+    .message-box {
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+    }
+
+    .message-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .glass-card {
+        margin: 20px;
+        padding: 32px 24px !important;
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LOADING STATE
+    ═══════════════════════════════════════════════════════════════ */
+    .premium-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .premium-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LABEL STYLING
+    ═══════════════════════════════════════════════════════════════ */
+    .premium-label {
+      display: block;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LINK STYLING
+    ═══════════════════════════════════════════════════════════════ */
+    .premium-link {
+      color: rgba(167, 139, 250, 0.8);
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .premium-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: #a78bfa;
+      transition: width 0.3s;
+    }
+
+    .premium-link:hover {
+      color: #a78bfa;
+    }
+
+    .premium-link:hover::after {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Aurora Animated Background -->
+  <div class="aurora-bg"></div>
+
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Main Content -->
+  <div style="position: relative; z-index: 10; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    
+    <div style="max-width: 480px; width: 100%;">
+
+      <!-- Logo Section -->
+      <div style="text-align: center; margin-bottom: 48px;">
+        <div class="logo-glow" style="display: inline-block; margin-bottom: 16px;">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="url(#logo-gradient)"/>
+            <path d="M20 44V20L32 28L44 20V44L32 36L20 44Z" fill="white"/>
+            <defs>
+              <linearGradient id="logo-gradient" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1 class="gradient-text" style="font-size: 42px; font-weight: 900; margin-bottom: 8px; letter-spacing: -1px;">
+          MORPHED TECH
+        </h1>
+        <p style="color: rgba(255, 255, 255, 0.5); font-size: 15px; font-weight: 500;">
+          Premium Data Engineering Mastery Platform
+        </p>
+      </div>
+
+      <!-- Glass Card -->
+      <div class="glass-card" style="padding: 48px 40px;">
+
+        <!-- Tab System -->
+        <div class="tab-container" style="margin-bottom: 32px;">
+          <button id="tabLogin" onclick="switchTab('login')" class="tab-btn active">Sign In</button>
+          <button id="tabSignup" onclick="switchTab('signup')" class="tab-btn">Sign Up</button>
+        </div>
+
+        <!-- Form Container -->
+        <div style="position: relative; min-height: 320px;">
+
+          <!-- Login Form -->
+          <div id="loginPanel" class="form-panel active-panel">
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label class="premium-label">Email Address</label>
+                <input type="email" id="loginEmail" required placeholder="you@example.com" class="premium-input">
+              </div>
+              <div>
+                <label class="premium-label">Password</label>
+                <input type="password" id="loginPassword" required placeholder="••••••••" class="premium-input">
+              </div>
+              <button type="submit" id="loginBtn" class="premium-btn" style="margin-top: 8px; width: 100%;">
+                Sign In
+              </button>
+            </form>
+          </div>
+
+          <!-- Signup Form -->
+          <div id="signupPanel" class="form-panel hidden-panel">
+            <form id="signupForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label class="premium-label">Full Name</label>
+                <input type="text" id="signupName" required placeholder="Your full name" class="premium-input">
+              </div>
+              <div>
+                <label class="premium-label">Email Address</label>
+                <input type="email" id="signupEmail" required placeholder="you@example.com" class="premium-input">
+              </div>
+              <div>
+                <label class="premium-label">Phone Number</label>
+                <input type="tel" id="signupPhone" required placeholder="+91 XXXXX XXXXX" class="premium-input">
+              </div>
+              <div>
+                <label class="premium-label">Password</label>
+                <input type="password" id="signupPassword" required placeholder="Minimum 6 characters" minlength="6" class="premium-input">
+              </div>
+              <button type="submit" id="signupBtn" class="premium-btn" style="margin-top: 8px; width: 100%;">
+                Create Account
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Message Box -->
+        <div id="msg" style="display: none; margin-top: 24px;"></div>
+
+        <!-- Admin Link -->
+        <div style="margin-top: 32px; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+          <a href="admin-login.html" class="premium-link">Admin Portal →</a>
+        </div>
+
+      </div>
+
+      <!-- Footer Text -->
+      <div style="text-align: center; margin-top: 32px; color: rgba(255, 255, 255, 0.3); font-size: 13px;">
+        <p>🔒 Secure authentication • 🚀 Instant access • ✨ Premium experience</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // PARTICLE SYSTEM
+    // ═══════════════════════════════════════════════════════════════
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        container.appendChild(particle);
+      }
+    }
+    createParticles();
+
+    // ═══════════════════════════════════════════════════════════════
+    // API CONFIGURATION
+    // ═══════════════════════════════════════════════════════════════
+    const API = 'http://localhost:5000/api';
+
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      window.location.href = u.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // TAB SWITCHING
+    // ═══════════════════════════════════════════════════════════════
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      
+      // Update tab buttons
+      document.getElementById('tabLogin').classList.toggle('active', isLogin);
+      document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+      
+      // Update panels
+      document.getElementById('loginPanel').className = 'form-panel ' + (isLogin ? 'active-panel' : 'hidden-panel');
+      document.getElementById('signupPanel').className = 'form-panel ' + (!isLogin ? 'active-panel' : 'hidden-panel');
+      
+      hideMsg();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // MESSAGE SYSTEM
+    // ═══════════════════════════════════════════════════════════════
+    function showMsg(text, isSuccess) {
+      const el = document.getElementById('msg');
+      el.textContent = text;
+      el.className = 'message-box ' + (isSuccess ? 'message-success' : 'message-error');
+      el.style.display = 'block';
+    }
+
+    function hideMsg() {
+      document.getElementById('msg').style.display = 'none';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LOADING STATE
+    // ═══════════════════════════════════════════════════════════════
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      btn.disabled = loading;
+      
+      if (loading) {
+        btn.classList.add('loading');
+        btn.textContent = '';
+      } else {
+        btn.classList.remove('loading');
+        btn.textContent = btnId === 'loginBtn' ? 'Sign In' : 'Create Account';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LOGIN FORM HANDLER
+    // ═══════════════════════════════════════════════════════════════
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      setLoading('loginBtn', true);
+      
+      try {
+        const r = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+          })
+        });
+        
+        const d = await r.json();
+        
+        if (r.ok) {
+          localStorage.setItem('token', d.token);
+          localStorage.setItem('user', JSON.stringify(d.user));
+          showMsg('✅ Login successful! Redirecting...', true);
+          
+          setTimeout(() => {
+            window.location.href = d.user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+          }, 800);
+        } else {
+          showMsg(d.error || 'Login failed', false);
+          setLoading('loginBtn', false);
+        }
+      } catch {
+        showMsg('Server error. Is the server running?', false);
+        setLoading('loginBtn', false);
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // SIGNUP FORM HANDLER
+    // ═══════════════════════════════════════════════════════════════
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      setLoading('signupBtn', true);
+      
+      try {
+        const r = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('signupName').value,
+            email: document.getElementById('signupEmail').value,
+            phone: document.getElementById('signupPhone').value,
+            password: document.getElementById('signupPassword').value
+          })
+        });
+        
+        const d = await r.json();
+        
+        if (r.ok) {
+          localStorage.setItem('token', d.token);
+          localStorage.setItem('user', JSON.stringify(d.user));
+          showMsg('✅ Account created! Redirecting...', true);
+          
+          setTimeout(() => window.location.href = 'student-dashboard.html', 800);
+        } else {
+          showMsg(d.error || 'Registration failed', false);
+          setLoading('signupBtn', false);
+        }
+      } catch {
+        showMsg('Server error. Is the server running?', false);
+        setLoading('signupBtn', false);
+      }
+    });
+  </script>
+
+</body>
+</html>

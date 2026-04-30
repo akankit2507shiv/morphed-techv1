@@ -1,0 +1,169 @@
+{
+  "project_id": "DE001",
+  "project_name": "End-to-End Batch ETL Pipeline",
+  "tagline": "Build production-ready pipeline from S3 to Redshift",
+  "level": "Beginner to Intermediate",
+  "duration": "4 Hours",
+  "tools": [
+    "Python",
+    "SQL",
+    "PySpark",
+    "AWS S3",
+    "Redshift",
+    "Airflow"
+  ],
+  "learning_sections": {
+    "project_info": {
+      "title": "📋 Project Info",
+      "business_case": "Retail company receives 20GB daily sales data from multiple stores.",
+      "how_much_data": "20GB daily batch files, scalable up to TB-level architecture.",
+      "why_company_built_this": "Manual reporting caused delays.",
+      "expected_salary_relevance": "Asked in 6–20 LPA interviews."
+    },
+    "overview": {
+      "title": "🎯 Overview",
+      "what_you_build": "Complete ETL pipeline",
+      "business_problem": "Slow reporting",
+      "final_output": "Analytics-ready warehouse tables"
+    },
+    "comic_learning": {
+      "title": "🎭 Comic",
+      "story": "Imagine store managers sending messy Excel files daily and your pipeline acts like an automated employee cleaning everything."
+    },
+    "deep_dive": {
+      "title": "📚 Deep Dive",
+      "architecture": [
+        "S3 raw layer",
+        "PySpark processing",
+        "Airflow orchestration",
+        "Redshift warehouse"
+      ],
+      "why_each_tool": [
+        "Why S3?",
+        "Why Spark?",
+        "Why Airflow?",
+        "Why Redshift?"
+      ]
+    },
+    "types": {
+      "title": "📋 Types",
+      "batch_types": [
+        "Daily batch",
+        "Weekly batch",
+        "Monthly batch"
+      ]
+    },
+    "components": {
+      "title": "⚙️ Components",
+      "components_used": [
+        "IAM",
+        "S3",
+        "Spark",
+        "Airflow",
+        "Redshift"
+      ]
+    },
+    "coding": {
+      "title": "💻 Coding",
+      "sql_examples": [
+        {
+          "question": "Find duplicate records",
+          "answer": "SELECT customer_id,count(*) FROM sales GROUP BY customer_id HAVING count(*)>1;"
+        }
+      ],
+      "pyspark_examples": [
+        {
+          "question": "Remove duplicates",
+          "answer": "df.dropDuplicates()"
+        }
+      ]
+    },
+    "qna": {
+      "title": "💬 Real Q&A",
+      "questions": [
+        {
+          "question": "How much data did your pipeline process?",
+          "answer": "Around 20GB daily."
+        },
+        {
+          "question": "How many tables were involved?",
+          "answer": "8 source tables."
+        },
+        {
+          "question": "How many Spark executors?",
+          "answer": "Based on workload scaling."
+        }
+      ]
+    },
+    "mcq_quiz": {
+      "title": "🎯 Quiz",
+      "questions": [
+        {
+          "question": "Which service stores raw data?",
+          "options": [
+            "Redshift",
+            "S3",
+            "Lambda",
+            "RDS"
+          ],
+          "answer": "S3"
+        }
+      ]
+    },
+    "interview": {
+      "title": "🎤 Interview Questions",
+      "realistic_questions": [
+        {
+          "question": "Why not use Glue instead of Spark?",
+          "answer": "Spark gave more transformation flexibility."
+        },
+        {
+          "question": "How do you scale if data becomes 10x?",
+          "answer": "Partition optimization and cluster scaling."
+        },
+        {
+          "question": "How do you monitor failures?",
+          "answer": "Airflow logs + alerts."
+        }
+      ]
+    },
+    "mistakes": {
+      "title": "⚠️ Common Mistakes",
+      "mistakes_list": [
+        "Memorizing architecture only",
+        "Ignoring failure handling",
+        "Unable to explain business impact"
+      ]
+    },
+    "practical": {
+      "title": "🔧 Practical Scenarios",
+      "real_cases": [
+        {
+          "scenario": "File corruption",
+          "solution": "Validation layer"
+        },
+        {
+          "scenario": "Schema change",
+          "solution": "Schema evolution handling"
+        }
+      ]
+    },
+    "memory_tricks": {
+      "title": "🧠 Memory Tricks",
+      "tricks": [
+        "S3 = Store",
+        "Spark = Process",
+        "Airflow = Schedule",
+        "Redshift = Analyze"
+      ]
+    },
+    "revision": {
+      "title": "⚡ Quick Revision",
+      "one_line_revision": [
+        "What is ETL?",
+        "Why Spark?",
+        "Why Airflow?"
+      ]
+    }
+  }
+}

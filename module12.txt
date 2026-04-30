@@ -1,0 +1,623 @@
+,
+
+  "python-sql-etl": {
+    title: "Python for SQL and ETL",
+    icon: "🔄",
+    difficulty: "Real Data Engineering Workflow",
+    duration: "75 min",
+    description: "How Python is used in real ETL pipelines to read source data, transform records, and load data into target systems",
+
+    comic: `📦 Warehouse Pickup (Read Source Data)
+
+Manager: "Before delivery starts, packages must be collected"
+Warehouse: [CSV Files, JSON APIs, Databases, Cloud Storage]
+Truck: *Picks up all packages*
+
+In Python:
+import pandas as pd
+df = pd.read_csv('sales.csv')  # Read CSV
+data = requests.get(url).json()  # Read API
+
+Collect data from sources! 📦
+
+🏭 Factory Cleaning Unit (Transform Data)
+
+Factory: "Raw materials are cleaned before final product"
+Raw Material: [Dirty, Duplicates, Nulls, Wrong Format]
+After Cleaning: [Clean, Unique, Valid, Standardized]
+
+In Python:
+df = df.dropna()  # Remove nulls
+df = df.drop_duplicates()  # Remove duplicates
+df['bonus'] = df['salary'] * 0.10  # Calculate
+
+Clean and transform data! 🏭
+
+🚚 Final Delivery (Load Target Systems)
+
+Delivery: "Processed package reaches final customer"
+Destinations: [S3, Redshift, Snowflake, Data Warehouses]
+
+In Python:
+df.to_csv('output.csv')  # Write CSV
+df.to_sql('employees', connection)  # Load SQL
+
+Deliver to destination! 🚚
+
+🎯 Aha Moment:
+ETL is the backbone of data engineering!
+Extract → Transform → Load = Complete pipeline! 🚀`,
+
+    deepDive: `🔄 Python for SQL and ETL - Complete Guide
+
+📌 Module Description:
+This module teaches how Python is used in real ETL pipelines to read source data, transform records, and load data into target systems.
+
+Category: Real Data Engineering Workflow
+Importance: Extremely High
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 Topic 1: Read Source Data
+
+Comic Story: Warehouse Pickup
+Before delivery starts, packages must be collected.
+
+What It Is:
+Extract data from multiple sources like files, APIs, and databases.
+
+Data Sources:
+1. CSV Files
+2. JSON APIs
+3. Databases
+4. Cloud Storage (S3, Azure Blob)
+
+Coding Example 1 - Read CSV source file:
+import pandas as pd
+
+df = pd.read_csv('sales.csv')
+print(df.head())
+print(f"Loaded {len(df)} records")
+
+Coding Example 2 - Read API source:
+import requests
+import pandas as pd
+
+response = requests.get('https://api.example.com/customers')
+data = response.json()
+df = pd.DataFrame(data)
+
+Coding Example 3 - Read from S3:
+import boto3
+import pandas as pd
+
+s3 = boto3.client('s3')
+obj = s3.get_object(Bucket='my-bucket', Key='data/sales.csv')
+df = pd.read_csv(obj['Body'])
+
+Coding Example 4 - Read from database:
+import pandas as pd
+import psycopg2
+
+connection = psycopg2.connect(
+    host='localhost',
+    database='mydb',
+    user='user',
+    password='password'
+)
+
+query = "SELECT * FROM customers WHERE active = true"
+df = pd.read_sql(query, connection)
+
+Coding Challenge:
+Read customer file from S3
+
+Hint: Use boto3 or pandas based on source type
+
+Solution:
+import boto3
+import pandas as pd
+
+s3 = boto3.client('s3')
+obj = s3.get_object(Bucket='my-data-bucket', Key='customers.csv')
+df = pd.read_csv(obj['Body'])
+
+print(f"Loaded {len(df)} customer records")
+print(df.head())
+
+Memory Trick: Read = Extract
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏭 Topic 2: Transform Data
+
+Comic Story: Factory Cleaning Unit
+Raw materials are cleaned before final product creation.
+
+What It Is:
+Clean, validate, enrich, and transform raw data.
+
+Common Transformations:
+1. Remove null values
+2. Remove duplicates
+3. Standardize columns
+4. Business calculations
+5. Data type conversions
+6. Join/merge datasets
+7. Filter invalid records
+8. Aggregate data
+
+Coding Example 1 - Remove null values:
+df = df.dropna()  # Remove all nulls
+df = df.dropna(subset=['email'])  # Remove if email is null
+
+Coding Example 2 - Remove duplicates:
+df = df.drop_duplicates()
+df = df.drop_duplicates(subset=['customer_id'])
+
+Coding Example 3 - Create calculated column:
+df['bonus'] = df['salary'] * 0.10
+df['full_name'] = df['first_name'] + ' ' + df['last_name']
+df['year'] = pd.to_datetime(df['date']).dt.year
+
+Coding Example 4 - Standardize columns:
+df['email'] = df['email'].str.lower().str.strip()
+df['phone'] = df['phone'].str.replace('-', '')
+
+Coding Example 5 - Filter invalid records:
+df = df[df['age'] >= 18]
+df = df[df['salary'] > 0]
+
+Coding Example 6 - Data type conversion:
+df['age'] = df['age'].astype(int)
+df['date'] = pd.to_datetime(df['date'])
+
+Coding Challenge:
+Remove duplicate customer records
+
+Hint: Use drop_duplicates()
+
+Solution:
+# Remove duplicates based on customer_id
+df = df.drop_duplicates(subset=['customer_id'], keep='first')
+
+print(f"After deduplication: {len(df)} unique customers")
+
+Interview Question:
+Q: How do you optimize large transformations?
+A: Use chunking for large files, vectorized operations instead of loops, filter early to reduce data size, use appropriate data types, leverage Spark for very large datasets.
+
+Memory Trick: Transform = Clean and enrich
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚚 Topic 3: Load Target Systems
+
+Comic Story: Final Delivery
+Processed package reaches final customer.
+
+What It Is:
+Load transformed data into final systems.
+
+Target Systems:
+1. S3 (Data Lake)
+2. Redshift (Data Warehouse)
+3. Snowflake (Cloud DW)
+4. PostgreSQL/MySQL (Databases)
+5. CSV/Parquet files
+
+Coding Example 1 - Write CSV output:
+df.to_csv('final_output.csv', index=False)
+
+Coding Example 2 - Upload to S3:
+import boto3
+
+s3 = boto3.client('s3')
+df.to_csv('output.csv', index=False)
+s3.upload_file('output.csv', 'my-bucket', 'processed/output.csv')
+
+Coding Example 3 - Load to SQL database:
+import pandas as pd
+import psycopg2
+
+connection = psycopg2.connect(
+    host='localhost',
+    database='mydb',
+    user='user',
+    password='password'
+)
+
+df.to_sql('employees', connection, if_exists='replace', index=False)
+
+Coding Example 4 - Load to Redshift:
+import pandas as pd
+import psycopg2
+
+connection = psycopg2.connect(
+    host='redshift-cluster.amazonaws.com',
+    database='analytics',
+    user='admin',
+    password='password',
+    port=5439
+)
+
+df.to_sql('sales_fact', connection, if_exists='append', index=False)
+
+Coding Challenge:
+Load transformed data into warehouse table
+
+Hint: Use connectors or cloud SDKs
+
+Solution:
+import pandas as pd
+import psycopg2
+
+# Connect to warehouse
+connection = psycopg2.connect(
+    host='warehouse.example.com',
+    database='analytics',
+    user='etl_user',
+    password='password'
+)
+
+# Load data
+df.to_sql(
+    'customer_dim',
+    connection,
+    if_exists='append',  # or 'replace'
+    index=False,
+    method='multi'
+)
+
+print(f"Loaded {len(df)} records to warehouse")
+
+Quiz:
+Q: L in ETL stands for?
+A: Load
+
+Memory Trick: Load = Final destination
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Top Interview Questions:
+
+1. How do you design ETL pipelines?
+   Answer: Identify sources → Define transformations → Choose target → Handle errors → Add logging → Schedule jobs → Monitor performance.
+
+2. How do you handle failed loads?
+   Answer: Use try-except blocks, implement retry logic, log errors, send alerts, maintain audit tables, use dead letter queues.
+
+3. How do you optimize transformations?
+   Answer: Filter early, use vectorized operations, chunk large files, use appropriate data types, leverage parallel processing, cache intermediate results.
+
+4. How do you process incremental data?
+   Answer: Use watermarks (last_updated timestamp), track processed IDs, use change data capture (CDC), implement upsert logic, maintain state.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏢 Real Project Usage:
+
+Read data from S3 → transform using Python → load into Redshift or Snowflake pipelines.
+
+Complete ETL Pipeline Example:
+import pandas as pd
+import boto3
+import psycopg2
+from datetime import datetime
+
+def extract_from_s3(bucket, key):
+    """Extract data from S3"""
+    s3 = boto3.client('s3')
+    obj = s3.get_object(Bucket=bucket, Key=key)
+    df = pd.read_csv(obj['Body'])
+    print(f"Extracted {len(df)} records from S3")
+    return df
+
+def transform_data(df):
+    """Transform and clean data"""
+    # Remove nulls
+    df = df.dropna(subset=['customer_id', 'email'])
+    
+    # Remove duplicates
+    df = df.drop_duplicates(subset=['customer_id'])
+    
+    # Standardize
+    df['email'] = df['email'].str.lower().str.strip()
+    df['phone'] = df['phone'].str.replace('-', '')
+    
+    # Calculate fields
+    df['full_name'] = df['first_name'] + ' ' + df['last_name']
+    df['processed_date'] = datetime.now()
+    
+    # Filter invalid
+    df = df[df['age'] >= 18]
+    
+    print(f"Transformed to {len(df)} valid records")
+    return df
+
+def load_to_warehouse(df, table_name):
+    """Load data to Redshift"""
+    connection = psycopg2.connect(
+        host='redshift-cluster.amazonaws.com',
+        database='analytics',
+        user='etl_user',
+        password='password',
+        port=5439
+    )
+    
+    df.to_sql(
+        table_name,
+        connection,
+        if_exists='append',
+        index=False,
+        method='multi'
+    )
+    
+    connection.close()
+    print(f"Loaded {len(df)} records to {table_name}")
+
+def run_etl_pipeline():
+    """Main ETL pipeline"""
+    try:
+        # Extract
+        df = extract_from_s3('my-data-bucket', 'raw/customers.csv')
+        
+        # Transform
+        df_transformed = transform_data(df)
+        
+        # Load
+        load_to_warehouse(df_transformed, 'customer_dim')
+        
+        print("ETL pipeline completed successfully")
+        
+    except Exception as e:
+        print(f"ETL pipeline failed: {e}")
+        # Send alert, log error, retry logic here
+
+if __name__ == '__main__':
+    run_etl_pipeline()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 Final Revision Formula:
+
+ETL Formula:
+Extract → Transform → Load
+
+📦 Extract = Read from sources (CSV, API, DB, S3)
+🏭 Transform = Clean, validate, enrich, calculate
+🚚 Load = Write to targets (S3, Redshift, Snowflake)
+
+Master ETL → Build production pipelines! 🚀`,
+
+    types: `🔄 Python for SQL and ETL - Quick Reference
+
+📦 Extract (Read):
+# CSV
+df = pd.read_csv('file.csv')
+
+# API
+data = requests.get(url).json()
+df = pd.DataFrame(data)
+
+# S3
+s3 = boto3.client('s3')
+obj = s3.get_object(Bucket='bucket', Key='file.csv')
+df = pd.read_csv(obj['Body'])
+
+# Database
+df = pd.read_sql(query, connection)
+
+🏭 Transform:
+# Remove nulls
+df = df.dropna()
+df = df.dropna(subset=['email'])
+
+# Remove duplicates
+df = df.drop_duplicates()
+df = df.drop_duplicates(subset=['id'])
+
+# Calculate
+df['bonus'] = df['salary'] * 0.10
+df['full_name'] = df['first'] + ' ' + df['last']
+
+# Standardize
+df['email'] = df['email'].str.lower()
+df['phone'] = df['phone'].str.replace('-', '')
+
+# Filter
+df = df[df['age'] >= 18]
+
+# Convert types
+df['age'] = df['age'].astype(int)
+df['date'] = pd.to_datetime(df['date'])
+
+🚚 Load:
+# CSV
+df.to_csv('output.csv', index=False)
+
+# S3
+s3.upload_file('file.csv', 'bucket', 'key')
+
+# Database
+df.to_sql('table', connection, if_exists='append', index=False)
+
+# Redshift
+df.to_sql('table', redshift_conn, if_exists='append', index=False)`,
+
+    qa: [
+      {
+        q: "What is ETL?",
+        a: "ETL stands for Extract, Transform, Load. Extract data from sources, Transform (clean/enrich), Load to targets. Example: Read CSV from S3, remove nulls, load to Redshift. Core data engineering workflow."
+      },
+      {
+        q: "What are common data sources in ETL?",
+        a: "CSV files, JSON APIs, databases (PostgreSQL, MySQL), cloud storage (S3, Azure Blob), data warehouses, streaming sources (Kafka). Use pandas, requests, boto3, database connectors to read."
+      },
+      {
+        q: "What are common transformations?",
+        a: "Remove nulls (dropna), remove duplicates (drop_duplicates), standardize (lower, strip), calculate fields, filter invalid records, convert data types, join datasets, aggregate data."
+      },
+      {
+        q: "What are common load targets?",
+        a: "S3 (data lake), Redshift (AWS warehouse), Snowflake (cloud warehouse), PostgreSQL/MySQL (databases), CSV/Parquet files. Use to_csv(), to_sql(), boto3 upload."
+      },
+      {
+        q: "How to handle failed loads?",
+        a: "Use try-except blocks, implement retry logic with exponential backoff, log errors to CloudWatch, send alerts (SNS/email), maintain audit tables, use dead letter queues for failed records."
+      },
+      {
+        q: "How to optimize transformations?",
+        a: "Filter early to reduce data size, use vectorized operations (avoid loops), chunk large files, use appropriate data types, leverage parallel processing, cache intermediate results, use Spark for very large data."
+      },
+      {
+        q: "How to process incremental data?",
+        a: "Use watermarks (last_updated timestamp), track processed IDs in state table, use change data capture (CDC), implement upsert logic (update if exists, insert if new), maintain processing state."
+      },
+      {
+        q: "How to design ETL pipeline?",
+        a: "Identify sources → Define transformations → Choose targets → Handle errors → Add logging → Schedule jobs (Airflow/Glue) → Monitor performance → Implement retry logic → Document pipeline."
+      },
+      {
+        q: "What is data validation in ETL?",
+        a: "Check data quality: null checks, duplicate checks, data type validation, range validation, referential integrity, business rule validation. Reject or quarantine invalid records."
+      },
+      {
+        q: "Where is Python ETL used?",
+        a: "AWS Glue jobs, Airflow DAGs, Lambda functions, batch processing, real-time streaming, data migration, data warehouse loading, API integrations, file processing pipelines."
+      }
+    ],
+
+    coding: {
+      title: "Python for SQL and ETL - Coding Challenges",
+      scenario: "Practice building ETL pipelines",
+      question: "Read CSV file and print record count",
+      input: "sales.csv file",
+      expectedOutput: "Loaded X records",
+      hint: "Use pd.read_csv() and len()",
+      solution: "import pandas as pd\n\ndf = pd.read_csv('sales.csv')\nprint(f'Loaded {len(df)} records')\nprint(df.head())",
+      note: "Always check data after reading to verify structure and content.",
+      thinkingApproach: [
+        "Import pandas library",
+        "Read CSV file using pd.read_csv()",
+        "Check record count using len()",
+        "Preview data using head()",
+        "Validate data structure"
+      ],
+      questions: [
+        {
+          q: "1. Read CSV file and print record count",
+          answer: "import pandas as pd\n\ndf = pd.read_csv('sales.csv')\nprint(f'Loaded {len(df)} records')\nprint(df.head())"
+        },
+        {
+          q: "2. Read data from API and convert to DataFrame",
+          answer: "import requests\nimport pandas as pd\n\nresponse = requests.get('https://api.example.com/customers')\ndata = response.json()\ndf = pd.DataFrame(data)\nprint(f'Loaded {len(df)} records')"
+        },
+        {
+          q: "3. Read CSV from S3",
+          answer: "import boto3\nimport pandas as pd\n\ns3 = boto3.client('s3')\nobj = s3.get_object(Bucket='my-bucket', Key='data/sales.csv')\ndf = pd.read_csv(obj['Body'])\nprint(f'Loaded {len(df)} records')"
+        },
+        {
+          q: "4. Remove null values from DataFrame",
+          answer: "df = df.dropna()\nprint(f'After removing nulls: {len(df)} records')"
+        },
+        {
+          q: "5. Remove duplicate customer records",
+          answer: "df = df.drop_duplicates(subset=['customer_id'], keep='first')\nprint(f'After deduplication: {len(df)} unique customers')"
+        },
+        {
+          q: "6. Create calculated bonus column",
+          answer: "df['bonus'] = df['salary'] * 0.10\nprint(df[['salary', 'bonus']].head())"
+        },
+        {
+          q: "7. Standardize email column",
+          answer: "df['email'] = df['email'].str.lower().str.strip()\nprint(df['email'].head())"
+        },
+        {
+          q: "8. Filter records where age >= 18",
+          answer: "df = df[df['age'] >= 18]\nprint(f'Valid records: {len(df)}')"
+        },
+        {
+          q: "9. Write DataFrame to CSV",
+          answer: "df.to_csv('output.csv', index=False)\nprint('Data written to output.csv')"
+        },
+        {
+          q: "10. Complete ETL pipeline (read, transform, write)",
+          answer: "import pandas as pd\n\n# Extract\ndf = pd.read_csv('sales.csv')\nprint(f'Extracted: {len(df)} records')\n\n# Transform\ndf = df.dropna()\ndf = df.drop_duplicates()\ndf['bonus'] = df['salary'] * 0.10\nprint(f'Transformed: {len(df)} records')\n\n# Load\ndf.to_csv('output.csv', index=False)\nprint('Loaded to output.csv')"
+        }
+      ]
+    },
+
+    quiz: [
+      { q: "E in ETL stands for?", options: ["Export", "Extract", "Execute", "Enable"], answer: 1 },
+      { q: "T in ETL stands for?", options: ["Transfer", "Transform", "Transmit", "Test"], answer: 1 },
+      { q: "L in ETL stands for?", options: ["List", "Load", "Link", "Log"], answer: 1 },
+      { q: "Which removes nulls?", options: ["remove_null()", "dropna()", "delete_null()", "clear_null()"], answer: 1 },
+      { q: "Which removes duplicates?", options: ["drop_duplicates()", "remove_dup()", "unique()", "dedupe()"], answer: 0 },
+      { q: "Common ETL source?", options: ["Monitor", "CSV files", "Printer", "Scanner"], answer: 1 },
+      { q: "Common ETL target?", options: ["Keyboard", "Data warehouse", "Mouse", "Screen"], answer: 1 },
+      { q: "How to read S3 file?", options: ["open()", "boto3", "read()", "load()"], answer: 1 },
+      { q: "How to write to database?", options: ["to_sql()", "write_db()", "insert()", "save()"], answer: 0 },
+      { q: "ETL pipeline order?", options: ["Load→Extract→Transform", "Extract→Transform→Load", "Transform→Extract→Load", "Load→Transform→Extract"], answer: 1 }
+    ],
+
+    interview: "Python for SQL and ETL: Core data engineering workflow. ETL = Extract, Transform, Load. Extract reads data from sources (CSV, API, databases, S3). Comic: Warehouse pickup - collect packages. Example: pd.read_csv('sales.csv'), requests.get(url).json(), boto3 S3 read. Transform cleans and enriches data. Comic: Factory cleaning - raw materials cleaned. Common: dropna() removes nulls, drop_duplicates() removes duplicates, calculate fields, standardize columns, filter invalid. Example: df['bonus']=df['salary']*0.10. Load writes to targets (S3, Redshift, Snowflake, databases). Comic: Final delivery - package reaches customer. Example: df.to_csv('output.csv'), df.to_sql('table', connection). Top questions: Design ETL (identify sources, define transforms, choose targets, handle errors, add logging), Handle failures (try-except, retry logic, alerts, audit tables), Optimize transforms (filter early, vectorized ops, chunk files, appropriate types), Process incremental (watermarks, track IDs, CDC, upsert). Real usage: Read from S3, transform with Python, load to Redshift/Snowflake. Complete pipeline: extract → transform → load with error handling. Memory: Extract=Read, Transform=Clean, Load=Write. Formula: Extract → Transform → Load. Master ETL for production pipelines.",
+
+    memory: `🔄 Python for SQL and ETL - Memory Map
+
+📦 Extract = Read Sources
+Comic: Warehouse pickup
+import pandas as pd
+df = pd.read_csv('sales.csv')  # CSV
+data = requests.get(url).json()  # API
+df = pd.read_csv(s3_obj['Body'])  # S3
+Memory: Extract = Read
+
+🏭 Transform = Clean & Enrich
+Comic: Factory cleaning
+df = df.dropna()  # Remove nulls
+df = df.drop_duplicates()  # Remove duplicates
+df['bonus'] = df['salary'] * 0.10  # Calculate
+df['email'] = df['email'].str.lower()  # Standardize
+df = df[df['age'] >= 18]  # Filter
+Memory: Transform = Clean
+
+🚚 Load = Write Targets
+Comic: Final delivery
+df.to_csv('output.csv')  # CSV
+df.to_sql('table', connection)  # Database
+s3.upload_file('file', 'bucket', 'key')  # S3
+Memory: Load = Write
+
+🎯 ETL Formula:
+Extract → Transform → Load
+
+📊 Top Interview Questions:
+1. Design ETL? Sources→Transforms→Targets→Errors→Logging
+2. Handle failures? try-except, retry, alerts, audit
+3. Optimize? Filter early, vectorized, chunk, types
+4. Incremental? Watermarks, track IDs, CDC, upsert
+
+✅ Real Usage:
+AWS Glue jobs
+Airflow DAGs
+Lambda functions
+Batch processing
+Data warehouse loading
+
+🔑 Common Operations:
+Extract: read_csv, read_sql, boto3
+Transform: dropna, drop_duplicates, calculate
+Load: to_csv, to_sql, upload_file
+
+📋 Pipeline Pattern:
+try:
+    df = extract()
+    df = transform(df)
+    load(df)
+except Exception as e:
+    log_error(e)
+    send_alert()`,
+
+    revision: "Python for SQL and ETL: Extract, Transform, Load workflow. Extract reads from sources (CSV, API, DB, S3). Comic: Warehouse pickup. Example: pd.read_csv(), requests.get().json(), boto3 S3. Transform cleans data. Comic: Factory cleaning. Operations: dropna() nulls, drop_duplicates(), calculate fields, standardize, filter. Example: df['bonus']=df['salary']*0.10. Load writes to targets (S3, Redshift, Snowflake, DB). Comic: Final delivery. Example: to_csv(), to_sql(), s3.upload_file(). Top questions: Design ETL (sources→transforms→targets→errors→logging), Handle failures (try-except, retry, alerts), Optimize (filter early, vectorized, chunk), Incremental (watermarks, CDC, upsert). Real usage: S3→Python→Redshift pipeline. Memory: Extract=Read, Transform=Clean, Load=Write. Formula: Extract → Transform → Load. Master for production pipelines."
+  }

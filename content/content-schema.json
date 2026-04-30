@@ -1,0 +1,264 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Topic Content Schema",
+  "description": "Schema for Morphex learning content",
+  "type": "object",
+  "required": ["id", "title", "content"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the topic"
+    },
+    "title": {
+      "type": "string",
+      "description": "Display title of the topic"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Emoji icon for the topic"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["Beginner", "Intermediate", "Advanced"]
+    },
+    "duration": {
+      "type": "string",
+      "description": "Estimated time to complete (e.g., '45 min')"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the topic"
+    },
+    "content": {
+      "type": "object",
+      "required": ["comicStory", "deepDive", "interactiveQA", "codingChallenge", "quiz"],
+      "properties": {
+        "comicStory": {
+          "type": "object",
+          "description": "Comic story to introduce the concept",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Story title"
+            },
+            "panels": {
+              "type": "array",
+              "description": "Story panels",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "description": "Panel image description or emoji"
+                  },
+                  "text": {
+                    "type": "string",
+                    "description": "Panel text/dialogue"
+                  }
+                }
+              }
+            },
+            "twist": {
+              "type": "string",
+              "description": "The twist ending that makes it memorable"
+            },
+            "lesson": {
+              "type": "string",
+              "description": "Key takeaway from the story"
+            }
+          }
+        },
+        "deepDive": {
+          "type": "object",
+          "description": "Detailed explanation of the concept",
+          "properties": {
+            "whatItIs": {
+              "type": "string",
+              "description": "Clear definition"
+            },
+            "whyItMatters": {
+              "type": "string",
+              "description": "Real-world importance"
+            },
+            "whereUsed": {
+              "type": "array",
+              "description": "Use cases",
+              "items": {
+                "type": "string"
+              }
+            },
+            "visualExamples": {
+              "type": "array",
+              "description": "Visual examples with diagrams",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "diagram": {
+                    "type": "string",
+                    "description": "ASCII art or description"
+                  }
+                }
+              }
+            },
+            "keyPoints": {
+              "type": "array",
+              "description": "Important points to remember",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "interactiveQA": {
+          "type": "array",
+          "description": "6 tap-to-reveal questions",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string",
+                "description": "Simple, clear answer"
+              },
+              "explanation": {
+                "type": "string",
+                "description": "Detailed explanation"
+              },
+              "memoryTrick": {
+                "type": "string",
+                "description": "Mnemonic or memory aid"
+              }
+            }
+          }
+        },
+        "codingChallenge": {
+          "type": "object",
+          "description": "Hands-on coding exercise",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "scenario": {
+              "type": "string",
+              "description": "Real-world scenario"
+            },
+            "dataset": {
+              "type": "object",
+              "description": "Sample data structure",
+              "properties": {
+                "tables": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "columns": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "sampleData": {
+                        "type": "array",
+                        "items": {
+                          "type": "array"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "problem": {
+              "type": "string",
+              "description": "What needs to be solved"
+            },
+            "expectedOutput": {
+              "type": "string",
+              "description": "What the result should look like"
+            },
+            "hints": {
+              "type": "array",
+              "description": "Progressive hints",
+              "items": {
+                "type": "string"
+              }
+            },
+            "solution": {
+              "type": "string",
+              "description": "Complete solution code"
+            },
+            "explanation": {
+              "type": "string",
+              "description": "Step-by-step solution explanation"
+            }
+          }
+        },
+        "quiz": {
+          "type": "array",
+          "description": "9 scenario-based quiz questions",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string",
+                "description": "Scenario-based question"
+              },
+              "options": {
+                "type": "array",
+                "description": "4 answer options",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "correctAnswer": {
+                "type": "integer",
+                "description": "Index of correct answer (0-3)",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "explanation": {
+                "type": "string",
+                "description": "Why this answer is correct"
+              },
+              "difficulty": {
+                "type": "string",
+                "enum": ["easy", "medium", "hard"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "prerequisites": {
+      "type": "array",
+      "description": "Topics that should be completed first",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nextTopics": {
+      "type": "array",
+      "description": "Recommended next topics",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

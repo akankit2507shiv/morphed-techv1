@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Complete Interview Example</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 30px; background: #f8fafc; color: #1e293b; line-height: 1.8; }
+.section { background: white; padding: 25px; margin-bottom: 20px; border-radius: 10px; border-left: 5px solid #3b82f6; }
+.title { font-size: 22px; font-weight: bold; color: #1e40af; margin-bottom: 15px; }
+.subtitle { font-size: 16px; font-weight: bold; color: #475569; margin-top: 15px; margin-bottom: 8px; }
+.text { font-size: 15px; color: #334155; margin-bottom: 10px; }
+.highlight { background: #dbeafe; padding: 15px; border-radius: 8px; margin: 10px 0; }
+.time { color: #64748b; font-size: 13px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="section">
+  <div class="title">🎤 Complete Interview Flow Example</div>
+  <p class="text">This is how a complete 30-minute Data Engineer interview looks with proper structure.</p>
+</div>
+
+<div class="section">
+  <div class="title">Part 1: Introduction (0-3 minutes)</div>
+  <div class="time">⏱️ Time: 3 minutes</div>
+  <div class="highlight">
+    <p class="text">"Good morning! I have 2 years of experience in Data Engineering.</p>
+    <p class="text">I work primarily with SQL, Python, PySpark, and AWS.</p>
+    <p class="text">Recently, I worked on building a real-time streaming data pipeline where we handled around 2 million daily events.</p>
+    <p class="text">My role was to design and implement the end-to-end architecture, ensuring sub-second latency and scalability.</p>
+    <p class="text">For this, I used Kafka for streaming, PySpark for processing, Delta Lake for storage, and Databricks for analytics.</p>
+    <p class="text">My latest project was the Real-time Streaming Pipeline, where I solved the challenge of processing 80K events per second with sub-second latency."</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="title">Part 2: Project Deep Dive (5-10 minutes)</div>
+  <div class="time">⏱️ Time: 5-7 minutes</div>
+  
+  <div class="subtitle">Interviewer: "Tell me more about this streaming pipeline project"</div>
+  
+  <div class="highlight">
+    <p class="subtitle">Problem:</p>
+    <p class="text">"The e-commerce platform needed real-time analytics on customer events like clicks, purchases, and cart actions. They had 2 million+ daily events but no system to process them in real-time for personalization and fraud detection."</p>
+    
+    <p class="subtitle">Data Size:</p>
+    <p class="text">"We were handling 2 million events per day, which translates to approximately 80K events per second during peak hours."</p>
+    
+    <p class="subtitle">Architecture:</p>
+    <p class="text">"I designed a Kafka → PySpark Streaming → Delta Lake → Databricks architecture. Events flow from Kafka topics, get processed by PySpark Streaming with windowing functions, stored in Delta Lake for ACID transactions, and analyzed in Databricks."</p>
+    
+    <p class="subtitle">Tools Used:</p>
+    <p class="text">"Apache Kafka for event streaming, PySpark Streaming for real-time processing, Delta Lake for reliable storage, Databricks for analytics, AWS S3 for data lake, and Python for custom logic."</p>
+    
+    <p class="subtitle">My Role:</p>
+    <p class="text">"I designed the complete architecture, implemented PySpark transformations with windowing and aggregations, set up Kafka partitioning for parallel processing, and configured Delta Lake for ACID compliance."</p>
+    
+    <p class="subtitle">Optimization:</p>
+    <p class="text">"I used Kafka partitioning to enable parallel processing, implemented micro-batching in PySpark to balance latency and throughput, added caching for frequently accessed reference data, and optimized Delta Lake merge operations."</p>
+    
+    <p class="subtitle">Outcome:</p>
+    <p class="text">"We achieved sub-second latency, successfully processed 80K events per second during peak loads, and reduced fraud detection time by 75%. The system has been running in production for 6 months with 99.9% uptime."</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="title">Part 3: Scenario Questions (10-15 minutes)</div>
+  <div class="time">⏱️ Time: 5 minutes</div>
+  
+  <div class="subtitle">Interviewer: "What if your streaming pipeline fails?"</div>
+  <div class="highlight">
+    <p class="text">"First, I would check the logs to identify the failure point - whether it's Kafka, PySpark, or Delta Lake.</p>
+    <p class="text">Then I would fix the immediate issue to restore service - for example, if it's a Kafka consumer lag, I'd scale up consumers.</p>
+    <p class="text">Next, I would optimize the process to prevent future failures - like adding retry logic and error handling.</p>
+    <p class="text">Finally, I would add monitoring alerts using CloudWatch or Datadog for early detection of issues."</p>
+  </div>
+  
+  <div class="subtitle">Interviewer: "How do you handle data quality issues?"</div>
+  <div class="highlight">
+    <p class="text">"I implement validation checks at multiple stages. First, schema validation when data enters Kafka. Second, data quality checks in PySpark using Great Expectations. Third, business rule validation before writing to Delta Lake. Any failed records go to a dead letter queue for investigation."</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="title">Part 4: STAR Method Question (15-20 minutes)</div>
+  <div class="time">⏱️ Time: 3-4 minutes</div>
+  
+  <div class="subtitle">Interviewer: "Tell me about a time when you had to optimize a slow pipeline"</div>
+  <div class="highlight">
+    <p class="subtitle">Situation:</p>
+    <p class="text">"Our batch ETL pipeline was taking 8 hours to process daily data, causing delays in morning reports."</p>
+    
+    <p class="subtitle">Task:</p>
+    <p class="text">"I was responsible for improving performance to meet the 1-hour SLA requirement."</p>
+    
+    <p class="subtitle">Action:</p>
+    <p class="text">"I analyzed the pipeline and found three bottlenecks. First, I optimized PySpark transformations by reducing shuffles. Second, I implemented partitioning strategy based on date and region. Third, I added caching for dimension tables that were being read multiple times. Fourth, I parallelized independent transformation tasks."</p>
+    
+    <p class="subtitle">Result:</p>
+    <p class="text">"The pipeline processing time reduced from 8 hours to 45 minutes - a 90% improvement. We consistently met the 1-hour SLA, and the business team could access reports by 7 AM daily."</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="title">Part 5: Technical Questions (20-25 minutes)</div>
+  <div class="time">⏱️ Time: 5 minutes</div>
+  
+  <div class="subtitle">Interviewer: "Explain the difference between batch and streaming"</div>
+  <div class="highlight">
+    <p class="text">"Batch processing handles data in large chunks at scheduled intervals - like processing all daily data at midnight. It's suitable for historical analysis and reports.</p>
+    <p class="text">Streaming processes data in real-time as it arrives - like processing each customer click immediately. It's needed for real-time dashboards, fraud detection, and instant personalization.</p>
+    <p class="text">In my streaming project, we used PySpark Streaming with micro-batches to balance real-time requirements with processing efficiency."</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="title">Part 6: Closing (25-30 minutes)</div>
+  <div class="time">⏱️ Time: 2-3 minutes</div>
+  
+  <div class="subtitle">Interviewer: "Do you have any questions for us?"</div>
+  <div class="highlight">
+    <p class="text">"Yes, I have a few questions:</p>
+    <p class="text">1. What is the current data infrastructure and tech stack your team uses?</p>
+    <p class="text">2. What are the biggest data engineering challenges the team is facing?</p>
+    <p class="text">3. What does a typical day look like for a data engineer in your team?"</p>
+  </div>
+</div>
+
+<div class="section" style="background: #f0fdf4; border-left-color: #22c55e;">
+  <div class="title" style="color: #15803d;">✅ Key Takeaways</div>
+  <p class="text">✔ Introduction controlled the interview direction</p>
+  <p class="text">✔ Project story was structured with 7 parts and numbers</p>
+  <p class="text">✔ Scenario answers used 4-step formula</p>
+  <p class="text">✔ STAR method made behavioral answer clear</p>
+  <p class="text">✔ Technical answers were simple and practical</p>
+  <p class="text">✔ Asking questions showed genuine interest</p>
+</div>
+
+</body>
+</html>

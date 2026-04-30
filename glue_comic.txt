@@ -1,0 +1,56 @@
+    // 🎭 COMIC STORY
+    comic: `📖 1
+Imagine you're a Data Engineer at a company 🏢
+Raw data comes from 5 sources daily:
+- MySQL database 🗄️
+- CSV files 📄
+- JSON logs 📋
+- API data 🌐
+- Excel sheets 📊
+
+📖 2
+😰 Problem
+- Data is messy (nulls, duplicates, wrong formats)
+- Different formats (CSV, JSON, Parquet)
+- Need to clean and combine all data
+- Manual work takes 8 hours daily! 😫
+- Need to load into Redshift for analytics
+
+📖 3
+🤔 Solution
+
+Use AWS Glue ETL!
+
+What is ETL?
+E = Extract (get data from sources)
+T = Transform (clean, filter, join)
+L = Load (store in target)
+
+📖 4
+🔧 AWS Glue Components:
+
+1️⃣ Glue Crawler → Scans S3, creates schema
+2️⃣ Data Catalog → Stores metadata (table structure)
+3️⃣ Glue Job → Runs PySpark ETL code
+4️⃣ Trigger → Schedules jobs (daily, hourly)
+
+Flow:
+S3 (raw) → Crawler → Catalog → Glue Job → S3/Redshift
+
+📖 5
+✨ Result:
+✔ Serverless (no servers to manage!)
+✔ Auto-scaling (handles any data size)
+✔ 8 hours → 15 minutes automated ⚡
+✔ Clean, transformed data ready for analytics
+✔ Scheduled to run daily automatically
+
+📖 6
+💡 Aha Moment:
+Without Glue = Manual ETL (slow, error-prone) 😵
+With Glue = Automated ETL pipeline (fast, reliable) 🚀
+
+Glue = Your serverless data cleaner + transformer!
+
+Real-world: S3 → Glue → Redshift → QuickSight`,
+

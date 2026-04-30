@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Detail - Morphed Tech</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 8% 12%, rgba(255,61,129,0.15) 0%, transparent 35%),radial-gradient(circle at 82% 6%, rgba(0,212,255,0.12) 0%, transparent 30%),radial-gradient(circle at 72% 82%, rgba(124,60,255,0.13) 0%, transparent 40%),linear-gradient(180deg, #050816 0%, #0b1020 50%, #070812 100%); min-height: 100vh; }
+    .gradient-text { background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; }
+    .section-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 2rem; margin-bottom: 1.5rem; }
+    .tab-btn { padding: 0.75rem 1.5rem; border-bottom: 2px solid transparent; transition: all 0.2s; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { border-bottom-color: #ff3d81; color: #00d4ff; font-weight: 600; }
+    .tab-btn:hover { background: rgba(255,61,129,0.1); }
+  </style>
+</head>
+<body class="text-white">
+
+  <header class="bg-dark/60 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="admin-dashboard.html" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-secondary rounded-lg text-sm font-medium transition">
+          ← Admin Dashboard
+        </a>
+        <a href="projects-syllabus.html" class="text-gray-400 hover:text-white transition">← Back to Projects</a>
+        <h1 id="projectTitle" class="text-2xl font-extrabold gradient-text"></h1>
+      </div>
+      <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition text-sm">Logout</button>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    
+    <!-- Project Header -->
+    <div id="projectHeader" class="card p-8 mb-8"></div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 border-b border-white/10 mb-8 overflow-x-auto pb-2">
+      <button onclick="showTab('projectinfo')" id="tab-projectinfo" class="tab-btn active text-secondary">📋 Project Info</button>
+      <button onclick="showTab('overview')" id="tab-overview" class="tab-btn text-gray-400">🎯 Overview</button>
+      <button onclick="showTab('comic')" id="tab-comic" class="tab-btn text-gray-400">🎭 Comic</button>
+      <button onclick="showTab('deepdive')" id="tab-deepdive" class="tab-btn text-gray-400">📚 Deep Dive</button>
+      <button onclick="showTab('types')" id="tab-types" class="tab-btn text-gray-400">📋 Types</button>
+      <button onclick="showTab('components')" id="tab-components" class="tab-btn text-gray-400">⚙️ Components</button>
+      <button onclick="showTab('coding')" id="tab-coding" class="tab-btn text-gray-400">💻 Coding</button>
+      <button onclick="showTab('qna')" id="tab-qna" class="tab-btn text-gray-400">💬 Q&A</button>
+      <button onclick="showTab('quiz')" id="tab-quiz" class="tab-btn text-gray-400">🎯 Quiz</button>
+      <button onclick="showTab('interview')" id="tab-interview" class="tab-btn text-gray-400">🎤 Interview</button>
+      <button onclick="showTab('mistakes')" id="tab-mistakes" class="tab-btn text-gray-400">⚠️ Mistakes</button>
+      <button onclick="showTab('practical')" id="tab-practical" class="tab-btn text-gray-400">🔧 Practical</button>
+      <button onclick="showTab('memory')" id="tab-memory" class="tab-btn text-gray-400">🧠 Memory</button>
+      <button onclick="showTab('revision')" id="tab-revision" class="tab-btn text-gray-400">⚡ Revision</button>
+    </div>
+
+    <!-- Content Sections -->
+    <div id="content-projectinfo"></div>
+    <div id="content-overview" class="hidden"></div>
+    <div id="content-comic" class="hidden"></div>
+    <div id="content-deepdive" class="hidden"></div>
+    <div id="content-types" class="hidden"></div>
+    <div id="content-components" class="hidden"></div>
+    <div id="content-coding" class="hidden"></div>
+    <div id="content-qna" class="hidden"></div>
+    <div id="content-quiz" class="hidden"></div>
+    <div id="content-interview" class="hidden"></div>
+    <div id="content-mistakes" class="hidden"></div>
+    <div id="content-practical" class="hidden"></div>
+    <div id="content-memory" class="hidden"></div>
+    <div id="content-revision" class="hidden"></div>
+
+  </main>
+
+  <script src="projects-content.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    // Temporarily bypass login check for testing
+    // if (!token) window.location.href = 'student-login.html';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project') || 'project-1'; // Default to project-1 if no parameter
+    const project = projectsContent[projectId];
+
+    if (!project) {
+      alert('Project not found! Available projects: ' + Object.keys(projectsContent).join(', '));
+      // Temporarily comment out redirect for testing
+      // window.location.href = 'projects-syllabus.html';
+    }
+
+    // Global HTML decode function
+    const decodeHTML = (html) => {
+      if (!html) return '';
+      const txt = document.createElement('textarea');
+      txt.innerHTML = html;
+      return txt.value;
+    };
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'student-login.html';
+    }
+
+    function showTab(tabName) {
+      ['projectinfo', 'overview', 'comic', 'deepdive', 'types', 'components', 'coding', 'qna', 'quiz', 'interview', 'mistakes', 'practical', 'memory', 'revision'].forEach(t => {
+        document.getElementById('content-' + t).classList.add('hidden');
+        const btn = document.getElementById('tab-' + t);
+        btn.classList.remove('active', 'text-secondary');
+        btn.classList.add('text-gray-400');
+      });
+      document.getElementById('content-' + tabName).classList.remove('hidden');
+      const activeBtn = document.getElementById('tab-' + tabName);
+      activeBtn.classList.add('active', 'text-secondary');
+      activeBtn.classList.remove('text-gray-400');
+    }
+
+    function renderHeader() {
+      document.getElementById('projectTitle').textContent = project.title;
+      document.getElementById('projectHeader').innerHTML = `
+        <div class="flex items-start gap-6">
+          <div class="text-6xl">${project.icon}</div>
+          <div class="flex-1">
+            <h2 class="text-3xl font-bold text-white mb-2">${project.title}</h2>
+            <p class="text-gray-400 text-lg mb-4">${project.subtitle}</p>
+            <div class="flex flex-wrap gap-3">
+              <span class="px-4 py-2 bg-yellow-500/20 text-yellow-300 rounded-lg text-sm font-semibold">${project.level}</span>
+              <span class="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-lg text-sm">⏱️ ${project.duration}</span>
+              ${project.tech_stack.map(tech => `<span class="px-3 py-1 bg-white/5 text-gray-300 rounded text-sm">${tech}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOverview() {
+      const content = document.getElementById('content-overview');
+      const overview = project.aatma["🎯 Overview"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🎯 Project Overview</h3>
+          
+          <div class="bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-6 mb-6">
+            <h4 class="text-xl font-semibold text-green-300 mb-3">Simple Definition</h4>
+            <p class="text-gray-200 text-xl leading-relaxed">${decodeHTML(overview.simple)}</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-6 mb-6">
+            <h4 class="text-xl font-semibold text-blue-300 mb-3">Detailed Explanation</h4>
+            <p class="text-gray-200 text-lg leading-relaxed">${decodeHTML(overview.explanation)}</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-6 mb-6">
+            <h4 class="text-xl font-semibold text-yellow-300 mb-3">💼 Real-World Example</h4>
+            <p class="text-gray-200 text-lg leading-relaxed">${decodeHTML(overview.example)}</p>
+          </div>
+          
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+              <h4 class="text-sm font-semibold text-blue-300 mb-2">What You Build</h4>
+              <p class="text-white text-lg">${decodeHTML(overview.what_you_build)}</p>
+            </div>
+            <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-5">
+              <h4 class="text-sm font-semibold text-red-300 mb-2">Business Problem</h4>
+              <p class="text-white text-lg">${decodeHTML(overview.business_problem)}</p>
+            </div>
+            <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5">
+              <h4 class="text-sm font-semibold text-green-300 mb-2">Final Output</h4>
+              <p class="text-white text-lg">${decodeHTML(overview.final_output)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderComic() {
+      const content = document.getElementById('content-comic');
+      const comic = project.aatma["🎭 Comic"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🎭 Comic Story</h3>
+          <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-8">
+            <p class="text-gray-200 text-xl leading-relaxed">${decodeHTML(comic.story)}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDeepDive() {
+      const content = document.getElementById('content-deepdive');
+      const deepDive = project.aatma["📚 Deep Dive"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">📚 Deep Dive - Step by Step</h3>
+          <div class="space-y-4">
+            ${deepDive.step_by_step.map((step, idx) => `
+              <div class="bg-white/5 border-l-4 border-secondary rounded-lg p-6 hover:bg-white/10 transition">
+                <div class="flex items-start gap-4">
+                  <span class="text-3xl font-bold text-secondary flex-shrink-0">${idx + 1}</span>
+                  <p class="text-gray-200 text-lg leading-relaxed flex-1">${decodeHTML(step)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          
+          ${deepDive.architecture ? `
+            <div class="mt-8">
+              <h4 class="text-2xl font-bold text-white mb-4">🏛️ Architecture Components</h4>
+              <div class="grid md:grid-cols-2 gap-3">
+                ${deepDive.architecture.map(comp => `
+                  <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                    <p class="text-gray-200 font-semibold">🔹 ${decodeHTML(comp)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+          
+          ${deepDive.why_each_tool ? `
+            <div class="mt-8">
+              <h4 class="text-2xl font-bold text-white mb-4">🤔 Why Each Tool?</h4>
+              <div class="space-y-3">
+                ${deepDive.why_each_tool.map(why => `
+                  <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                    <p class="text-gray-200">✅ ${decodeHTML(why)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderTypes() {
+      const content = document.getElementById('content-types');
+      const types = project.aatma["📋 Types"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">📋 Types of ETL</h3>
+          <div class="space-y-4 mb-8">
+            ${types.types.map((type, idx) => `
+              <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-6 hover:bg-blue-500/20 transition">
+                <div class="flex items-start gap-4">
+                  <span class="text-2xl font-bold text-accent flex-shrink-0">${idx + 1}</span>
+                  <p class="text-gray-200 text-lg leading-relaxed flex-1">${decodeHTML(type)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          
+          ${types.batch_types ? `
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-4">📅 Batch Processing Types</h4>
+              <div class="grid md:grid-cols-3 gap-4">
+                ${types.batch_types.map(batch => `
+                  <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5">
+                    <p class="text-gray-200 font-semibold">• ${decodeHTML(batch)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderComponents() {
+      const content = document.getElementById('content-components');
+      const components = project.aatma["⚙️ Components"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">⚙️ Components Used</h3>
+          <div class="grid md:grid-cols-2 gap-4 mb-8">
+            ${components.components.map(component => `
+              <div class="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/30 rounded-lg p-5 hover:bg-purple-500/20 transition">
+                <p class="text-gray-200 text-lg font-semibold">🔹 ${decodeHTML(component)}</p>
+              </div>
+            `).join('')}
+          </div>
+          
+          ${components.components_used ? `
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-4">🛠️ Key Components</h4>
+              <div class="flex flex-wrap gap-3">
+                ${components.components_used.map(comp => `
+                  <div class="bg-blue-500/20 border border-blue-500/40 rounded-lg px-4 py-2">
+                    <p class="text-white font-semibold">${decodeHTML(comp)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderCoding() {
+      const content = document.getElementById('content-coding');
+      const coding = project.aatma["💻 Coding"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">💻 Real PySpark Coding Examples</h3>
+          
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 mb-8">
+            <h4 class="text-xl font-semibold text-blue-300 mb-3">What We Do:</h4>
+            <p class="text-gray-200 text-lg">${decodeHTML(coding.what_we_do)}</p>
+          </div>
+
+          <div class="space-y-8">
+            ${coding.examples.map((example, idx) => `
+              <div class="bg-white/5 border border-white/10 rounded-lg p-6 hover:bg-white/10 transition">
+                <div class="flex items-start gap-4 mb-4">
+                  <span class="text-2xl font-bold text-green-400 flex-shrink-0">${idx + 1}</span>
+                  <div class="flex-1">
+                    <h4 class="text-xl font-bold text-white mb-2">${decodeHTML(example.title)}</h4>
+                    <p class="text-gray-400 text-base">${decodeHTML(example.description)}</p>
+                  </div>
+                </div>
+                
+                <div class="bg-black/40 border border-gray-700 rounded-lg p-4 mb-3 overflow-x-auto">
+                  <pre class="text-green-300 text-sm font-mono">${decodeHTML(example.code)}</pre>
+                </div>
+                
+                <div class="bg-gray-800/50 border border-gray-600 rounded-lg p-4">
+                  <p class="text-xs text-gray-400 mb-2 font-semibold">OUTPUT:</p>
+                  <pre class="text-cyan-300 text-sm font-mono">${decodeHTML(example.output)}</pre>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQnA() {
+      const content = document.getElementById('content-qna');
+      const qna = project.aatma["💬 Q&A"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">💬 Real Interview Questions & Detailed Answers</h3>
+          <p class="text-gray-400 mb-6">These are actual questions asked in 6-20 LPA data engineering interviews. Practice explaining these in your own words.</p>
+          <div class="space-y-6">
+            ${qna.map((qa, idx) => `
+              <div class="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg p-6 hover:bg-blue-500/20 transition">
+                <div class="flex items-start gap-4 mb-4">
+                  <span class="text-2xl font-bold text-blue-400 flex-shrink-0">Q${idx + 1}</span>
+                  <h4 class="text-xl font-semibold text-white">${decodeHTML(qa.question)}</h4>
+                </div>
+                <div class="pl-12 bg-white/5 rounded-lg p-5 border-l-4 border-green-500">
+                  <p class="text-green-300 text-sm font-semibold mb-2">✅ ANSWER:</p>
+                  <p class="text-gray-200 text-lg leading-relaxed">${decodeHTML(qa.answer)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuiz() {
+      const content = document.getElementById('content-quiz');
+      const quiz = project.aatma["🎯 Quiz"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🎯 Quiz</h3>
+          <div class="space-y-4">
+            ${quiz.map((question, idx) => `
+              <div class="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-6 hover:bg-yellow-500/20 transition">
+                <p class="text-gray-200 text-lg leading-relaxed">${decodeHTML(question)}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInterview() {
+      const content = document.getElementById('content-interview');
+      const interview = project.aatma["🎤 Interview"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🎤 Interview Answers</h3>
+          <div class="space-y-4">
+            ${interview.map((answer, idx) => `
+              <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-6 hover:bg-purple-500/20 transition">
+                <div class="flex items-start gap-4">
+                  <span class="text-xl font-bold text-purple-400 flex-shrink-0">A${idx + 1}</span>
+                  <p class="text-gray-200 text-lg leading-relaxed flex-1">${decodeHTML(answer)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMistakes() {
+      const content = document.getElementById('content-mistakes');
+      const mistakes = project.aatma["⚠️ Mistakes"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">⚠️ Common Mistakes to Avoid</h3>
+          <div class="space-y-4">
+            ${mistakes.map((mistake, idx) => `
+              <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-6 hover:bg-red-500/20 transition">
+                <div class="flex items-start gap-4">
+                  <span class="text-3xl flex-shrink-0">❌</span>
+                  <p class="text-gray-200 text-lg leading-relaxed flex-1">${decodeHTML(mistake)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPractical() {
+      const content = document.getElementById('content-practical');
+      const practical = project.aatma["🔧 Practical"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🔧 Practical Task</h3>
+          <div class="bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-8 mb-6">
+            <h4 class="text-2xl font-semibold text-green-300 mb-4">Task:</h4>
+            <p class="text-gray-200 text-xl leading-relaxed">${decodeHTML(practical.task)}</p>
+          </div>
+          <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-8 mb-6">
+            <h4 class="text-2xl font-semibold text-blue-300 mb-4">Expected Output:</h4>
+            <p class="text-gray-200 text-xl leading-relaxed">${decodeHTML(practical.output)}</p>
+          </div>
+          
+          ${practical.real_cases ? `
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-4">🚪 Real-World Scenarios</h4>
+              <div class="grid md:grid-cols-2 gap-4">
+                ${practical.real_cases.map(scenario => `
+                  <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-5">
+                    <h5 class="text-lg font-semibold text-red-300 mb-2">⚠️ ${decodeHTML(scenario.scenario)}</h5>
+                    <p class="text-gray-200">✅ ${decodeHTML(scenario.solution)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderMemory() {
+      const content = document.getElementById('content-memory');
+      const memory = project.aatma["🧠 Memory"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">🧠 Memory Tricks</h3>
+          <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-10 mb-6">
+            <h4 class="text-2xl font-semibold text-purple-300 mb-4 text-center">Main Trick:</h4>
+            <p class="text-4xl font-bold text-white text-center">${decodeHTML(memory.trick)}</p>
+          </div>
+          <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-10 mb-6">
+            <h4 class="text-2xl font-semibold text-blue-300 mb-4 text-center">Quick Shortcut:</h4>
+            <p class="text-4xl font-bold text-white text-center">${decodeHTML(memory.shortcut)}</p>
+          </div>
+          
+          ${memory.tricks ? `
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-4 text-center">🎯 Quick Memory Aids</h4>
+              <div class="grid md:grid-cols-2 gap-4">
+                ${memory.tricks.map(trick => `
+                  <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-6 text-center">
+                    <p class="text-2xl font-bold text-white">${decodeHTML(trick)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderRevision() {
+      const content = document.getElementById('content-revision');
+      const revision = project.aatma["⚡ Revision"];
+      content.innerHTML = `
+        <div class="section-card">
+          <h3 class="text-3xl font-bold text-white mb-6">⚡ Quick Revision</h3>
+          <div class="bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-8 mb-6">
+            <p class="text-gray-200 text-xl leading-relaxed">${decodeHTML(revision.summary)}</p>
+          </div>
+          
+          ${revision.one_line_revision ? `
+            <div>
+              <h4 class="text-2xl font-bold text-white mb-4">📝 One-Line Revision Points</h4>
+              <div class="space-y-3">
+                ${revision.one_line_revision.map(point => `
+                  <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                    <p class="text-gray-200 text-lg">• ${decodeHTML(point)}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderProjectInfo() {
+      const content = document.getElementById('content-projectinfo');
+      
+      let html = `<div class="space-y-6">`;
+      
+      // Project Info Section (NEW)
+      if (project.aatma["📋 Project Info"]) {
+        const projectInfo = project.aatma["📋 Project Info"];
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📋 Project Info</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-blue-300 mb-2">🏯 Business Case</h4>
+                <p class="text-gray-200">${decodeHTML(projectInfo.business_case)}</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-purple-300 mb-2">📊 How Much Data</h4>
+                <p class="text-gray-200">${decodeHTML(projectInfo.how_much_data)}</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-green-300 mb-2">🎯 Why Company Built This</h4>
+                <p class="text-gray-200">${decodeHTML(projectInfo.why_company_built_this)}</p>
+              </div>
+              <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-yellow-300 mb-2">💰 Salary Relevance</h4>
+                <p class="text-gray-200">${decodeHTML(projectInfo.expected_salary_relevance)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Project Overview
+      if (project.project_overview) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🎯 Project Overview</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="text-blue-300 text-sm font-semibold mb-2">Project Name</p>
+                <p class="text-white text-lg">${decodeHTML(project.project_overview.project_name)}</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="text-purple-300 text-sm font-semibold mb-2">Industry</p>
+                <p class="text-white text-lg">${decodeHTML(project.project_overview.industry)}</p>
+              </div>
+            </div>
+            <div class="mt-4 bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+              <p class="text-green-300 text-sm font-semibold mb-2">Problem Statement</p>
+              <p class="text-gray-200">${decodeHTML(project.project_overview.problem_statement)}</p>
+            </div>
+            <div class="mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+              <p class="text-yellow-300 text-sm font-semibold mb-2">Business Goal</p>
+              <p class="text-gray-200">${decodeHTML(project.project_overview.business_goal)}</p>
+            </div>
+            <div class="mt-4 bg-teal-500/10 border border-teal-500/30 rounded-lg p-4">
+              <p class="text-teal-300 text-sm font-semibold mb-2">Real-World Impact</p>
+              <p class="text-gray-200">${decodeHTML(project.project_overview.real_world_impact)}</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Architecture Flow
+      if (project.architecture_flow) {
+        const flowArray = Array.isArray(project.architecture_flow) ? project.architecture_flow : Object.values(project.architecture_flow);
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🏛️ Architecture Flow</h3>
+            <div class="space-y-3">
+              ${flowArray.map((step, idx) => `
+                <div class="bg-white/5 border-l-4 border-secondary rounded-lg p-4 hover:bg-white/10 transition">
+                  <h4 class="text-lg font-semibold text-secondary mb-1">${step.component_name || step.name || 'Step ' + (idx + 1)}</h4>
+                  <p class="text-gray-300">${decodeHTML(step.description)}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Curriculum Modules
+      if (project.curriculum_modules) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📚 Curriculum Modules</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              ${project.curriculum_modules.map(module => `
+                <div class="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-5">
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="text-2xl font-bold text-secondary">${module.module_number}</span>
+                    <div>
+                      <h4 class="text-lg font-semibold text-white">${decodeHTML(module.title || module.module_name)}</h4>
+                      <p class="text-sm text-gray-400">⏱️ ${decodeHTML(module.duration)}</p>
+                    </div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    ${module.topics.map(topic => `
+                      <span class="px-2 py-1 bg-white/10 text-gray-300 rounded text-xs">${decodeHTML(topic)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Technology Stack
+      if (project.technology_stack) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🛠️ Technology Stack</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              ${project.technology_stack.programming_languages ? `
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <p class="text-green-300 font-semibold mb-3">Programming Languages</p>
+                  <div class="flex flex-wrap gap-2">
+                    ${project.technology_stack.programming_languages.map(lang => `
+                      <span class="px-3 py-1 bg-white/10 text-white rounded">${decodeHTML(lang)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              ${project.technology_stack.big_data_tools ? `
+                <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                  <p class="text-blue-300 font-semibold mb-3">Big Data Tools</p>
+                  <div class="flex flex-wrap gap-2">
+                    ${project.technology_stack.big_data_tools.map(tool => `
+                      <span class="px-3 py-1 bg-white/10 text-white rounded">${decodeHTML(tool)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              ${project.technology_stack.cloud_services ? `
+                <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                  <p class="text-purple-300 font-semibold mb-3">Cloud Services</p>
+                  <div class="flex flex-wrap gap-2">
+                    ${project.technology_stack.cloud_services.map(service => `
+                      <span class="px-3 py-1 bg-white/10 text-white rounded">${decodeHTML(service)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              ${project.technology_stack.orchestration_tools ? `
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <p class="text-yellow-300 font-semibold mb-3">Orchestration Tools</p>
+                  <div class="flex flex-wrap gap-2">
+                    ${project.technology_stack.orchestration_tools.map(tool => `
+                      <span class="px-3 py-1 bg-white/10 text-white rounded">${decodeHTML(tool)}</span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Hands-on Deliverables
+      if (project.hands_on_deliverables) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📦 Hands-on Deliverables</h3>
+            <div class="grid md:grid-cols-2 gap-3">
+              ${project.hands_on_deliverables.map(item => `
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex items-center gap-3">
+                  <span class="text-2xl">✅</span>
+                  <p class="text-gray-200">${decodeHTML(item)}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Resume Support
+      if (project.resume_support) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">💼 Resume Support</h3>
+            <div class="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-6">
+              <h4 class="text-xl font-semibold text-purple-300 mb-4">Project Title for Resume</h4>
+              <p class="text-white text-lg mb-6">${decodeHTML(project.resume_support.resume_project_title)}</p>
+              <h4 class="text-xl font-semibold text-purple-300 mb-4">Bullet Points</h4>
+              <ul class="space-y-2">
+                ${project.resume_support.resume_bullet_points.map(point => `
+                  <li class="text-gray-200 flex items-start gap-2">
+                    <span class="text-green-400 mt-1">•</span>
+                    <span>${decodeHTML(point)}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Interview Preparation
+      if (project.interview_preparation) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🎤 Interview Preparation</h3>
+            <div class="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg p-6">
+              <h4 class="text-xl font-semibold text-blue-300 mb-4">Mock Interview Questions</h4>
+              <ul class="space-y-3">
+                ${project.interview_preparation.mock_questions.map(question => `
+                  <li class="text-gray-200 bg-white/5 rounded-lg p-3">❓ ${decodeHTML(question)}</li>
+                `).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Business Positioning
+      if (project.business_positioning) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🎯 Target Audience & Career Roles</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-blue-300 mb-3">Target Audience</h4>
+                <ul class="space-y-2">
+                  ${project.business_positioning.target_audience.map(audience => `
+                    <li class="text-gray-200 flex items-center gap-2">
+                      <span class="text-green-400">✓</span>
+                      <span>${audience}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-purple-300 mb-3">Career Roles</h4>
+                <ul class="space-y-2">
+                  ${project.business_positioning.career_roles_targeted.map(role => `
+                    <li class="text-gray-200 flex items-center gap-2">
+                      <span class="text-yellow-400">⭐</span>
+                      <span>${decodeHTML(role)}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // NEW SECTIONS ADDED
+      
+      // Project Info
+      if (project.project_info) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📝 Project Information</h3>
+            <div class="space-y-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-blue-300 mb-2">What You Will Build</h4>
+                <p class="text-gray-200">${decodeHTML(project.project_info.what_you_will_build)}</p>
+              </div>
+              <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-red-300 mb-2">Business Problem</h4>
+                <p class="text-gray-200">${decodeHTML(project.project_info.business_problem)}</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-green-300 mb-2">Why Companies Need This</h4>
+                <p class="text-gray-200">${decodeHTML(project.project_info.why_companies_need_this)}</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-purple-300 mb-3">Real-World Usage</h4>
+                <ul class="space-y-2">
+                  ${project.project_info.real_world_usage.map(usage => `
+                    <li class="text-gray-200 flex items-center gap-2">
+                      <span class="text-green-400">•</span>
+                      <span>${decodeHTML(usage)}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-yellow-300 mb-2">Expected Output</h4>
+                <p class="text-gray-200">${decodeHTML(project.project_info.expected_output)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Learning Outcomes
+      if (project.learning_outcomes) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🎯 Learning Outcomes</h3>
+            <div class="grid md:grid-cols-2 gap-3">
+              ${project.learning_outcomes.map((outcome, idx) => `
+                <div class="bg-gradient-to-r from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-lg p-4 flex items-start gap-3">
+                  <span class="text-2xl font-bold text-green-400">${idx + 1}</span>
+                  <p class="text-gray-200">${decodeHTML(outcome)}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Folder Structure
+      if (project.folder_structure) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📁 Folder Structure</h3>
+            <div class="bg-gray-800/50 border border-gray-600 rounded-lg p-5">
+              <p class="text-gray-400 mb-4">${decodeHTML(project.folder_structure.description)}</p>
+              <div class="grid md:grid-cols-3 gap-2">
+                ${project.folder_structure.folders.map(folder => `
+                  <div class="bg-white/5 rounded px-3 py-2 font-mono text-sm text-cyan-300">📂 ${decodeHTML(folder)}</div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Dataset Information
+      if (project.dataset_information) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">📊 Dataset Information</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p class="text-blue-300 text-sm font-semibold mb-2">Dataset Type</p>
+                <p class="text-white text-lg">${decodeHTML(project.dataset_information.dataset_type)}</p>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <p class="text-purple-300 text-sm font-semibold mb-2">Data Volume</p>
+                <p class="text-white text-lg">${decodeHTML(project.dataset_information.data_volume)}</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                <p class="text-green-300 text-sm font-semibold mb-2">Source Type</p>
+                <p class="text-white text-lg">${decodeHTML(project.dataset_information.source_type)}</p>
+              </div>
+              <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                <p class="text-yellow-300 text-sm font-semibold mb-2">Sample Columns</p>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  ${project.dataset_information.sample_columns.map(col => `
+                    <span class="px-2 py-1 bg-white/10 text-gray-300 rounded text-xs">${decodeHTML(col)}</span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Top 7 Most Asked Questions
+      if (project.top_7_most_asked_interviewer_questions) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🔥 Top 7 Most Asked Interviewer Questions</h3>
+            <div class="space-y-4">
+              ${project.top_7_most_asked_interviewer_questions.map((qa, idx) => `
+                <div class="bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/30 rounded-lg p-5">
+                  <div class="flex items-start gap-3 mb-3">
+                    <span class="text-2xl font-bold text-red-400">Q${idx + 1}</span>
+                    <h4 class="text-lg font-semibold text-white">${qa.question}</h4>
+                  </div>
+                  <div class="pl-10">
+                    <p class="text-gray-300">${decodeHTML(qa.detailed_answer)}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Communication Mastery
+      if (project.communication_mastery) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">🗣️ Communication Mastery</h3>
+            <div class="space-y-4">
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-blue-300 mb-2">How to Introduce in Interview</h4>
+                <p class="text-gray-200">${decodeHTML(project.communication_mastery.how_to_introduce_project_in_interview)}</p>
+              </div>
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-green-300 mb-2">HR Round</h4>
+                  <p class="text-gray-200 text-sm">${decodeHTML(project.communication_mastery.hr_round_explanation)}</p>
+                </div>
+                <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-purple-300 mb-2">Technical Round</h4>
+                  <p class="text-gray-200 text-sm">${decodeHTML(project.communication_mastery.technical_round_explanation)}</p>
+                </div>
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                  <h4 class="text-sm font-semibold text-yellow-300 mb-2">Manager Round</h4>
+                  <p class="text-gray-200 text-sm">${decodeHTML(project.communication_mastery.manager_round_explanation)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Salary Role Mapping
+      if (project.salary_role_mapping) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">💰 Salary & Role Mapping</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-green-300 mb-3">Fresher Roles</h4>
+                <ul class="space-y-2">
+                  ${project.salary_role_mapping.fresher_roles.map(role => `
+                    <li class="text-gray-200 text-sm">• ${decodeHTML(role)}</li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-blue-300 mb-3">Mid-Level Roles</h4>
+                <ul class="space-y-2">
+                  ${project.salary_role_mapping.mid_level_roles.map(role => `
+                    <li class="text-gray-200 text-sm">• ${decodeHTML(role)}</li>
+                  `).join('')}
+                </ul>
+              </div>
+              <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-5">
+                <h4 class="text-lg font-semibold text-purple-300 mb-3">High-Paying Roles</h4>
+                <ul class="space-y-2">
+                  ${project.salary_role_mapping.high_paying_roles.map(role => `
+                    <li class="text-gray-200 text-sm">• ${decodeHTML(role)}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Final Transformation
+      if (project.final_transformation) {
+        html += `
+          <div class="section-card">
+            <h3 class="text-3xl font-bold text-white mb-6">✨ Your Transformation Journey</h3>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+              <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
+                <h4 class="text-xl font-semibold text-red-300 mb-3">❌ Before</h4>
+                <p class="text-gray-200 text-lg">${decodeHTML(project.final_transformation.before)}</p>
+              </div>
+              <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-6">
+                <h4 class="text-xl font-semibold text-green-300 mb-3">✅ After</h4>
+                <p class="text-gray-200 text-lg">${decodeHTML(project.final_transformation.after)}</p>
+              </div>
+            </div>
+            <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-6">
+              <h4 class="text-xl font-semibold text-purple-300 mb-3">🎯 Final Goal</h4>
+              <p class="text-white text-xl font-semibold">${decodeHTML(project.final_transformation.final_goal)}</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      html += `</div>`;
+      content.innerHTML = html;
+    }
+
+    // Initialize
+    renderHeader();
+    renderProjectInfo();
+    renderOverview();
+    renderComic();
+    renderDeepDive();
+    renderTypes();
+    renderComponents();
+    renderCoding();
+    renderQnA();
+    renderQuiz();
+    renderInterview();
+    renderMistakes();
+    renderPractical();
+    renderMemory();
+    renderRevision();
+  </script>
+</body>
+</html>

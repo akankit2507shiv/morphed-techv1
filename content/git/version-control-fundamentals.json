@@ -1,0 +1,254 @@
+{
+  "id": "version-control-fundamentals",
+  "title": "Version Control Fundamentals",
+  "icon": "📚",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "Understanding version control systems and why they're essential",
+  "prerequisites": [],
+  "nextTopics": ["git-basics"],
+  "content": {
+    "comicStory": {
+      "title": "The Book Writer's Nightmare",
+      "panels": [
+        {
+          "image": "📖",
+          "text": "Meet Sarah, writing her first book. She saves it as 'book.doc' and starts writing Chapter 1."
+        },
+        {
+          "image": "✍️",
+          "text": "She makes changes, saves again. Realizes she deleted an important paragraph. Can't get it back!"
+        },
+        {
+          "image": "😰",
+          "text": "Sarah starts making copies: 'book_v2.doc', 'book_final.doc', 'book_final_FINAL.doc'"
+        },
+        {
+          "image": "🤦",
+          "text": "Now she has 20 files and can't remember which version has what changes!"
+        },
+        {
+          "image": "💡",
+          "text": "TWIST: Her friend shows her Version Control - like a time machine for her book!"
+        },
+        {
+          "image": "✨",
+          "text": "Now Sarah saves every version automatically, can go back anytime, and never loses work!"
+        }
+      ],
+      "twist": "Without version control, you're drowning in file copies. With it, you have a time machine!",
+      "lesson": "Version Control = Time machine + Collaboration tool + Safety net for your code!"
+    },
+    "deepDive": {
+      "whatItIs": "Version Control is a system that records changes to files over time, allowing you to recall specific versions later. It tracks who made what changes, when, and why - providing a complete history of your project.",
+      "whyItMatters": "Without version control, you risk losing work, creating file chaos (file_v1, file_final_FINAL), having no change history, collaboration nightmares, and fear of experimentation. With it, you never lose work, maintain clean workspace, have complete history, collaborate safely, and experiment fearlessly.",
+      "whereUsed": [
+        "Software Development: Every tech company (Google, Facebook, Amazon) uses Git",
+        "Data Engineering: Track ETL scripts, SQL queries, pipeline code, notebooks",
+        "Documentation: README files, API docs, user guides, technical specs",
+        "Configuration Management: Server configs, environment variables, Infrastructure as Code",
+        "Collaboration: GitHub for code hosting, GitLab for DevOps, Bitbucket for teams"
+      ],
+      "visualExamples": [
+        {
+          "title": "Centralized Version Control (CVCS)",
+          "description": "ONE central server stores everything. Developers check out files, make changes, check back in.",
+          "diagram": "Central Server ← Developer 1\n              ← Developer 2\n              ← Developer 3\n\nPros: Simple, easy administration\nCons: Single point of failure, requires network"
+        },
+        {
+          "title": "Distributed Version Control (DVCS)",
+          "description": "EVERY developer has FULL copy of repository. Work offline, sync when ready.",
+          "diagram": "Developer 1 (full copy) ↔ Remote Server ↔ Developer 2 (full copy)\n                                        ↔ Developer 3 (full copy)\n\nPros: Work offline, fast, no single point of failure\nCons: Steeper learning curve"
+        },
+        {
+          "title": "Git Benefits",
+          "description": "Why Git became the industry standard",
+          "diagram": "✔ Complete History (every change recorded)\n✔ Branching & Merging (parallel development)\n✔ Collaboration (multiple developers)\n✔ Backup & Recovery (never lose work)\n✔ Experimentation (try ideas safely)\n✔ Code Review (quality assurance)"
+        }
+      ],
+      "keyPoints": [
+        "Version Control tracks changes to files over time",
+        "Centralized (SVN) = One server, Distributed (Git) = Full copy everywhere",
+        "Git is the industry standard (fast, offline, powerful branching)",
+        "Benefits: Complete history, safe collaboration, easy recovery",
+        "Use for: Code, documentation, configs, scripts",
+        "Don't use for: Large binaries, sensitive data, generated files",
+        "Every commit is a save point you can return to"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is Version Control?",
+        "answer": "A system that tracks changes to files over time, allowing you to recall specific versions later.",
+        "explanation": "Version Control records every change, tracks who changed what, enables collaboration, and provides backup. It's like a time machine for your code!",
+        "memoryTrick": "Version Control = Time machine ⏰"
+      },
+      {
+        "question": "Why use Version Control?",
+        "answer": "To track changes, collaborate safely, never lose work, and experiment without fear.",
+        "explanation": "Without it: Lost work, file chaos, no history, collaboration nightmares. With it: Complete history, safe collaboration, easy recovery, fearless experimentation.",
+        "memoryTrick": "Version Control = Safety + History + Collaboration 🎯"
+      },
+      {
+        "question": "What's the difference between Centralized and Distributed Version Control?",
+        "answer": "Centralized has one server (SVN), Distributed has full copy on every machine (Git).",
+        "explanation": "Centralized requires network and has single point of failure. Distributed works offline, is faster, and has no single point of failure.",
+        "memoryTrick": "Centralized = One server, Distributed = Full copies 📦"
+      },
+      {
+        "question": "What is Git?",
+        "answer": "A distributed version control system that's become the industry standard.",
+        "explanation": "Git gives every developer a full copy of the repository, enables fast offline work, powerful branching, and has a robust ecosystem (GitHub, GitLab).",
+        "memoryTrick": "Git = Distributed VCS 🚀"
+      },
+      {
+        "question": "Can you work offline with Git?",
+        "answer": "Yes! Full repository history is stored locally.",
+        "explanation": "You can commit changes, view history, create branches, and do everything offline. Sync with remote when back online.",
+        "memoryTrick": "Git = Offline capable ✅"
+      },
+      {
+        "question": "What should NOT be stored in Git?",
+        "answer": "Large binary files (videos, images) and sensitive data (passwords, API keys).",
+        "explanation": "Git is optimized for text files. Don't store: large binaries, passwords/secrets, generated files (build outputs), or dependencies (node_modules).",
+        "memoryTrick": "Git = Text files, not binaries/secrets 🚫"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Understanding Version Control Workflow",
+      "scenario": "You're building a simple version control system to understand how it works. Simulate creating versions, viewing history, and reverting changes.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "versions",
+            "columns": ["version", "content", "message"],
+            "sampleData": [
+              [1, "Hello World", "Initial commit"],
+              [2, "Hello World!", "Added exclamation"]
+            ]
+          }
+        ]
+      },
+      "problem": "Create a simple version control class that can commit changes, view history, and revert to previous versions.",
+      "expectedOutput": "Version 1: Hello World\nVersion 2: Hello World!\nHistory: 2 commits\nReverted to version 1: Hello World",
+      "hints": [
+        "Store each commit in a list with version number, content, and message",
+        "History should show all commits",
+        "Revert should restore content from a specific version",
+        "Each commit increments the version number"
+      ],
+      "solution": "class SimpleVersionControl:\n    def __init__(self):\n        self.commits = []\n        self.current_content = \"\"\n    \n    def commit(self, content, message):\n        self.commits.append({\n            'version': len(self.commits) + 1,\n            'content': content,\n            'message': message\n        })\n        self.current_content = content\n        print(f\"Committed: {message}\")\n    \n    def history(self):\n        print(f\"History: {len(self.commits)} commits\")\n        for commit in self.commits:\n            print(f\"  Version {commit['version']}: {commit['message']}\")\n    \n    def revert(self, version):\n        if version <= len(self.commits):\n            self.current_content = self.commits[version-1]['content']\n            print(f\"Reverted to version {version}\")\n\n# Usage\nvc = SimpleVersionControl()\nvc.commit(\"Hello World\", \"Initial commit\")\nvc.commit(\"Hello World!\", \"Added exclamation\")\nvc.history()\nvc.revert(1)",
+      "explanation": "This simulates basic version control: commit() saves versions, history() shows all commits, revert() restores previous versions. In real Git, you use: git init, git add, git commit, git log, git revert."
+    },
+    "quiz": [
+      {
+        "question": "What is the main purpose of Version Control?",
+        "options": [
+          "To make code run faster",
+          "To track changes to files over time",
+          "To compile code",
+          "To delete old files"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Version Control tracks every change to files, allowing you to see history, revert changes, and collaborate safely. It's essential for any project.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What type of Version Control System is Git?",
+        "options": [
+          "Centralized",
+          "Distributed",
+          "Hybrid",
+          "Manual"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git is a Distributed Version Control System (DVCS). Every developer has a full copy of the repository, enabling offline work and eliminating single points of failure.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Can you work offline with Git?",
+        "options": [
+          "Yes, full history is local",
+          "No, always need internet",
+          "Only for reading",
+          "Only for small files"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Git stores the complete repository locally, so you can commit, view history, create branches, and do everything offline. Sync with remote when back online.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What is a commit in Git?",
+        "options": [
+          "Deleting files",
+          "A snapshot of changes at a point in time",
+          "Uploading to server",
+          "Compiling code"
+        ],
+        "correctAnswer": 1,
+        "explanation": "A commit is a permanent snapshot of your changes, like a save point in a game. It includes a message describing what changed and can be reverted to anytime.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Why is Git the industry standard?",
+        "options": [
+          "It's the oldest",
+          "Speed, offline work, powerful branching, and ecosystem",
+          "It's the simplest",
+          "It's the most expensive"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git won because of fast local operations, offline capability, easy branching/merging, and the GitHub/GitLab ecosystem. Used by Google, Facebook, Amazon, and most tech companies.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What should NOT be stored in Git?",
+        "options": [
+          "Code files",
+          "Large binary files and sensitive data",
+          "Documentation",
+          "Configuration files"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Don't store: large binaries (videos, images), passwords/API keys, generated files (build outputs), or dependencies (node_modules). Git is optimized for text files.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What's the difference between Centralized and Distributed VCS?",
+        "options": [
+          "No difference",
+          "Centralized = one server, Distributed = full copy on every machine",
+          "Centralized is faster",
+          "Distributed is older"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Centralized (SVN) has one central server and requires network. Distributed (Git) gives everyone a full copy, enabling offline work and eliminating single points of failure.",
+        "difficulty": "hard"
+      },
+      {
+        "question": "What is branching in Git?",
+        "options": [
+          "Deleting code",
+          "Creating parallel versions of code",
+          "Uploading files",
+          "Compiling code"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Branching creates a separate line of development. You can work on features independently, experiment safely, and merge back when ready. Main branch stays stable.",
+        "difficulty": "hard"
+      },
+      {
+        "question": "Real scenario: You deployed code on Friday. Monday, users report a bug. What's the Git advantage?",
+        "options": [
+          "Nothing, you're stuck",
+          "Revert to Thursday's working version in seconds",
+          "Manually fix everything",
+          "Blame someone else"
+        ],
+        "correctAnswer": 1,
+        "explanation": "With Git, you can instantly revert to any previous commit. Without it, you'd have to manually fix or restore from backups (if they exist). Version control is your safety net!",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

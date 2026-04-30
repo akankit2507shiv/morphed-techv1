@@ -1,0 +1,278 @@
+{
+  "id": "git-auth-collaboration",
+  "title": "Authentication & Security + Collaboration Workflow",
+  "icon": "🔐",
+  "difficulty": "Intermediate",
+  "duration": "50 min",
+  "description": "Learn secure authentication methods and team collaboration workflows including SSH, PAT, Pull Requests, and code reviews.",
+  "prerequisites": ["git-remote-repository"],
+  "nextTopics": ["git-best-practices"],
+  "content": {
+    "comicStory": {
+      "title": "The Secure Collaboration Castle",
+      "panels": [
+        {
+          "image": "👨💻🔒",
+          "text": "Dev tried to push code to GitHub but got: 'Authentication failed!'"
+        },
+        {
+          "image": "😰🚫",
+          "text": "Dev panicked: 'Why can't I push my code? I know the password!'"
+        },
+        {
+          "image": "🔐✨",
+          "text": "Git Master appeared: 'GitHub stopped accepting passwords! You need SSH keys or Personal Access Tokens!'"
+        },
+        {
+          "image": "🔑🛡️",
+          "text": "'SSH keys are like a secure ID card - set up once, use forever without passwords!'"
+        },
+        {
+          "image": "🎫💳",
+          "text": "'Personal Access Tokens (PAT) are like temporary passes - more secure than passwords!'"
+        },
+        {
+          "image": "✅🔓",
+          "text": "Dev set up SSH keys and pushed successfully! 'Now I'm secure!'"
+        },
+        {
+          "image": "👥🤝",
+          "text": "Manager said: 'Great! Now let's talk about team collaboration workflow.'"
+        },
+        {
+          "image": "🌿➡️📋",
+          "text": "'Create a feature branch, make changes, then create a Pull Request (PR) for review.'"
+        },
+        {
+          "image": "👀✍️",
+          "text": "'Team reviews your code, suggests improvements, and approves when ready.'"
+        },
+        {
+          "image": "🔀✅",
+          "text": "'After approval, merge your PR into main branch. Code is now live!'"
+        },
+        {
+          "image": "🚫⚠️",
+          "text": "'Never push directly to main! Always use branches and PRs for safety.'"
+        },
+        {
+          "image": "😊🎓",
+          "text": "Dev smiled: 'Now I can work securely and collaborate smoothly with my team!'"
+        }
+      ]
+    },
+    "deepDive": {
+      "sections": [
+        {
+          "title": "Authentication & Security",
+          "content": "Secure authentication is essential for accessing Git repositories safely.\n\n**Why Authentication Matters:**\n- Protects your code from unauthorized access\n- Ensures only authorized users can push changes\n- Tracks who made what changes\n- Prevents security breaches\n\n**Authentication Methods:**\n\n1. **SSH Keys (Recommended)**\n   - Most secure method\n   - No password needed after setup\n   - Works seamlessly\n   - One-time configuration\n\n2. **Personal Access Tokens (PAT)**\n   - Secure alternative to passwords\n   - Can be revoked anytime\n   - Set expiration dates\n   - Fine-grained permissions\n\n3. **HTTPS with Credentials**\n   - Username + PAT\n   - Easier for beginners\n   - Requires token for each operation\n\n**Setting Up SSH Keys:**\n\n```bash\n# 1. Generate SSH key\nssh-keygen -t ed25519 -C \"your@email.com\"\n\n# 2. Start SSH agent\neval \"$(ssh-agent -s)\"\n\n# 3. Add key to agent\nssh-add ~/.ssh/id_ed25519\n\n# 4. Copy public key\ncat ~/.ssh/id_ed25519.pub\n\n# 5. Add to GitHub:\n# Settings → SSH and GPG keys → New SSH key → Paste\n\n# 6. Test connection\nssh -T git@github.com\n```\n\n**Setting Up Personal Access Token:**\n\n```bash\n# On GitHub:\n# Settings → Developer settings → Personal access tokens → Generate new token\n\n# Select scopes:\n# - repo (full control)\n# - workflow (if using GitHub Actions)\n\n# Copy token and use as password when pushing\ngit push origin main\n# Username: your-username\n# Password: paste-your-token-here\n```\n\n**Security Best Practices:**\n- Never share your private SSH key\n- Never commit tokens or passwords to code\n- Use .gitignore for sensitive files\n- Rotate tokens regularly\n- Use different tokens for different projects\n- Enable two-factor authentication (2FA)"
+        },
+        {
+          "title": "Pull Requests (PR)",
+          "content": "Pull Requests are the foundation of team collaboration in Git.\n\n**What is a Pull Request?**\nA request to merge your changes from one branch into another (usually into main).\n\n**Why Use Pull Requests?**\n- Code review before merging\n- Discussion and feedback\n- Quality assurance\n- Knowledge sharing\n- Track changes and decisions\n- Prevent bugs from reaching production\n\n**Pull Request Workflow:**\n\n```bash\n# 1. Create feature branch\ngit checkout -b feature/user-login\n\n# 2. Make changes and commit\ngit add .\ngit commit -m \"Add user login feature\"\n\n# 3. Push branch to remote\ngit push -u origin feature/user-login\n\n# 4. Create PR on GitHub:\n# - Go to repository\n# - Click \"Pull requests\" → \"New pull request\"\n# - Select your branch\n# - Add title and description\n# - Request reviewers\n# - Create pull request\n\n# 5. Address review comments\n# Make changes based on feedback\ngit add .\ngit commit -m \"Address review comments\"\ngit push origin feature/user-login\n\n# 6. After approval, merge PR\n# Click \"Merge pull request\" on GitHub\n\n# 7. Delete branch after merge\ngit checkout main\ngit pull origin main\ngit branch -d feature/user-login\ngit push origin --delete feature/user-login\n```\n\n**PR Best Practices:**\n- Write clear title and description\n- Keep PRs small and focused\n- Link related issues\n- Add screenshots for UI changes\n- Respond to comments promptly\n- Test before requesting review\n- Use PR templates"
+        },
+        {
+          "title": "Code Reviews",
+          "content": "Code reviews ensure code quality and knowledge sharing.\n\n**What is Code Review?**\nTeam members review your code before it's merged to catch bugs, improve quality, and share knowledge.\n\n**Benefits of Code Reviews:**\n- Catch bugs early\n- Improve code quality\n- Share knowledge across team\n- Maintain coding standards\n- Learn from others\n- Reduce technical debt\n\n**How to Review Code:**\n\n**As a Reviewer:**\n1. Understand the context and requirements\n2. Check for bugs and edge cases\n3. Verify code follows standards\n4. Look for performance issues\n5. Suggest improvements\n6. Be constructive and respectful\n7. Approve or request changes\n\n**Review Checklist:**\n- Does code work as intended?\n- Are there any bugs or edge cases?\n- Is code readable and maintainable?\n- Are there tests?\n- Does it follow team standards?\n- Are there security issues?\n- Is documentation updated?\n\n**As a PR Author:**\n1. Provide context in PR description\n2. Self-review before requesting review\n3. Respond to comments professionally\n4. Make requested changes\n5. Thank reviewers for feedback\n\n**Review Comments Examples:**\n\n✅ Good:\n- \"Consider using a map here for O(1) lookup instead of array iteration\"\n- \"This function is doing too much. Can we split it?\"\n- \"Great solution! Just one suggestion: add error handling here\"\n\n❌ Bad:\n- \"This is wrong\"\n- \"Why did you do it this way?\"\n- \"I would never write code like this\""
+        },
+        {
+          "title": "Branch Naming Strategy",
+          "content": "Consistent branch naming improves organization and clarity.\n\n**Why Branch Naming Matters:**\n- Easy to understand purpose\n- Better organization\n- Automated workflows\n- Clear history\n\n**Common Naming Conventions:**\n\n**Format:**\n```\n<type>/<description>\n```\n\n**Types:**\n- `feature/` - New features\n- `bugfix/` - Bug fixes\n- `hotfix/` - Urgent production fixes\n- `refactor/` - Code refactoring\n- `docs/` - Documentation updates\n- `test/` - Test additions/updates\n- `chore/` - Maintenance tasks\n\n**Examples:**\n```bash\n# Good branch names\nfeature/user-authentication\nfeature/payment-integration\nbugfix/login-error\nbugfix/cart-calculation\nhotfix/security-patch\nrefactor/database-queries\ndocs/api-documentation\ntest/user-service\n\n# Bad branch names\nfix\nupdate\nmy-branch\ntest123\ndev-branch\n```\n\n**With Issue Numbers:**\n```bash\nfeature/123-user-login\nbugfix/456-payment-error\nhotfix/789-security-fix\n```\n\n**Best Practices:**\n- Use lowercase\n- Use hyphens, not spaces\n- Be descriptive but concise\n- Include issue/ticket number if applicable\n- Follow team conventions"
+        },
+        {
+          "title": "Git Flow vs Trunk-Based Development",
+          "content": "Two popular branching strategies for team collaboration.\n\n**Git Flow:**\n\nA branching model with multiple long-lived branches.\n\n**Branches:**\n- `main` - Production code\n- `develop` - Integration branch\n- `feature/*` - New features\n- `release/*` - Release preparation\n- `hotfix/*` - Production fixes\n\n**Workflow:**\n```bash\n# 1. Create feature from develop\ngit checkout develop\ngit checkout -b feature/new-feature\n\n# 2. Work on feature\ngit commit -m \"Add feature\"\n\n# 3. Merge back to develop\ngit checkout develop\ngit merge feature/new-feature\n\n# 4. Create release branch\ngit checkout -b release/1.0.0\n\n# 5. After testing, merge to main and develop\ngit checkout main\ngit merge release/1.0.0\ngit tag v1.0.0\n\ngit checkout develop\ngit merge release/1.0.0\n```\n\n**Pros:**\n- Clear separation of concerns\n- Supports multiple versions\n- Structured release process\n\n**Cons:**\n- Complex for small teams\n- Slower integration\n- More merge conflicts\n\n**Trunk-Based Development:**\n\nDevelopers work on short-lived branches and merge to main frequently.\n\n**Workflow:**\n```bash\n# 1. Create short-lived branch\ngit checkout -b feature/small-change\n\n# 2. Make small changes\ngit commit -m \"Small improvement\"\n\n# 3. Merge to main quickly (same day)\ngit checkout main\ngit merge feature/small-change\ngit push origin main\n\n# 4. Delete branch\ngit branch -d feature/small-change\n```\n\n**Pros:**\n- Faster integration\n- Fewer merge conflicts\n- Simpler workflow\n- Continuous delivery friendly\n\n**Cons:**\n- Requires good CI/CD\n- Needs feature flags for incomplete features\n- Requires discipline\n\n**Comparison:**\n\n| Aspect | Git Flow | Trunk-Based |\n|--------|----------|-------------|\n| Branches | Multiple long-lived | Short-lived only |\n| Complexity | High | Low |\n| Integration | Slower | Faster |\n| Best for | Large teams, releases | Small teams, continuous delivery |\n| Merge conflicts | More frequent | Less frequent |\n\n**Which to Choose?**\n- **Git Flow**: Large teams, scheduled releases, multiple versions\n- **Trunk-Based**: Small teams, continuous deployment, fast iteration"
+        },
+        {
+          "title": "Collaboration Best Practices",
+          "content": "Essential practices for smooth team collaboration.\n\n**1. Never Push Directly to Main**\n```bash\n# ❌ Bad\ngit checkout main\ngit commit -m \"Quick fix\"\ngit push origin main\n\n# ✅ Good\ngit checkout -b bugfix/issue-123\ngit commit -m \"Fix issue 123\"\ngit push origin bugfix/issue-123\n# Create PR for review\n```\n\n**2. Pull Before Push**\n```bash\n# Always sync before pushing\ngit pull origin main\ngit push origin main\n```\n\n**3. Write Clear Commit Messages**\n```bash\n# ❌ Bad\ngit commit -m \"fix\"\ngit commit -m \"update\"\n\n# ✅ Good\ngit commit -m \"Fix login validation bug\"\ngit commit -m \"Add user authentication feature\"\n```\n\n**4. Keep Branches Updated**\n```bash\n# Regularly sync with main\ngit checkout feature-branch\ngit fetch origin\ngit rebase origin/main\n```\n\n**5. Use .gitignore**\n```bash\n# Don't commit:\n# - Dependencies (node_modules/)\n# - Build files (dist/, build/)\n# - Environment files (.env)\n# - IDE files (.vscode/, .idea/)\n# - OS files (.DS_Store)\n```\n\n**6. Communicate**\n- Comment on PRs\n- Ask questions\n- Share knowledge\n- Be respectful\n- Help teammates\n\n**7. Test Before Pushing**\n```bash\n# Run tests locally\nnpm test\n# Or\npytest\n\n# Then push\ngit push origin feature-branch\n```\n\n**8. Keep PRs Small**\n- One feature per PR\n- Easier to review\n- Faster to merge\n- Less risk\n\n**9. Document Changes**\n- Update README\n- Add comments\n- Update documentation\n- Write clear PR descriptions\n\n**10. Be a Good Team Player**\n- Review others' code\n- Help with issues\n- Share knowledge\n- Follow team standards\n- Be open to feedback"
+        }
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is the difference between SSH and HTTPS authentication?",
+        "answer": "SSH uses key-based authentication (no password needed after setup) and is more secure. HTTPS requires username and Personal Access Token for each operation. SSH is recommended for frequent Git operations."
+      },
+      {
+        "question": "What is a Pull Request?",
+        "answer": "A Pull Request (PR) is a request to merge your changes from one branch into another. It enables code review, discussion, and quality checks before merging code into the main branch."
+      },
+      {
+        "question": "Why should you never push directly to main?",
+        "answer": "Pushing directly to main bypasses code review, can introduce bugs to production, breaks team workflow, and makes it harder to track changes. Always use branches and Pull Requests for safety and collaboration."
+      },
+      {
+        "question": "What is the difference between Git Flow and Trunk-Based Development?",
+        "answer": "Git Flow uses multiple long-lived branches (main, develop, feature, release) with structured releases. Trunk-Based Development uses short-lived branches that merge to main frequently. Git Flow is better for large teams with scheduled releases; Trunk-Based is better for continuous delivery."
+      },
+      {
+        "question": "What makes a good branch name?",
+        "answer": "Good branch names follow a pattern like 'type/description' (e.g., feature/user-login, bugfix/payment-error). They should be lowercase, use hyphens, be descriptive but concise, and follow team conventions."
+      },
+      {
+        "question": "What should you check during code review?",
+        "answer": "Check if code works as intended, look for bugs and edge cases, verify it follows coding standards, check for performance and security issues, ensure tests are included, and verify documentation is updated."
+      }
+    ],
+    "codingChallenge": {
+      "title": "Complete Collaboration Workflow",
+      "description": "Practice the full workflow: authentication setup, branch creation, PR workflow, and code review.",
+      "difficulty": "Intermediate",
+      "tasks": [
+        {
+          "step": 1,
+          "instruction": "Set up SSH authentication (if not already done)",
+          "command": "# Generate SSH key\nssh-keygen -t ed25519 -C \"your@email.com\"\n\n# Start SSH agent\neval \"$(ssh-agent -s)\"\n\n# Add key\nssh-add ~/.ssh/id_ed25519\n\n# Copy public key and add to GitHub\ncat ~/.ssh/id_ed25519.pub"
+        },
+        {
+          "step": 2,
+          "instruction": "Clone repository using SSH",
+          "command": "git clone git@github.com:username/repo.git\ncd repo"
+        },
+        {
+          "step": 3,
+          "instruction": "Create feature branch with proper naming",
+          "command": "git checkout -b feature/user-profile\n# Good naming: type/description"
+        },
+        {
+          "step": 4,
+          "instruction": "Make changes and commit with clear message",
+          "command": "echo 'User profile feature' > profile.js\ngit add profile.js\ngit commit -m \"Add user profile feature with avatar support\""
+        },
+        {
+          "step": 5,
+          "instruction": "Push branch to remote",
+          "command": "git push -u origin feature/user-profile"
+        },
+        {
+          "step": 6,
+          "instruction": "Create Pull Request on GitHub",
+          "command": "# On GitHub:\n# 1. Go to repository\n# 2. Click 'Pull requests' → 'New pull request'\n# 3. Select feature/user-profile branch\n# 4. Add title: 'Add user profile feature'\n# 5. Add description explaining changes\n# 6. Request reviewers\n# 7. Create pull request"
+        },
+        {
+          "step": 7,
+          "instruction": "Address review comments",
+          "command": "# Make changes based on feedback\necho 'Updated based on review' >> profile.js\ngit add profile.js\ngit commit -m \"Address review comments: add error handling\"\ngit push origin feature/user-profile"
+        },
+        {
+          "step": 8,
+          "instruction": "Merge PR after approval",
+          "command": "# On GitHub:\n# Click 'Merge pull request' → 'Confirm merge'"
+        },
+        {
+          "step": 9,
+          "instruction": "Clean up local branches",
+          "command": "git checkout main\ngit pull origin main\ngit branch -d feature/user-profile"
+        },
+        {
+          "step": 10,
+          "instruction": "Delete remote branch",
+          "command": "git push origin --delete feature/user-profile"
+        }
+      ],
+      "verification": "Check GitHub to see merged PR, updated main branch, and deleted feature branch."
+    },
+    "quiz": [
+      {
+        "question": "What is the most secure authentication method for Git?",
+        "options": [
+          "Password",
+          "SSH Keys",
+          "Username only",
+          "No authentication"
+        ],
+        "correctAnswer": 1,
+        "explanation": "SSH keys are the most secure method. They use public-key cryptography and don't require passwords after initial setup."
+      },
+      {
+        "question": "What is a Pull Request?",
+        "options": [
+          "Downloading code",
+          "Request to merge changes with code review",
+          "Deleting branches",
+          "Creating repository"
+        ],
+        "correctAnswer": 1,
+        "explanation": "A Pull Request is a request to merge your changes from one branch into another, enabling code review and discussion before merging."
+      },
+      {
+        "question": "Should you push directly to main branch?",
+        "options": [
+          "Yes, always",
+          "No, use branches and PRs",
+          "Only on Fridays",
+          "Only for small changes"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Never push directly to main. Always use feature branches and Pull Requests to enable code review and maintain code quality."
+      },
+      {
+        "question": "What is a Personal Access Token (PAT)?",
+        "options": [
+          "A password",
+          "Secure alternative to password for Git authentication",
+          "A branch name",
+          "A commit message"
+        ],
+        "correctAnswer": 1,
+        "explanation": "PAT is a secure token used instead of passwords for Git authentication. It can be revoked and has fine-grained permissions."
+      },
+      {
+        "question": "What is the correct branch naming format?",
+        "options": [
+          "random-name",
+          "type/description (e.g., feature/login)",
+          "UPPERCASE",
+          "numbers only"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Use format 'type/description' like feature/user-login or bugfix/payment-error. This makes the purpose clear and improves organization."
+      },
+      {
+        "question": "What is Git Flow?",
+        "options": [
+          "A Git command",
+          "Branching strategy with multiple long-lived branches",
+          "A GitHub feature",
+          "A merge conflict"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git Flow is a branching model using multiple branches (main, develop, feature, release, hotfix) for structured development and releases."
+      },
+      {
+        "question": "What is Trunk-Based Development?",
+        "options": [
+          "Using only main branch",
+          "Short-lived branches merged to main frequently",
+          "Never using branches",
+          "A Git command"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Trunk-Based Development uses short-lived feature branches that are merged to main frequently, enabling continuous delivery."
+      },
+      {
+        "question": "What should you do before pushing code?",
+        "options": [
+          "Nothing",
+          "Pull latest changes and test",
+          "Delete branches",
+          "Change branch name"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Always pull latest changes to sync with team and test your code locally before pushing to ensure it works correctly."
+      },
+      {
+        "question": "What makes a good code review?",
+        "options": [
+          "Just approve everything",
+          "Check for bugs, quality, and provide constructive feedback",
+          "Reject everything",
+          "Ignore the code"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Good code reviews check for bugs, verify quality, ensure standards are followed, and provide constructive, respectful feedback."
+      }
+    ]
+  }
+}

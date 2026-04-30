@@ -1,0 +1,262 @@
+{
+  "id": "git-workflow-core",
+  "title": "Git Workflow (Core)",
+  "icon": "🔄",
+  "difficulty": "Beginner",
+  "duration": "55 min",
+  "description": "The complete journey of code from your system to the team",
+  "prerequisites": ["git-basics"],
+  "nextTopics": ["git-basic-commands"],
+  "content": {
+    "comicStory": {
+      "title": "The Book Publishing Journey",
+      "panels": [
+        {
+          "image": "📝",
+          "text": "Sarah writes a book. Old way: Write directly in final book. Make mistake? Book is ruined!"
+        },
+        {
+          "image": "😱",
+          "text": "Want to share? Photocopy entire book. No drafts, no review, no safety net!"
+        },
+        {
+          "image": "💡",
+          "text": "Better way: Stage 1 - Working Directory (Your Desk). Write on loose papers, experiment freely."
+        },
+        {
+          "image": "📋",
+          "text": "Stage 2 - Staging Area (Review Table). Select which papers to keep, organize them, review before finalizing."
+        },
+        {
+          "image": "💾",
+          "text": "Stage 3 - Local Repository (Your Safe). Lock finalized chapters in safe. Create permanent record."
+        },
+        {
+          "image": "☁️",
+          "text": "Stage 4 - Remote Repository (Publisher). Send to publisher (GitHub). Team can access. Shared with world!"
+        }
+      ],
+      "twist": "Git Workflow = Multiple safety checkpoints! Each stage gives you control and safety!",
+      "lesson": "Working Directory → Staging Area → Local Repo → Remote Repo. Four stages with review at each step!"
+    },
+    "deepDive": {
+      "whatItIs": "Git Workflow is the process of moving code through four distinct stages: Working Directory (where you write code), Staging Area (prepare changes), Local Repository (save locally), and Remote Repository (share with team). Each stage provides a checkpoint for review and organization.",
+      "whyItMatters": "The staged approach provides multiple safety checkpoints, allows selective commits, enables review before saving, and maintains clean history. Without this workflow, you'd have chaos - no organization, no review, and no safety net.",
+      "whereUsed": [
+        "Daily development: Write code → stage → commit → push",
+        "Feature development: Work on features, stage related changes together",
+        "Bug fixes: Quick fixes with clear commit messages",
+        "Code review: Review changes before committing",
+        "Team collaboration: Share work through remote repository"
+      ],
+      "visualExamples": [
+        {
+          "title": "The Four Stages",
+          "description": "How code moves through Git workflow",
+          "diagram": "Working Directory → [git add] → Staging Area\n                                    ↓\n                              [git commit]\n                                    ↓\n                            Local Repository\n                                    ↓\n                               [git push]\n                                    ↓\n                           Remote Repository"
+        },
+        {
+          "title": "Stage 1: Working Directory",
+          "description": "Your project folder where you write code",
+          "diagram": "Characteristics:\n✔ Temporary workspace\n✔ Can modify freely\n✔ Changes not saved in Git\n✔ Can be lost if not staged\n\nExample: /my-project/\n  index.html\n  style.css\n  script.js"
+        },
+        {
+          "title": "Stage 2: Staging Area",
+          "description": "Prepare changes for commit",
+          "diagram": "Why needed:\n✔ Select specific changes\n✔ Review before committing\n✔ Organize related changes\n✔ Flexibility in what to save\n\nCommand: git add filename\nLike a shopping cart before checkout!"
+        },
+        {
+          "title": "Complete Workflow Example",
+          "description": "Step-by-step workflow",
+          "diagram": "1. Write code (Working Directory)\n2. git status (check changes)\n3. git add file.txt (stage)\n4. git status (verify staged)\n5. git commit -m \"message\" (save locally)\n6. git push origin main (upload to remote)"
+        }
+      ],
+      "keyPoints": [
+        "Four stages: Working Directory → Staging → Local Repo → Remote Repo",
+        "git add: Moves changes from Working to Staging",
+        "git commit: Saves changes from Staging to Local Repo",
+        "git push: Uploads from Local to Remote Repo",
+        "Staging Area allows selective commits",
+        "Each stage is a checkpoint for review",
+        "Always check git status before committing"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What are the four stages of Git workflow?",
+        "answer": "Working Directory → Staging Area → Local Repository → Remote Repository",
+        "explanation": "Code moves through four stages: 1) Working Directory (write code), 2) Staging Area (prepare changes), 3) Local Repository (save locally), 4) Remote Repository (share with team). Each stage has a purpose!",
+        "memoryTrick": "4 Stages: Work → Stage → Commit → Push 🔄"
+      },
+      {
+        "question": "What does 'git add' do?",
+        "answer": "Moves changes from Working Directory to Staging Area.",
+        "explanation": "git add stages changes, preparing them for commit. It marks files to be saved but doesn't save permanently yet. Example: git add file.txt",
+        "memoryTrick": "git add = Stage changes 📋"
+      },
+      {
+        "question": "What does 'git commit' do?",
+        "answer": "Saves changes permanently in Local Repository.",
+        "explanation": "git commit saves staged changes, creates permanent snapshot, records in local history, and requires a commit message. Example: git commit -m \"Add feature\"",
+        "memoryTrick": "git commit = Save locally 💾"
+      },
+      {
+        "question": "What does 'git push' do?",
+        "answer": "Uploads commits from Local to Remote Repository.",
+        "explanation": "git push uploads local commits, updates remote repository (GitHub), shares with team, and creates cloud backup. Example: git push origin main",
+        "memoryTrick": "git push = Upload to remote ☁️"
+      },
+      {
+        "question": "Why is Staging Area needed?",
+        "answer": "To review and select specific changes before committing.",
+        "explanation": "Staging Area allows: reviewing before committing, selecting specific changes, organizing related changes, and flexibility in what to save. Like a shopping cart before checkout!",
+        "memoryTrick": "Staging = Review before save 📋"
+      },
+      {
+        "question": "What is the correct order of commands?",
+        "answer": "git add → git commit → git push",
+        "explanation": "Correct workflow: 1) git add (stage), 2) git commit (save locally), 3) git push (upload to remote). Remember: Stage → Save → Share",
+        "memoryTrick": "Order: add → commit → push ➡️"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Git Workflow Simulation",
+      "scenario": "You're building a data pipeline. Simulate the complete Git workflow: modify files, stage changes, commit with message, and push to remote. Track the state at each stage.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "workflow_stages",
+            "columns": ["stage", "files", "status"],
+            "sampleData": [
+              ["Working", ["pipeline.py"], "modified"],
+              ["Staging", ["pipeline.py"], "staged"],
+              ["Local", ["pipeline.py"], "committed"],
+              ["Remote", ["pipeline.py"], "pushed"]
+            ]
+          }
+        ]
+      },
+      "problem": "Create a class that simulates Git workflow stages: modify file, add to staging, commit to local repo, and push to remote.",
+      "expectedOutput": "Working: 1 file modified\nStaged: 1 file\nCommitted: 1 commit\nPushed: Success",
+      "hints": [
+        "Track files in each stage: working_dir, staging_area, local_repo, remote_repo",
+        "modify_file() adds to working directory",
+        "add() moves from working to staging",
+        "commit() moves from staging to local repo",
+        "push() moves from local to remote repo"
+      ],
+      "solution": "class GitWorkflow:\n    def __init__(self):\n        self.working_dir = []\n        self.staging_area = []\n        self.local_repo = []\n        self.remote_repo = []\n    \n    def modify_file(self, filename, content):\n        self.working_dir.append({'file': filename, 'content': content})\n        print(f\"Working: {len(self.working_dir)} file modified\")\n    \n    def add(self, filename):\n        for file in self.working_dir:\n            if file['file'] == filename:\n                self.staging_area.append(file)\n                print(f\"Staged: {len(self.staging_area)} file\")\n                break\n    \n    def commit(self, message):\n        commit = {\n            'files': self.staging_area.copy(),\n            'message': message\n        }\n        self.local_repo.append(commit)\n        self.staging_area.clear()\n        print(f\"Committed: {len(self.local_repo)} commit\")\n    \n    def push(self):\n        self.remote_repo.extend(self.local_repo)\n        self.local_repo.clear()\n        print(\"Pushed: Success\")\n\n# Usage\ngit = GitWorkflow()\ngit.modify_file(\"pipeline.py\", \"import pandas\")\ngit.add(\"pipeline.py\")\ngit.commit(\"Add data pipeline\")\ngit.push()",
+      "explanation": "This simulates Git workflow: modify_file() creates changes in working directory, add() stages them, commit() saves to local repo, push() uploads to remote. In real Git: git add, git commit -m, git push origin main."
+    },
+    "quiz": [
+      {
+        "question": "How many stages are in Git workflow?",
+        "options": [
+          "2 stages",
+          "4 stages",
+          "1 stage",
+          "6 stages"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git workflow has 4 stages: Working Directory (write code), Staging Area (prepare), Local Repository (save locally), Remote Repository (share with team).",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git add' do?",
+        "options": [
+          "Deletes files",
+          "Stages changes for commit",
+          "Pushes to remote",
+          "Shows history"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git add moves changes from Working Directory to Staging Area, preparing them for commit. It doesn't save permanently yet.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git commit' do?",
+        "options": [
+          "Stages files",
+          "Saves staged changes permanently in Local Repository",
+          "Uploads to remote",
+          "Shows diff"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git commit saves staged changes permanently in Local Repository with a message. Creates a snapshot that can be reverted to anytime.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git push' do?",
+        "options": [
+          "Downloads changes",
+          "Uploads local commits to Remote Repository",
+          "Stages files",
+          "Shows log"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git push uploads commits from Local Repository to Remote Repository (like GitHub), sharing your work with the team and creating cloud backup.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Why is Staging Area needed?",
+        "options": [
+          "Not needed",
+          "To review and select specific changes before committing",
+          "To delete files",
+          "To push faster"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Staging Area allows reviewing changes before committing, selecting specific files, and organizing related changes together. Provides flexibility and control!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What's the correct order of commands?",
+        "options": [
+          "push → add → commit",
+          "add → commit → push",
+          "commit → add → push",
+          "add → push → commit"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Correct workflow: git add (stage changes), git commit (save locally), git push (upload to remote). Remember: Stage → Save → Share!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is a good commit message?",
+        "options": [
+          "'Update'",
+          "'Add user login feature'",
+          "'asdfgh'",
+          "'Changes'"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Good commit messages are clear, descriptive, in present tense, and explain what changed. Bad: 'Update', 'Fix', 'Changes'. Good: 'Add user login feature'.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Can you commit without staging?",
+        "options": [
+          "No, never",
+          "Yes, using 'git commit -a' for tracked files",
+          "Yes, always",
+          "Only on weekends"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git commit -a commits all tracked modified files, skipping staging. But staging is recommended for better control and organization!",
+        "difficulty": "hard"
+      },
+      {
+        "question": "What should you check before committing?",
+        "options": [
+          "Nothing",
+          "Use 'git status' to see what's staged",
+          "Weather forecast",
+          "Stock prices"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Always run git status before committing to verify what's staged, check for untracked files, and ensure you're committing the right changes!",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

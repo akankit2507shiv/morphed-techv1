@@ -1,0 +1,518 @@
+,
+
+  "builtin-functions": {
+    title: "Important Built-in Functions",
+    icon: "⚡",
+    difficulty: "Python Productivity",
+    duration: "55 min",
+    description: "Python built-in functions frequently asked in interviews and widely used in real-world data transformations",
+
+    comic: `🏭 Factory Machine (map)
+
+Factory Manager: "Apply same operation to every product"
+Products: [Raw1, Raw2, Raw3]
+Machine: *Processes each* → [Finished1, Finished2, Finished3]
+
+In Python:
+nums = [1, 2, 3]
+result = list(map(lambda x: x*x, nums))
+print(result)  # [1, 4, 9]
+
+Same operation applied everywhere! 🏭
+
+🛂 Airport Security Filter (filter)
+
+Security: "Only valid passengers move ahead"
+Passengers: [Valid, Invalid, Valid, Invalid]
+After Filter: [Valid, Valid]
+
+In Python:
+nums = [1, 2, 3, 4]
+result = list(filter(lambda x: x%2==0, nums))
+print(result)  # [2, 4]
+
+Keep only what passes the test! 🛂
+
+💑 Marriage Pairing (zip)
+
+Matchmaker: "Pair boys with girls"
+Boys: [A, B, C]
+Girls: [X, Y, Z]
+Pairs: [(A,X), (B,Y), (C,Z)]
+
+In Python:
+names = ['Ankit', 'Rahul']
+salary = [50000, 60000]
+print(list(zip(names, salary)))
+# [('Ankit', 50000), ('Rahul', 60000)]
+
+Two groups paired together! 💑
+
+📋 Class Attendance (enumerate)
+
+Teacher: "Every student gets roll number"
+Students: [Ankit, Rahul, Priya]
+With Roll: [(0,Ankit), (1,Rahul), (2,Priya)]
+
+In Python:
+names = ['Ankit', 'Rahul']
+for i, name in enumerate(names):
+    print(i, name)
+# 0 Ankit
+# 1 Rahul
+
+Index automatically tracked! 📋
+
+🎯 Aha Moment:
+Built-in functions make code cleaner and faster!
+Used heavily in AWS Glue and PySpark transformations! 🚀`,
+
+    deepDive: `⚡ Important Built-in Functions - Complete Guide
+
+📌 Module Description:
+This module teaches Python built-in functions frequently asked in interviews and widely used in real-world data transformations.
+
+Category: Python Productivity
+Importance: High Interview Importance
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏭 Topic 1: map()
+
+Comic Story: Factory Machine
+Same operation applied to every product.
+
+What It Is:
+Applies function to every element of iterable.
+
+Interview Q&A:
+Q: Why use map instead of loop?
+A: Cleaner syntax for applying same transformation.
+
+Coding Example 1 - Square all numbers:
+nums = [1, 2, 3]
+result = list(map(lambda x: x*x, nums))
+print(result)  # [1, 4, 9]
+
+Coding Example 2 - Convert to uppercase:
+names = ['ankit', 'rahul']
+result = list(map(str.upper, names))
+print(result)  # ['ANKIT', 'RAHUL']
+
+Coding Challenge:
+Convert all names to uppercase
+
+Hint: Use lambda with upper()
+
+Solution:
+names = ['ankit', 'rahul', 'priya']
+result = list(map(lambda x: x.upper(), names))
+print(result)  # ['ANKIT', 'RAHUL', 'PRIYA']
+
+Quiz:
+Q: map returns what type?
+A: Map object (need to convert to list)
+
+Interview Question:
+Q: Where is map used in data engineering?
+A: Transforming column values in DataFrames, applying same function to all records, data cleaning operations.
+
+Memory Trick: Map = Apply everywhere
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛂 Topic 2: filter()
+
+Comic Story: Airport Security Filter
+Only valid passengers move ahead.
+
+What It Is:
+Filters elements based on condition.
+
+Coding Example 1 - Find even numbers:
+nums = [1, 2, 3, 4]
+result = list(filter(lambda x: x%2==0, nums))
+print(result)  # [2, 4]
+
+Coding Example 2 - Filter adults:
+ages = [15, 20, 17, 25, 30]
+adults = list(filter(lambda x: x>=18, ages))
+print(adults)  # [20, 25, 30]
+
+Coding Challenge:
+Filter salaries greater than 50000
+
+Hint: Use conditional lambda
+
+Solution:
+salaries = [40000, 60000, 45000, 70000, 55000]
+high_salaries = list(filter(lambda x: x>50000, salaries))
+print(high_salaries)  # [60000, 70000, 55000]
+
+Memory Trick: Filter = Keep valid
+
+Interview Question:
+Q: Difference between map and filter?
+A: Map transforms all elements (returns same count). Filter selects elements (returns fewer or equal count).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💑 Topic 3: zip()
+
+Comic Story: Marriage Pairing
+Two groups are paired together.
+
+What It Is:
+Combines multiple iterables.
+
+Coding Example 1 - Combine names and salaries:
+names = ['Ankit', 'Rahul']
+salary = [50000, 60000]
+print(list(zip(names, salary)))
+# [('Ankit', 50000), ('Rahul', 60000)]
+
+Coding Example 2 - Create dictionary from two lists:
+keys = ['name', 'age', 'city']
+values = ['Ankit', 25, 'Pune']
+result = dict(zip(keys, values))
+print(result)  # {'name': 'Ankit', 'age': 25, 'city': 'Pune'}
+
+Coding Challenge:
+Combine product names with prices
+
+Hint: Pass multiple lists in zip()
+
+Solution:
+products = ['Laptop', 'Mouse', 'Keyboard']
+prices = [50000, 500, 1500]
+result = list(zip(products, prices))
+print(result)
+# [('Laptop', 50000), ('Mouse', 500), ('Keyboard', 1500)]
+
+Interview Question:
+Q: Where is zip used in ETL?
+A: Combining data from multiple sources, creating key-value pairs, merging parallel lists into records.
+
+Memory Trick: Zip = Pair together
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 Topic 4: enumerate()
+
+Comic Story: Class Attendance
+Every student gets roll number.
+
+What It Is:
+Provides index with values.
+
+Coding Example 1 - Print index with names:
+names = ['Ankit', 'Rahul', 'Priya']
+for i, name in enumerate(names):
+    print(i, name)
+# 0 Ankit
+# 1 Rahul
+# 2 Priya
+
+Coding Example 2 - Start index from 1:
+names = ['Ankit', 'Rahul']
+for i, name in enumerate(names, start=1):
+    print(f'Student {i}: {name}')
+# Student 1: Ankit
+# Student 2: Rahul
+
+Coding Challenge:
+Print product positions in cart
+
+Hint: Use enumerate in loop
+
+Solution:
+cart = ['Laptop', 'Mouse', 'Keyboard']
+for position, product in enumerate(cart, start=1):
+    print(f'Position {position}: {product}')
+# Position 1: Laptop
+# Position 2: Mouse
+# Position 3: Keyboard
+
+Quiz:
+Q: What extra value does enumerate provide?
+A: Index
+
+Memory Trick: Enumerate = Index tracker
+
+Interview Question:
+Q: enumerate vs normal loop?
+A: enumerate provides automatic index tracking, cleaner than manual counter (i=0, i+=1).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Top Interview Questions:
+
+1. map vs filter
+   Answer: map transforms all elements (same count). filter selects elements (fewer or equal count).
+   Example: map(lambda x: x*2, [1,2,3]) → [2,4,6]. filter(lambda x: x>1, [1,2,3]) → [2,3].
+
+2. zip use cases
+   Answer: Combine parallel lists, create dictionaries from keys/values, merge data from multiple sources.
+
+3. enumerate vs normal loop
+   Answer: enumerate provides automatic index, cleaner than manual counter. Example: for i,val in enumerate(list).
+
+4. Lambda with map
+   Answer: Lambda provides inline function for map. Example: map(lambda x: x*x, nums) squares all numbers.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏢 Real Project Usage:
+
+Used for data transformations inside AWS Glue jobs and PySpark notebook pipelines.
+
+Example - AWS Glue ETL:
+# Map - Transform all salaries
+salaries = [40000, 50000, 60000]
+increased = list(map(lambda x: x * 1.1, salaries))
+
+# Filter - Get high performers
+scores = [60, 75, 85, 90, 55]
+high_performers = list(filter(lambda x: x >= 80, scores))
+
+# Zip - Combine employee data
+names = ['Ankit', 'Rahul', 'Priya']
+departments = ['IT', 'HR', 'Finance']
+employees = list(zip(names, departments))
+
+# Enumerate - Track record positions
+for index, record in enumerate(data_records):
+    print(f'Processing record {index}: {record}')
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 Final Revision Formula:
+
+Built-in Formula:
+Transform → Filter → Combine → Track
+
+🏭 Transform = map() (apply function everywhere)
+🛂 Filter = filter() (keep valid only)
+💑 Combine = zip() (pair together)
+📋 Track = enumerate() (index tracker)
+
+Master built-in functions → Write cleaner code! 🚀`,
+
+    types: `⚡ Built-in Functions - Quick Reference
+
+🏭 map():
+nums = [1, 2, 3]
+result = list(map(lambda x: x*x, nums))
+# [1, 4, 9]
+
+names = ['ankit', 'rahul']
+result = list(map(str.upper, names))
+# ['ANKIT', 'RAHUL']
+
+🛂 filter():
+nums = [1, 2, 3, 4]
+result = list(filter(lambda x: x%2==0, nums))
+# [2, 4]
+
+ages = [15, 20, 17, 25]
+adults = list(filter(lambda x: x>=18, ages))
+# [20, 25]
+
+💑 zip():
+names = ['Ankit', 'Rahul']
+salary = [50000, 60000]
+result = list(zip(names, salary))
+# [('Ankit', 50000), ('Rahul', 60000)]
+
+keys = ['name', 'age']
+values = ['Ankit', 25]
+result = dict(zip(keys, values))
+# {'name': 'Ankit', 'age': 25}
+
+📋 enumerate():
+names = ['Ankit', 'Rahul']
+for i, name in enumerate(names):
+    print(i, name)
+# 0 Ankit
+# 1 Rahul
+
+for i, name in enumerate(names, start=1):
+    print(f'{i}: {name}')
+# 1: Ankit
+# 2: Rahul`,
+
+    qa: [
+      {
+        q: "What does map() do?",
+        a: "map() applies function to every element of iterable. Returns map object (convert to list). Example: list(map(lambda x: x*2, [1,2,3])) returns [2,4,6]. Used for transforming all elements."
+      },
+      {
+        q: "What does filter() do?",
+        a: "filter() selects elements based on condition. Returns filter object. Example: list(filter(lambda x: x>2, [1,2,3,4])) returns [3,4]. Used for selecting valid elements."
+      },
+      {
+        q: "Difference between map and filter?",
+        a: "map transforms all elements (same count). filter selects elements (fewer or equal count). map: [1,2,3] → [2,4,6]. filter: [1,2,3,4] → [2,4] (only even)."
+      },
+      {
+        q: "What does zip() do?",
+        a: "zip() combines multiple iterables into tuples. Example: zip(['A','B'], [1,2]) returns [('A',1), ('B',2)]. Used for pairing parallel lists, creating dictionaries."
+      },
+      {
+        q: "What does enumerate() do?",
+        a: "enumerate() provides index with values. Example: for i,val in enumerate(['A','B']): print(i,val) prints 0 A, 1 B. Can start from custom index: enumerate(list, start=1)."
+      },
+      {
+        q: "Why use map instead of loop?",
+        a: "map provides cleaner syntax, more readable, functional programming style. Example: map(lambda x: x*2, nums) vs for loop with append. Often faster for simple transformations."
+      },
+      {
+        q: "How to create dictionary from two lists?",
+        a: "Use dict(zip(keys, values)). Example: keys=['name','age'], values=['Ankit',25], dict(zip(keys,values)) returns {'name':'Ankit','age':25}."
+      },
+      {
+        q: "enumerate vs normal loop?",
+        a: "enumerate provides automatic index tracking. Cleaner than manual counter (i=0, i+=1). Example: for i,val in enumerate(list) vs i=0; for val in list: i+=1."
+      },
+      {
+        q: "Where is map used in data engineering?",
+        a: "Transforming DataFrame columns, applying same function to all records, data cleaning (uppercase, strip, format), salary increases, price calculations."
+      },
+      {
+        q: "Where is filter used in ETL?",
+        a: "Selecting valid records, removing nulls, filtering by date range, getting high-value transactions, quality checks, data validation."
+      }
+    ],
+
+    coding: {
+      title: "Built-in Functions - Coding Challenges",
+      scenario: "Practice built-in functions for data transformations",
+      question: "Square all numbers using map",
+      input: "nums = [1, 2, 3, 4, 5]",
+      expectedOutput: "[1, 4, 9, 16, 25]",
+      hint: "Use map with lambda function",
+      solution: "nums = [1, 2, 3, 4, 5]\nresult = list(map(lambda x: x*x, nums))\nprint(result)",
+      note: "map applies function to every element. Returns map object, convert to list.",
+      thinkingApproach: [
+        "Identify transformation needed (square)",
+        "Use map with lambda function",
+        "Convert map object to list",
+        "Print result"
+      ],
+      questions: [
+        {
+          q: "1. Square all numbers using map",
+          answer: "nums = [1, 2, 3]\nresult = list(map(lambda x: x*x, nums))\nprint(result)"
+        },
+        {
+          q: "2. Convert all names to uppercase using map",
+          answer: "names = ['ankit', 'rahul', 'priya']\nresult = list(map(lambda x: x.upper(), names))\nprint(result)"
+        },
+        {
+          q: "3. Find even numbers using filter",
+          answer: "nums = [1, 2, 3, 4, 5, 6]\nresult = list(filter(lambda x: x%2==0, nums))\nprint(result)"
+        },
+        {
+          q: "4. Filter salaries greater than 50000",
+          answer: "salaries = [40000, 60000, 45000, 70000, 55000]\nhigh_salaries = list(filter(lambda x: x>50000, salaries))\nprint(high_salaries)"
+        },
+        {
+          q: "5. Filter adults (age >= 18)",
+          answer: "ages = [15, 20, 17, 25, 30]\nadults = list(filter(lambda x: x>=18, ages))\nprint(adults)"
+        },
+        {
+          q: "6. Combine names and salaries using zip",
+          answer: "names = ['Ankit', 'Rahul']\nsalary = [50000, 60000]\nresult = list(zip(names, salary))\nprint(result)"
+        },
+        {
+          q: "7. Combine product names with prices",
+          answer: "products = ['Laptop', 'Mouse', 'Keyboard']\nprices = [50000, 500, 1500]\nresult = list(zip(products, prices))\nprint(result)"
+        },
+        {
+          q: "8. Create dictionary from keys and values using zip",
+          answer: "keys = ['name', 'age', 'city']\nvalues = ['Ankit', 25, 'Pune']\nresult = dict(zip(keys, values))\nprint(result)"
+        },
+        {
+          q: "9. Print index with names using enumerate",
+          answer: "names = ['Ankit', 'Rahul', 'Priya']\nfor i, name in enumerate(names):\n    print(i, name)"
+        },
+        {
+          q: "10. Print product positions in cart (start from 1)",
+          answer: "cart = ['Laptop', 'Mouse', 'Keyboard']\nfor position, product in enumerate(cart, start=1):\n    print(f'Position {position}: {product}')"
+        }
+      ]
+    },
+
+    quiz: [
+      { q: "map returns what type?", options: ["List", "Map object", "Tuple", "Set"], answer: 1 },
+      { q: "filter returns what type?", options: ["List", "Filter object", "Tuple", "Set"], answer: 1 },
+      { q: "map vs filter?", options: ["Same", "map transforms, filter selects", "filter transforms", "Both select"], answer: 1 },
+      { q: "zip combines?", options: ["One list", "Multiple iterables", "Nothing", "Only two lists"], answer: 1 },
+      { q: "enumerate provides?", options: ["Values only", "Index with values", "Index only", "Nothing"], answer: 1 },
+      { q: "Why use map?", options: ["Slower", "Cleaner syntax", "Complex", "Useless"], answer: 1 },
+      { q: "dict(zip(keys,values)) creates?", options: ["List", "Dictionary", "Tuple", "Set"], answer: 1 },
+      { q: "enumerate start parameter?", options: ["Cannot change", "Can customize", "Always 0", "Always 1"], answer: 1 },
+      { q: "map with lambda?", options: ["Not possible", "Inline function", "Complex", "Slow"], answer: 1 },
+      { q: "filter condition returns?", options: ["String", "True/False", "Number", "List"], answer: 1 }
+    ],
+
+    interview: "Important Built-in Functions: Python productivity tools for data transformations. map() applies function to every element. Comic: Factory machine - same operation on every product. Example: list(map(lambda x: x*x, [1,2,3])) returns [1,4,9]. Used for transforming all elements. filter() selects elements based on condition. Comic: Airport security - only valid passengers pass. Example: list(filter(lambda x: x%2==0, [1,2,3,4])) returns [2,4]. Used for selecting valid elements. zip() combines multiple iterables into tuples. Comic: Marriage pairing - two groups paired. Example: zip(['A','B'], [1,2]) returns [('A',1),('B',2)]. Used for pairing lists, creating dictionaries. enumerate() provides index with values. Comic: Class attendance - every student gets roll number. Example: for i,name in enumerate(names): print(i,name). Automatic index tracking. Top questions: map vs filter (map transforms all, filter selects), zip use cases (combine lists, create dicts), enumerate vs loop (automatic index vs manual counter), Lambda with map (inline function). Real usage: AWS Glue transformations, PySpark pipelines. Transform salaries with map, filter high performers, zip employee data, enumerate records. Memory: Map=Apply everywhere, Filter=Keep valid, Zip=Pair together, Enumerate=Index tracker. Formula: Transform → Filter → Combine → Track. Master built-in functions for cleaner code.",
+
+    memory: `⚡ Built-in Functions - Memory Map
+
+🏭 map() = Apply Everywhere
+Comic: Factory machine
+nums = [1, 2, 3]
+result = list(map(lambda x: x*x, nums))
+# [1, 4, 9]
+Memory: Map = Apply everywhere
+
+🛂 filter() = Keep Valid
+Comic: Airport security
+nums = [1, 2, 3, 4]
+result = list(filter(lambda x: x%2==0, nums))
+# [2, 4]
+Memory: Filter = Keep valid
+
+💑 zip() = Pair Together
+Comic: Marriage pairing
+names = ['Ankit', 'Rahul']
+salary = [50000, 60000]
+result = list(zip(names, salary))
+# [('Ankit', 50000), ('Rahul', 60000)]
+Memory: Zip = Pair together
+
+📋 enumerate() = Index Tracker
+Comic: Class attendance
+names = ['Ankit', 'Rahul']
+for i, name in enumerate(names):
+    print(i, name)
+# 0 Ankit
+# 1 Rahul
+Memory: Enumerate = Index tracker
+
+🎯 Built-in Formula:
+Transform → Filter → Combine → Track
+
+📊 Top Interview Questions:
+1. map vs filter? Transform vs Select
+2. zip use cases? Combine lists, create dicts
+3. enumerate vs loop? Auto index vs manual
+4. Lambda with map? Inline function
+
+✅ Real Usage:
+AWS Glue transformations
+PySpark pipelines
+Data cleaning
+Column transformations
+Record filtering
+
+🔑 Quick Reference:
+map() → Transform all elements
+filter() → Select valid elements
+zip() → Combine iterables
+enumerate() → Index + values
+Lambda → Inline function`,
+
+    revision: "Built-in Functions: map() applies function to all elements (factory machine). Example: list(map(lambda x: x*x, [1,2,3])). filter() selects based on condition (airport security). Example: list(filter(lambda x: x%2==0, [1,2,3,4])). zip() combines iterables (marriage pairing). Example: zip(['A','B'], [1,2]). enumerate() provides index with values (class attendance). Example: for i,val in enumerate(list). Top questions: map vs filter (transform vs select), zip use cases (combine lists, dicts), enumerate vs loop (auto index), Lambda with map (inline function). Real usage: AWS Glue, PySpark transformations. Memory: Map=Apply, Filter=Keep valid, Zip=Pair, Enumerate=Index. Formula: Transform → Filter → Combine → Track. Master for cleaner code."
+  }

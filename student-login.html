@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Morphed Tech | Data Engineering Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="dopamine-ui.css">
+  <style>
+    .form-wrap { position: relative; min-height: 320px; }
+    .form-panel { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .form-panel.hidden-panel { opacity: 0; transform: translateX(30px); pointer-events: none; position: absolute; width: 100%; }
+    .form-panel.active-panel { opacity: 1; transform: translateX(0); position: relative; }
+    .logo-glow { filter: drop-shadow(0 0 30px rgba(255, 61, 129, 0.6)); animation: pulse-glow 3s ease-in-out infinite; }
+    @keyframes pulse-glow { 0%, 100% { filter: drop-shadow(0 0 30px rgba(255, 61, 129, 0.6)); } 50% { filter: drop-shadow(0 0 40px rgba(124, 60, 255, 0.8)); } }
+    
+    /* Toggle Switch */
+    .toggle { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); border-radius: 26px; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.2); }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
+    input:checked + .slider { background: linear-gradient(135deg, #ff3d81, #7c3cff); border-color: transparent; }
+    input:checked + .slider:before { transform: translateX(24px); }
+  </style>
+</head>
+<body>
+
+  <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    <div style="max-width: 480px; width: 100%;">
+
+      <!-- Logo Section -->
+      <div style="text-align: center; margin-bottom: 48px;">
+        <div class="logo-glow" style="display: inline-block; margin-bottom: 20px;">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="72" height="72" rx="18" fill="url(#logo-gradient)"/>
+            <path d="M22 50V22L36 32L50 22V50L36 40L22 50Z" fill="white"/>
+            <defs>
+              <linearGradient id="logo-gradient" x1="0" y1="0" x2="72" y2="72">
+                <stop offset="0%" stop-color="#ff3d81"/>
+                <stop offset="50%" stop-color="#7c3cff"/>
+                <stop offset="100%" stop-color="#00d4ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1 class="gradient-text" style="font-size: 48px; font-weight: 900; margin-bottom: 12px; letter-spacing: -1.5px;">MORPHED TECH</h1>
+        <p class="text-muted" style="font-size: 16px; font-weight: 600;">Data Engineering Mastery Platform</p>
+      </div>
+
+      <!-- Login Card -->
+      <div class="panel panel-lg">
+
+        <!-- Admin/Student Switch -->
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 0.75rem;">
+          <span id="studentLabel" class="text-muted" style="font-size: 0.9rem; font-weight: 600; color: var(--cyan);">Student Login</span>
+          <label class="toggle" style="cursor: pointer;">
+            <input type="checkbox" id="loginModeSwitch" onchange="toggleLoginMode()">
+            <span class="slider"></span>
+          </label>
+          <span id="adminLabel" class="text-muted" style="font-size: 0.9rem; font-weight: 600;">Admin Login</span>
+        </div>
+
+        <!-- Student Tabs (visible by default) -->
+        <div id="studentTabs" class="tabs" style="margin-bottom: 32px;">
+          <button id="tabLogin" onclick="switchTab('login')" class="tab active">Sign In</button>
+          <button id="tabSignup" onclick="switchTab('signup')" class="tab">Sign Up</button>
+        </div>
+
+        <!-- Admin Title (hidden by default) -->
+        <div id="adminTitle" style="display: none; text-align: center; margin-bottom: 2rem;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--pink); margin-bottom: 0.5rem;">🔐 Admin Portal</h2>
+          <p class="text-muted" style="font-size: 0.9rem;">Secure Access Only</p>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-wrap">
+          <!-- Student Login Form -->
+          <div id="loginPanel" class="form-panel active-panel">
+            <form id="loginForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label class="label">Email Address</label>
+                <input type="email" id="loginEmail" required placeholder="you@example.com" class="input">
+              </div>
+              <div>
+                <label class="label">Password</label>
+                <input type="password" id="loginPassword" required placeholder="••••••••" class="input">
+              </div>
+              <button type="submit" id="loginBtn" class="btn btn-primary" style="margin-top: 8px; width: 100%;">Sign In</button>
+            </form>
+          </div>
+
+          <!-- Student Signup Form -->
+          <div id="signupPanel" class="form-panel hidden-panel">
+            <form id="signupForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label class="label">Full Name</label>
+                <input type="text" id="signupName" required placeholder="Your full name" class="input">
+              </div>
+              <div>
+                <label class="label">Email Address</label>
+                <input type="email" id="signupEmail" required placeholder="you@example.com" class="input">
+              </div>
+              <div>
+                <label class="label">Phone Number</label>
+                <input type="tel" id="signupPhone" required placeholder="+91 XXXXX XXXXX" class="input">
+              </div>
+              <div>
+                <label class="label">Password</label>
+                <input type="password" id="signupPassword" required placeholder="Minimum 6 characters" minlength="6" class="input">
+              </div>
+              <button type="submit" id="signupBtn" class="btn btn-primary" style="margin-top: 8px; width: 100%;">Create Account</button>
+            </form>
+          </div>
+
+          <!-- Admin Login Form (hidden by default) -->
+          <div id="adminPanel" class="form-panel hidden-panel">
+            <form id="adminLoginForm" style="display: flex; flex-direction: column; gap: 20px;">
+              <div>
+                <label class="label">Admin ID</label>
+                <input type="text" id="adminEmail" required placeholder="Enter admin ID" class="input">
+              </div>
+              <div>
+                <label class="label">Admin Password</label>
+                <input type="password" id="adminPassword" required placeholder="••••••••" class="input">
+              </div>
+              <button type="submit" id="adminBtn" class="btn btn-primary" style="margin-top: 8px; width: 100%; background: linear-gradient(135deg, #ff3d81, #7c3cff); box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">🔐 Admin Login</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Message Box -->
+        <div id="msg" style="display: none; margin-top: 24px;"></div>
+      </div>
+
+      <!-- Footer Text -->
+      <div class="text-muted" style="text-align: center; margin-top: 32px; font-size: 13px;">
+        <p>Secure • Fast • Professional</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+
+    // Toggle between Student and Admin login
+    function toggleLoginMode() {
+      const isAdmin = document.getElementById('loginModeSwitch').checked;
+      const studentTabs = document.getElementById('studentTabs');
+      const adminTitle = document.getElementById('adminTitle');
+      const loginPanel = document.getElementById('loginPanel');
+      const signupPanel = document.getElementById('signupPanel');
+      const adminPanel = document.getElementById('adminPanel');
+      const studentLabel = document.getElementById('studentLabel');
+      const adminLabel = document.getElementById('adminLabel');
+      
+      if (isAdmin) {
+        // Show admin login
+        studentTabs.style.display = 'none';
+        adminTitle.style.display = 'block';
+        loginPanel.className = 'form-panel hidden-panel';
+        signupPanel.className = 'form-panel hidden-panel';
+        adminPanel.className = 'form-panel active-panel';
+        studentLabel.style.color = 'var(--text-muted)';
+        adminLabel.style.color = 'var(--cyan)';
+      } else {
+        // Show student login
+        studentTabs.style.display = 'flex';
+        adminTitle.style.display = 'none';
+        loginPanel.className = 'form-panel active-panel';
+        signupPanel.className = 'form-panel hidden-panel';
+        adminPanel.className = 'form-panel hidden-panel';
+        studentLabel.style.color = 'var(--cyan)';
+        adminLabel.style.color = 'var(--text-muted)';
+      }
+      hideMsg();
+    }
+
+    // Check URL parameter to auto-open signup tab
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam === 'signup') {
+      switchTab('signup');
+    }
+
+    function switchTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('tabLogin').classList.toggle('active', isLogin);
+      document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+      document.getElementById('loginPanel').className = 'form-panel ' + (isLogin ? 'active-panel' : 'hidden-panel');
+      document.getElementById('signupPanel').className = 'form-panel ' + (!isLogin ? 'active-panel' : 'hidden-panel');
+      hideMsg();
+    }
+
+    function showMsg(text, isSuccess) {
+      const el = document.getElementById('msg');
+      el.textContent = text;
+      el.className = isSuccess ? 'badge badge-success' : 'badge badge-warning';
+      el.style.display = 'block';
+      el.style.width = '100%';
+      el.style.justifyContent = 'center';
+    }
+
+    function hideMsg() { document.getElementById('msg').style.display = 'none'; }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      btn.disabled = loading;
+      if (btnId === 'loginBtn') {
+        btn.textContent = loading ? 'Please wait...' : 'Sign In';
+      } else if (btnId === 'signupBtn') {
+        btn.textContent = loading ? 'Please wait...' : 'Create Account';
+      } else if (btnId === 'adminBtn') {
+        btn.textContent = loading ? 'Please wait...' : '🔐 Admin Login';
+      }
+      btn.style.opacity = loading ? '0.6' : '1';
+    }
+
+    // Student Login
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      setLoading('loginBtn', true);
+      try {
+        const r = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value })
+        });
+        const d = await r.json();
+        if (r.ok) {
+          localStorage.setItem('token', d.token);
+          localStorage.setItem('user', JSON.stringify(d.user));
+          showMsg('✅ Login successful! Redirecting...', true);
+          setTimeout(() => {
+            window.location.href = d.user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+          }, 800);
+        } else {
+          showMsg(d.error || 'Login failed', false);
+          setLoading('loginBtn', false);
+        }
+      } catch {
+        showMsg('Server error. Is the server running?', false);
+        setLoading('loginBtn', false);
+      }
+    });
+
+    // Student Signup
+    document.getElementById('signupForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      setLoading('signupBtn', true);
+      try {
+        const r = await fetch(`${API}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('signupName').value,
+            email: document.getElementById('signupEmail').value,
+            phone: document.getElementById('signupPhone').value,
+            password: document.getElementById('signupPassword').value
+          })
+        });
+        const d = await r.json();
+        if (r.ok) {
+          localStorage.setItem('token', d.token);
+          localStorage.setItem('user', JSON.stringify(d.user));
+          showMsg('✅ Account created! Redirecting...', true);
+          setTimeout(() => window.location.href = 'student-dashboard.html', 800);
+        } else {
+          showMsg(d.error || 'Registration failed', false);
+          setLoading('signupBtn', false);
+        }
+      } catch {
+        showMsg('Server error. Is the server running?', false);
+        setLoading('signupBtn', false);
+      }
+    });
+
+    // Admin Login
+    document.getElementById('adminLoginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      setLoading('adminBtn', true);
+      try {
+        const r = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('adminEmail').value,
+            password: document.getElementById('adminPassword').value
+          })
+        });
+        const d = await r.json();
+        if (r.ok) {
+          if (d.user.role !== 'admin') {
+            showMsg('❌ Access denied. Admin credentials required.', false);
+            setLoading('adminBtn', false);
+            return;
+          }
+          localStorage.setItem('token', d.token);
+          localStorage.setItem('user', JSON.stringify(d.user));
+          showMsg('✅ Admin login successful! Redirecting...', true);
+          setTimeout(() => window.location.href = 'admin-dashboard.html', 800);
+        } else {
+          showMsg(d.error || 'Invalid admin credentials', false);
+          setLoading('adminBtn', false);
+        }
+      } catch {
+        showMsg('Server error. Is the server running?', false);
+        setLoading('adminBtn', false);
+      }
+    });
+  </script>
+</body>
+</html>

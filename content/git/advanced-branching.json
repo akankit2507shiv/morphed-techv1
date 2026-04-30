@@ -1,0 +1,270 @@
+{
+  "id": "git-advanced-branching",
+  "title": "Advanced Branching",
+  "icon": "🌳",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "Master advanced branching techniques including rebase, cherry-pick, squash, stash, and detached HEAD for clean commit history.",
+  "prerequisites": ["git-branching-merging"],
+  "nextTopics": ["git-remote-repository"],
+  "content": {
+    "comicStory": {
+      "title": "The Time Traveler's Code",
+      "panels": [
+        {
+          "image": "👨‍💻📚",
+          "text": "Dev was working on a feature when his manager asked: 'Can you rewrite history to make it cleaner?'"
+        },
+        {
+          "image": "🤔💭",
+          "text": "Dev thought: 'Rewrite history? Am I a time traveler now?'"
+        },
+        {
+          "image": "🧙‍♂️✨",
+          "text": "Git Master appeared: 'With git rebase, you ARE a time traveler! You can rewrite commit history.'"
+        },
+        {
+          "image": "🌳➡️📏",
+          "text": "'Rebase moves your branch on top of another, creating a clean linear history instead of messy merge commits.'"
+        },
+        {
+          "image": "🍒🎯",
+          "text": "'Need just ONE commit from another branch? Use git cherry-pick to grab it!'"
+        },
+        {
+          "image": "📦🔨",
+          "text": "'Made 10 tiny commits? Squash them into one beautiful commit with git rebase -i.'"
+        },
+        {
+          "image": "💼🚨",
+          "text": "Suddenly, manager called: 'Emergency bug fix needed NOW!' But Dev had uncommitted work..."
+        },
+        {
+          "image": "🎒✨",
+          "text": "'Use git stash!' said Git Master. 'It saves your work temporarily without committing.'"
+        },
+        {
+          "image": "🐛✅",
+          "text": "Dev stashed his work, fixed the bug, then ran git stash pop to get his work back!"
+        },
+        {
+          "image": "👻⚠️",
+          "text": "'One warning,' said Git Master. 'Avoid detached HEAD state - that's when you're not on any branch!'"
+        },
+        {
+          "image": "😊🎓",
+          "text": "Dev smiled: 'Now I can time travel through commits and keep history clean!'"
+        }
+      ]
+    },
+    "deepDive": {
+      "sections": [
+        {
+          "title": "Git Rebase - Rewriting History",
+          "content": "Rebase moves your branch commits on top of another branch, creating a linear history.\n\n**Why Rebase?**\n- Clean, linear commit history\n- No merge commits cluttering history\n- Easier to understand project timeline\n\n**Basic Rebase:**\n```bash\ngit checkout feature-branch\ngit rebase main\n```\n\n**What happens:**\n1. Git finds common ancestor of both branches\n2. Saves your commits temporarily\n3. Moves your branch to tip of main\n4. Replays your commits one by one\n\n**Interactive Rebase:**\n```bash\ngit rebase -i HEAD~3  # Rebase last 3 commits\n```\n\nOptions:\n- pick: Keep commit as is\n- reword: Change commit message\n- squash: Combine with previous commit\n- drop: Remove commit\n\n**Golden Rule:** Never rebase commits that have been pushed to shared branches!"
+        },
+        {
+          "title": "Cherry-pick - Selective Commit Application",
+          "content": "Cherry-pick applies a specific commit from one branch to another.\n\n**Use Cases:**\n- Apply bug fix from one branch to another\n- Move specific feature to different branch\n- Recover commits from deleted branch\n\n**Syntax:**\n```bash\ngit cherry-pick <commit-hash>\n```\n\n**Example:**\n```bash\n# On main branch, want commit from feature branch\ngit checkout main\ngit cherry-pick a1b2c3d\n```\n\n**Cherry-pick Multiple Commits:**\n```bash\ngit cherry-pick commit1 commit2 commit3\n```\n\n**Cherry-pick Range:**\n```bash\ngit cherry-pick commit1^..commit5\n```\n\n**Handling Conflicts:**\nIf conflicts occur:\n1. Resolve conflicts manually\n2. git add resolved files\n3. git cherry-pick --continue"
+        },
+        {
+          "title": "Squash Commits - Combining History",
+          "content": "Squashing combines multiple commits into one for cleaner history.\n\n**Why Squash?**\n- Remove 'work in progress' commits\n- Combine related changes\n- Clean up before merging to main\n\n**Method 1: Interactive Rebase**\n```bash\ngit rebase -i HEAD~4  # Last 4 commits\n```\n\nChange:\n```\npick a1b2c3d First commit\npick d4e5f6g Second commit\npick h7i8j9k Third commit\npick l0m1n2o Fourth commit\n```\n\nTo:\n```\npick a1b2c3d First commit\nsquash d4e5f6g Second commit\nsquash h7i8j9k Third commit\nsquash l0m1n2o Fourth commit\n```\n\n**Method 2: Soft Reset**\n```bash\ngit reset --soft HEAD~4\ngit commit -m \"Combined commit message\"\n```\n\n**Method 3: Merge with Squash**\n```bash\ngit checkout main\ngit merge --squash feature-branch\ngit commit -m \"Feature complete\"\n```"
+        },
+        {
+          "title": "Git Stash - Temporary Storage",
+          "content": "Stash saves uncommitted changes temporarily without committing.\n\n**Common Scenario:**\nYou're working on a feature, but need to switch branches for urgent bug fix.\n\n**Basic Stash Commands:**\n```bash\ngit stash              # Save changes\ngit stash list         # View all stashes\ngit stash pop          # Apply and remove latest stash\ngit stash apply        # Apply but keep stash\ngit stash drop         # Delete latest stash\ngit stash clear        # Delete all stashes\n```\n\n**Named Stash:**\n```bash\ngit stash save \"WIP: user authentication\"\n```\n\n**Stash Specific Files:**\n```bash\ngit stash push -m \"message\" file1.js file2.js\n```\n\n**Apply Specific Stash:**\n```bash\ngit stash list\n# stash@{0}: WIP on feature\n# stash@{1}: Bug fix attempt\n\ngit stash apply stash@{1}\n```\n\n**Stash Untracked Files:**\n```bash\ngit stash -u  # Include untracked files\n```\n\n**Create Branch from Stash:**\n```bash\ngit stash branch new-branch-name\n```"
+        },
+        {
+          "title": "Detached HEAD State",
+          "content": "Detached HEAD occurs when you checkout a specific commit instead of a branch.\n\n**What is HEAD?**\nHEAD is a pointer to the current branch reference. Normally:\n```\nHEAD → main → commit abc123\n```\n\n**Detached HEAD:**\n```\nHEAD → commit abc123 (no branch)\n```\n\n**How to Enter Detached HEAD:**\n```bash\ngit checkout abc123  # Checkout specific commit\n```\n\n**Warning Message:**\n```\nYou are in 'detached HEAD' state. You can look around,\nmake experimental changes and commit them, but any commits\nyou make will be lost when you checkout another branch.\n```\n\n**Use Cases:**\n- Viewing old code version\n- Testing historical commits\n- Debugging past states\n\n**Exiting Detached HEAD:**\n```bash\ngit checkout main  # Return to branch\n```\n\n**Saving Work from Detached HEAD:**\n```bash\n# Create branch from current position\ngit checkout -b new-branch-name\n\n# Or tag the commit\ngit tag temp-save\ngit checkout main\n```\n\n**Best Practice:** Avoid making commits in detached HEAD unless you create a branch first."
+        }
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is the main difference between merge and rebase?",
+        "answer": "Merge creates a new merge commit combining two branches, preserving complete history. Rebase moves your commits on top of another branch, creating linear history without merge commits. Merge is safer for shared branches; rebase creates cleaner history but should not be used on public commits."
+      },
+      {
+        "question": "When should you use git cherry-pick?",
+        "answer": "Use cherry-pick when you need to apply a specific commit from one branch to another without merging the entire branch. Common scenarios: applying a bug fix to multiple branches, moving a feature commit to a different branch, or recovering specific commits from a deleted branch."
+      },
+      {
+        "question": "What is the golden rule of git rebase?",
+        "answer": "Never rebase commits that have been pushed to shared/public branches. Rebasing rewrites commit history, which can cause serious problems for other developers who have based their work on those commits. Only rebase local commits that haven't been shared."
+      },
+      {
+        "question": "How is git stash different from git commit?",
+        "answer": "Git stash temporarily saves uncommitted changes without creating a commit. It's useful for quickly switching contexts without committing incomplete work. Git commit permanently records changes in history. Stash is temporary storage; commit is permanent history."
+      },
+      {
+        "question": "What happens if you make commits in detached HEAD state?",
+        "answer": "Commits made in detached HEAD state are not attached to any branch. When you checkout another branch, these commits become orphaned and will eventually be garbage collected. To save them, create a new branch before leaving detached HEAD state using 'git checkout -b new-branch-name'."
+      },
+      {
+        "question": "How do you squash the last 5 commits into one?",
+        "answer": "Use interactive rebase: 'git rebase -i HEAD~5'. In the editor, keep 'pick' for the first commit and change the rest to 'squash' or 's'. Save and close. Git will combine all commits and let you edit the final commit message. Alternatively, use 'git reset --soft HEAD~5' then 'git commit'."
+      }
+    ],
+    "codingChallenge": {
+      "title": "Advanced Branching Workflow",
+      "description": "Practice rebase, cherry-pick, squash, and stash operations.",
+      "difficulty": "Intermediate",
+      "tasks": [
+        {
+          "step": 1,
+          "instruction": "Create a new repository and make 3 commits on main branch",
+          "command": "git init advanced-git && cd advanced-git\necho 'Initial' > file.txt && git add . && git commit -m 'Initial commit'\necho 'Second' >> file.txt && git add . && git commit -m 'Second commit'\necho 'Third' >> file.txt && git add . && git commit -m 'Third commit'"
+        },
+        {
+          "step": 2,
+          "instruction": "Create feature branch and make 3 small commits",
+          "command": "git checkout -b feature\necho 'Feature 1' >> feature.txt && git add . && git commit -m 'WIP: feature part 1'\necho 'Feature 2' >> feature.txt && git add . && git commit -m 'WIP: feature part 2'\necho 'Feature 3' >> feature.txt && git add . && git commit -m 'WIP: feature part 3'"
+        },
+        {
+          "step": 3,
+          "instruction": "Squash the 3 feature commits into one using interactive rebase",
+          "command": "git rebase -i HEAD~3\n# In editor: keep first 'pick', change others to 'squash'\n# Edit commit message to: 'Feature: Complete implementation'"
+        },
+        {
+          "step": 4,
+          "instruction": "Switch to main and make a new commit",
+          "command": "git checkout main\necho 'Main update' >> file.txt && git add . && git commit -m 'Main branch update'"
+        },
+        {
+          "step": 5,
+          "instruction": "Rebase feature branch on top of main",
+          "command": "git checkout feature\ngit rebase main\n# Feature commits now on top of main's latest commit"
+        },
+        {
+          "step": 6,
+          "instruction": "Create hotfix branch and make a commit",
+          "command": "git checkout main\ngit checkout -b hotfix\necho 'Bug fix' >> bugfix.txt && git add . && git commit -m 'Fix critical bug'"
+        },
+        {
+          "step": 7,
+          "instruction": "Cherry-pick the hotfix commit to feature branch",
+          "command": "git log --oneline  # Note the hotfix commit hash\ngit checkout feature\ngit cherry-pick <hotfix-commit-hash>"
+        },
+        {
+          "step": 8,
+          "instruction": "Make changes without committing, then stash them",
+          "command": "echo 'Unfinished work' >> wip.txt\ngit add wip.txt\ngit stash save 'WIP: new feature in progress'"
+        },
+        {
+          "step": 9,
+          "instruction": "Switch branches, then restore stashed work",
+          "command": "git checkout main\ngit stash list\ngit checkout feature\ngit stash pop"
+        },
+        {
+          "step": 10,
+          "instruction": "View a specific old commit (enter detached HEAD), then return",
+          "command": "git log --oneline\ngit checkout <old-commit-hash>  # Detached HEAD state\n# View files, explore code\ngit checkout feature  # Return to branch"
+        }
+      ],
+      "verification": "Run 'git log --oneline --graph --all' to see clean linear history with squashed commits and cherry-picked changes."
+    },
+    "quiz": [
+      {
+        "question": "What does 'git rebase main' do when run from a feature branch?",
+        "options": [
+          "Merges main into feature branch",
+          "Moves feature branch commits on top of main's latest commit",
+          "Deletes the feature branch",
+          "Creates a new branch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git rebase moves (replays) your feature branch commits on top of the latest commit in main, creating a linear history without merge commits."
+      },
+      {
+        "question": "Which command applies a specific commit from another branch?",
+        "options": [
+          "git apply",
+          "git merge",
+          "git cherry-pick",
+          "git rebase"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Git cherry-pick applies a specific commit (by its hash) from one branch to your current branch, without merging the entire branch."
+      },
+      {
+        "question": "What is the golden rule of rebasing?",
+        "options": [
+          "Always rebase before merging",
+          "Never rebase public/shared commits",
+          "Rebase every day",
+          "Only rebase on Fridays"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Never rebase commits that have been pushed to shared branches. Rebasing rewrites history, which causes problems for collaborators who based work on those commits."
+      },
+      {
+        "question": "What does 'git stash' do?",
+        "options": [
+          "Commits your changes",
+          "Deletes uncommitted changes",
+          "Temporarily saves uncommitted changes",
+          "Creates a new branch"
+        ],
+        "correctAnswer": 2,
+        "explanation": "Git stash temporarily saves your uncommitted changes (both staged and unstaged) so you can switch branches or work on something else, then restore them later."
+      },
+      {
+        "question": "How do you apply stashed changes and remove them from stash?",
+        "options": [
+          "git stash apply",
+          "git stash pop",
+          "git stash drop",
+          "git stash clear"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Git stash pop applies the most recent stashed changes and removes them from the stash list. 'git stash apply' applies changes but keeps them in stash."
+      },
+      {
+        "question": "What is detached HEAD state?",
+        "options": [
+          "When HEAD points to a branch",
+          "When HEAD points directly to a commit instead of a branch",
+          "When you delete a branch",
+          "When you create a new branch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Detached HEAD occurs when HEAD points directly to a specific commit rather than a branch reference. This happens when you checkout a commit hash instead of a branch name."
+      },
+      {
+        "question": "Which command combines multiple commits into one?",
+        "options": [
+          "git merge --squash",
+          "git rebase -i with squash option",
+          "git reset --soft then commit",
+          "All of the above"
+        ],
+        "correctAnswer": 3,
+        "explanation": "All three methods can squash commits: interactive rebase with squash, merge with --squash flag, or soft reset followed by a new commit. Each has different use cases."
+      },
+      {
+        "question": "What happens to commits made in detached HEAD if you don't create a branch?",
+        "options": [
+          "They are automatically saved",
+          "They become orphaned and will be garbage collected",
+          "They merge into main",
+          "Nothing, they stay forever"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Commits made in detached HEAD state are not attached to any branch. If you don't create a branch before leaving, they become orphaned and will eventually be deleted by Git's garbage collector."
+      },
+      {
+        "question": "Which is safer for shared branches: merge or rebase?",
+        "options": [
+          "Rebase",
+          "Merge",
+          "Both are equally safe",
+          "Neither is safe"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Merge is safer for shared branches because it preserves history without rewriting it. Rebase rewrites commit history, which can cause serious problems for collaborators on shared branches."
+      }
+    ]
+  }
+}

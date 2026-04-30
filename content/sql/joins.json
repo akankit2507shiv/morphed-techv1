@@ -1,0 +1,271 @@
+{
+  "id": "joins",
+  "title": "SQL Joins",
+  "icon": "🔗",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "Combine data from multiple tables",
+  "prerequisites": [],
+  "nextTopics": ["subqueries", "window-functions"],
+  "content": {
+    "comicStory": {
+      "title": "The Dating App Disaster",
+      "panels": [
+        {
+          "image": "👨‍💼",
+          "text": "Meet Bob. He runs a dating app with two databases: one for USERS and one for PROFILES."
+        },
+        {
+          "image": "😰",
+          "text": "Problem: Users are complaining they can't see profile pictures! The data is in separate tables."
+        },
+        {
+          "image": "💡",
+          "text": "Bob's intern suggests: 'Why don't we just MERGE the tables?' Bob facepalms."
+        },
+        {
+          "image": "🔗",
+          "text": "Bob uses INNER JOIN to connect users with their profiles using user_id as the key."
+        },
+        {
+          "image": "😱",
+          "text": "TWIST: Half the users disappeared! Turns out, not everyone filled out their profile."
+        },
+        {
+          "image": "✅",
+          "text": "Bob switches to LEFT JOIN - now ALL users show up, even without profiles!"
+        }
+      ],
+      "twist": "The wrong JOIN type can make your data vanish! Always think about what you want to keep.",
+      "lesson": "JOINs connect tables, but the TYPE of JOIN determines which rows survive."
+    },
+    "deepDive": {
+      "whatItIs": "SQL JOINs combine rows from two or more tables based on a related column between them. Think of it as matching puzzle pieces - you connect tables where certain values match.",
+      "whyItMatters": "Real-world data is never in one table. Customer info, orders, products, payments - all separate. JOINs let you see the complete picture by connecting related data.",
+      "whereUsed": [
+        "E-commerce: Connecting customers with their orders",
+        "Banking: Linking accounts with transactions",
+        "Social Media: Matching users with their posts and comments",
+        "Analytics: Combining sales data with product information",
+        "HR Systems: Connecting employees with departments and salaries"
+      ],
+      "visualExamples": [
+        {
+          "title": "INNER JOIN - Only Matches",
+          "description": "Returns only rows where there's a match in BOTH tables",
+          "diagram": "Table A: [1,2,3] ∩ Table B: [2,3,4] = Result: [2,3]"
+        },
+        {
+          "title": "LEFT JOIN - Keep All from Left",
+          "description": "Returns ALL rows from left table, matched rows from right (or NULL)",
+          "diagram": "Table A: [1,2,3] ← Table B: [2,3,4] = Result: [1,2,3] (1 has NULL from B)"
+        },
+        {
+          "title": "RIGHT JOIN - Keep All from Right",
+          "description": "Returns ALL rows from right table, matched rows from left (or NULL)",
+          "diagram": "Table A: [1,2,3] → Table B: [2,3,4] = Result: [2,3,4] (4 has NULL from A)"
+        },
+        {
+          "title": "FULL OUTER JOIN - Keep Everything",
+          "description": "Returns ALL rows from both tables, with NULLs where no match",
+          "diagram": "Table A: [1,2,3] ∪ Table B: [2,3,4] = Result: [1,2,3,4]"
+        }
+      ],
+      "keyPoints": [
+        "INNER JOIN = Only matching rows (intersection)",
+        "LEFT JOIN = All from left table + matches from right",
+        "RIGHT JOIN = All from right table + matches from left",
+        "FULL OUTER JOIN = Everything from both tables",
+        "JOIN key must exist in both tables",
+        "Use table aliases (a, b) for cleaner code",
+        "Multiple JOINs can be chained together"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is the main purpose of SQL JOINs?",
+        "answer": "To combine data from multiple tables based on related columns.",
+        "explanation": "JOINs allow you to retrieve data that's spread across different tables by connecting them through common columns (like user_id, product_id, etc.).",
+        "memoryTrick": "Think of JOINs as 'connecting the dots' between related data tables."
+      },
+      {
+        "question": "What's the difference between INNER JOIN and LEFT JOIN?",
+        "answer": "INNER JOIN returns only matching rows; LEFT JOIN returns all rows from the left table plus matches from the right.",
+        "explanation": "INNER JOIN is strict (both sides must match). LEFT JOIN is lenient (keeps everything from left, even if right side is empty).",
+        "memoryTrick": "LEFT JOIN = 'Left side is VIP, they ALL get in, even without a +1'"
+      },
+      {
+        "question": "When would you use a LEFT JOIN instead of INNER JOIN?",
+        "answer": "When you want to keep all records from the main table, even if there's no matching data in the joined table.",
+        "explanation": "Example: Show all customers, even those who haven't placed orders yet. INNER JOIN would hide customers with no orders.",
+        "memoryTrick": "LEFT JOIN = 'Don't leave anyone behind from the left table!'"
+      },
+      {
+        "question": "What is a JOIN key?",
+        "answer": "The column(s) used to match rows between tables, typically a foreign key relationship.",
+        "explanation": "It's the common column that exists in both tables. Like user_id in both Users and Orders tables.",
+        "memoryTrick": "JOIN key = The 'handshake' column that connects two tables"
+      },
+      {
+        "question": "Can you JOIN more than two tables?",
+        "answer": "Yes! You can chain multiple JOINs to connect as many tables as needed.",
+        "explanation": "Example: Users JOIN Orders JOIN Products JOIN Categories - each JOIN adds another table to the result.",
+        "memoryTrick": "JOINs are like LEGO blocks - stack as many as you need!"
+      },
+      {
+        "question": "What happens if the JOIN key has duplicate values?",
+        "answer": "You get a cartesian product - each matching row from table A pairs with EVERY matching row from table B.",
+        "explanation": "If table A has 3 rows with id=5 and table B has 2 rows with id=5, you get 3×2=6 result rows.",
+        "memoryTrick": "Duplicates multiply! 3×2=6 (not 3+2=5)"
+      }
+    ],
+    "codingChallenge": {
+      "title": "E-commerce Order Analysis",
+      "scenario": "You work for an online store. The manager wants a report showing customer names with their order details. Some customers haven't ordered yet, but should still appear in the report.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "customers",
+            "columns": ["customer_id", "name", "email"],
+            "sampleData": [
+              [1, "Alice", "alice@email.com"],
+              [2, "Bob", "bob@email.com"],
+              [3, "Charlie", "charlie@email.com"],
+              [4, "Diana", "diana@email.com"]
+            ]
+          },
+          {
+            "name": "orders",
+            "columns": ["order_id", "customer_id", "product", "amount"],
+            "sampleData": [
+              [101, 1, "Laptop", 1200],
+              [102, 1, "Mouse", 25],
+              [103, 2, "Keyboard", 75],
+              [104, 3, "Monitor", 300]
+            ]
+          }
+        ]
+      },
+      "problem": "Write a query to show ALL customers with their orders. Include customers who haven't ordered anything (show NULL for order details).",
+      "expectedOutput": "customer_id | name | order_id | product | amount\n1 | Alice | 101 | Laptop | 1200\n1 | Alice | 102 | Mouse | 25\n2 | Bob | 103 | Keyboard | 75\n3 | Charlie | 104 | Monitor | 300\n4 | Diana | NULL | NULL | NULL",
+      "hints": [
+        "You need to keep ALL customers, even those without orders",
+        "Which JOIN type keeps all rows from the left table?",
+        "LEFT JOIN is your friend here!",
+        "Syntax: SELECT ... FROM customers LEFT JOIN orders ON ..."
+      ],
+      "solution": "SELECT \n  c.customer_id,\n  c.name,\n  o.order_id,\n  o.product,\n  o.amount\nFROM customers c\nLEFT JOIN orders o ON c.customer_id = o.customer_id\nORDER BY c.customer_id;",
+      "explanation": "We use LEFT JOIN because we want ALL customers (left table) to appear, even if they have no matching orders (right table). Diana appears with NULL values because she hasn't placed any orders yet. If we used INNER JOIN, Diana would disappear from the results!"
+    },
+    "quiz": [
+      {
+        "question": "You have a Users table (1000 rows) and a Premium_Users table (200 rows). You want to find all premium users. Which JOIN should you use?",
+        "options": [
+          "INNER JOIN - only users who are premium",
+          "LEFT JOIN - all users, mark who is premium",
+          "RIGHT JOIN - all premium users",
+          "FULL OUTER JOIN - everyone"
+        ],
+        "correctAnswer": 0,
+        "explanation": "INNER JOIN is correct because you only want users who exist in BOTH tables (i.e., users who are premium). LEFT JOIN would include all 1000 users, which is not what we want.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Your manager wants a report of ALL products, showing sales data if available. Products table has 500 items, Sales table has 300 transactions. What's the result count?",
+        "options": [
+          "300 rows (only products with sales)",
+          "500 rows (all products, some with NULL sales)",
+          "800 rows (sum of both tables)",
+          "150,000 rows (cartesian product)"
+        ],
+        "correctAnswer": 1,
+        "explanation": "LEFT JOIN from Products to Sales gives 500 rows - one for each product. Products without sales will have NULL in sales columns. This keeps all products visible.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "You JOIN Orders and Customers, but get 10,000 rows instead of expected 1,000. What's the likely cause?",
+        "options": [
+          "The JOIN key has duplicate values in one or both tables",
+          "You used the wrong JOIN type",
+          "The database is corrupted",
+          "You forgot the WHERE clause"
+        ],
+        "correctAnswer": 0,
+        "explanation": "Duplicate JOIN keys cause a cartesian product. If 10 orders have customer_id=5 and 10 customers have id=5, you get 10×10=100 rows just for id=5. This multiplies across all duplicates.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Which query finds customers who have NEVER placed an order?",
+        "options": [
+          "INNER JOIN customers and orders",
+          "LEFT JOIN customers to orders, WHERE order_id IS NULL",
+          "RIGHT JOIN customers to orders",
+          "FULL OUTER JOIN customers and orders"
+        ],
+        "correctAnswer": 1,
+        "explanation": "LEFT JOIN keeps all customers. Those without orders will have NULL in order columns. Filter WHERE order_id IS NULL to find customers with no orders.",
+        "difficulty": "hard"
+      },
+      {
+        "question": "You need to combine 3 tables: Users, Orders, Products. What's the correct approach?",
+        "options": [
+          "Use 3 separate queries and merge in Excel",
+          "Chain JOINs: Users JOIN Orders JOIN Products",
+          "Only JOIN two tables at a time, can't do three",
+          "Use UNION instead of JOIN"
+        ],
+        "correctAnswer": 1,
+        "explanation": "You can chain multiple JOINs. Example: FROM Users u JOIN Orders o ON u.id=o.user_id JOIN Products p ON o.product_id=p.id. Each JOIN adds another table.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Performance issue: Joining two large tables (1M rows each) is very slow. What's the first thing to check?",
+        "options": [
+          "Buy a faster computer",
+          "Check if JOIN keys have indexes",
+          "Use INNER JOIN instead of LEFT JOIN",
+          "Split the query into smaller parts"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Indexes on JOIN keys dramatically speed up queries. Without indexes, the database does a full table scan for each match. With indexes, lookups are instant.",
+        "difficulty": "hard"
+      },
+      {
+        "question": "What's the result of: Table A (3 rows) FULL OUTER JOIN Table B (5 rows) with 2 matching rows?",
+        "options": [
+          "2 rows (only matches)",
+          "6 rows (3+5-2 duplicates)",
+          "8 rows (3+5)",
+          "15 rows (3×5)"
+        ],
+        "correctAnswer": 1,
+        "explanation": "FULL OUTER JOIN returns all unique rows from both tables. 3 from A + 5 from B = 8, but 2 rows match (counted once, not twice), so 8-2+2 = 6 rows total.",
+        "difficulty": "hard"
+      },
+      {
+        "question": "You LEFT JOIN Employees to Departments. Some employees show NULL for department_name. What does this mean?",
+        "options": [
+          "Those employees don't exist",
+          "Those employees are not assigned to any department",
+          "The JOIN syntax is wrong",
+          "The database has an error"
+        ],
+        "correctAnswer": 1,
+        "explanation": "LEFT JOIN keeps all employees. NULL in department columns means no matching department was found - these employees aren't assigned to a department yet.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Real scenario: You need to find products that have NEVER been ordered. Which approach works?",
+        "options": [
+          "INNER JOIN Products and Orders",
+          "LEFT JOIN Products to Orders, filter WHERE order_id IS NULL",
+          "RIGHT JOIN Products to Orders",
+          "Use UNION between Products and Orders"
+        ],
+        "correctAnswer": 1,
+        "explanation": "LEFT JOIN from Products to Orders keeps all products. Products never ordered will have NULL in order columns. Filter WHERE order_id IS NULL to find them.",
+        "difficulty": "medium"
+      }
+    ]
+  }
+}

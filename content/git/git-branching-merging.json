@@ -1,0 +1,260 @@
+{
+  "id": "git-branching-merging",
+  "title": "Branching & Merging",
+  "icon": "🌿",
+  "difficulty": "Intermediate",
+  "duration": "60 min",
+  "description": "Work on features independently and merge changes safely",
+  "prerequisites": ["git-basic-commands"],
+  "nextTopics": [],
+  "content": {
+    "comicStory": {
+      "title": "The Parallel Universe Developer",
+      "panels": [
+        {
+          "image": "👨‍💻",
+          "text": "Meet Alex, working on a website. Boss says: 'Add login feature, but don't break the live site!'"
+        },
+        {
+          "image": "😰",
+          "text": "Without branches: Alex edits main code directly. Half-done login breaks everything. Site crashes! 💥"
+        },
+        {
+          "image": "🤔",
+          "text": "With branches: Alex creates 'feature-login' branch. Works in parallel universe! Main site stays safe."
+        },
+        {
+          "image": "✨",
+          "text": "Alex completes login feature in branch. Tests it. Everything works perfectly!"
+        },
+        {
+          "image": "🔀",
+          "text": "TWIST: Alex merges branch into main. But teammate also changed same file! Merge conflict! 😱"
+        },
+        {
+          "image": "✅",
+          "text": "Alex resolves conflict, merges successfully. Login feature live! Main site never broke during development!"
+        }
+      ],
+      "twist": "Branches let you work safely in parallel, but merging requires handling conflicts!",
+      "lesson": "Branching = Parallel development. Merging = Combining work. Conflicts = Manual resolution needed!"
+    },
+    "deepDive": {
+      "whatItIs": "Branching creates separate lines of development where you can work independently without affecting the main codebase. Merging combines changes from different branches back together. Think of branches as parallel universes where you can experiment safely.",
+      "whyItMatters": "Without branching, all developers would work on the same code simultaneously, causing chaos and breaking the main codebase. Branches enable safe experimentation, parallel development, and organized collaboration. They're essential for team workflows and feature development.",
+      "whereUsed": [
+        "Feature Development: Create branch for each new feature",
+        "Bug Fixes: Isolate bug fixes in separate branches",
+        "Team Collaboration: Multiple developers work on different branches",
+        "Release Management: Maintain separate branches for different versions",
+        "Experimentation: Try new ideas without risk"
+      ],
+      "visualExamples": [
+        {
+          "title": "Branch Visualization",
+          "description": "How branches work in Git",
+          "diagram": "main:     A --- B --- C --- F --- G\n                    \\\n feature:            D --- E\n\nA, B, C = commits on main\nD, E = commits on feature branch\nF = merge commit (combines D, E into main)\nG = new commit on main after merge"
+        },
+        {
+          "title": "Creating and Switching Branches",
+          "description": "Basic branch operations",
+          "diagram": "# Create new branch\ngit branch feature-login\n\n# Switch to branch\ngit checkout feature-login\n# OR (newer syntax)\ngit switch feature-login\n\n# Create and switch in one command\ngit checkout -b feature-login\n# OR\ngit switch -c feature-login"
+        },
+        {
+          "title": "Merging Process",
+          "description": "How to merge branches",
+          "diagram": "# Switch to main branch\ngit checkout main\n\n# Merge feature branch into main\ngit merge feature-login\n\n# Result: feature-login changes now in main"
+        },
+        {
+          "title": "Fast-Forward vs 3-Way Merge",
+          "description": "Two types of merges",
+          "diagram": "Fast-Forward (no new commits on main):\nmain:     A --- B\n               \\\nfeature:        C --- D\n\nAfter merge:\nmain:     A --- B --- C --- D\n\n3-Way Merge (new commits on both):\nmain:     A --- B --- E\n               \\\nfeature:        C --- D\n\nAfter merge:\nmain:     A --- B --- E --- M\n               \\         /\nfeature:        C --- D\n(M = merge commit)"
+        }
+      ],
+      "keyPoints": [
+        "Branch = Separate line of development",
+        "Main/Master = Primary branch (production code)",
+        "Feature branch = Branch for specific feature",
+        "git branch: Create new branch",
+        "git checkout/switch: Switch between branches",
+        "git merge: Combine branches",
+        "Fast-forward merge: Simple linear merge",
+        "Merge conflict: When same code changed differently"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What is a branch in Git?",
+        "answer": "A separate line of development where you can work independently without affecting the main codebase.",
+        "explanation": "Branch is like a parallel universe. You can make changes, experiment, and develop features without touching the main code. Once ready, you merge it back.",
+        "memoryTrick": "Branch = Parallel universe 🌿"
+      },
+      {
+        "question": "Why use branches?",
+        "answer": "To develop features, fix bugs, and collaborate safely without breaking the main code.",
+        "explanation": "Branches allow: safe experimentation, parallel development, isolated bug fixes, team collaboration, and keeping main code stable. Essential for professional development!",
+        "memoryTrick": "Branches = Safe parallel work 🛡️"
+      },
+      {
+        "question": "How to create a new branch?",
+        "answer": "Use 'git branch branch-name' to create, then 'git checkout branch-name' to switch to it.",
+        "explanation": "git branch creates the branch. git checkout switches to it. Shortcut: git checkout -b branch-name (creates and switches in one command).",
+        "memoryTrick": "git checkout -b = Create + Switch ⚡"
+      },
+      {
+        "question": "What does 'git merge' do?",
+        "answer": "Combines changes from one branch into another (usually into main).",
+        "explanation": "Merging integrates work from feature branch into main branch. First checkout main, then git merge feature-branch. This brings all feature changes into main.",
+        "memoryTrick": "git merge = Combine branches 🔀"
+      },
+      {
+        "question": "What is a merge conflict?",
+        "answer": "When two branches modify the same part of code differently, requiring manual resolution.",
+        "explanation": "Conflict occurs when Git can't automatically merge because same lines were changed differently. You must manually choose which changes to keep.",
+        "memoryTrick": "Conflict = Same code, different changes ⚠️"
+      },
+      {
+        "question": "What is fast-forward merge?",
+        "answer": "When no new commits exist on main, Git simply moves forward and adds branch commits.",
+        "explanation": "If main hasn't changed since branch was created, Git just moves main pointer forward to include branch commits. No merge commit needed. Simple and clean!",
+        "memoryTrick": "Fast-forward = Linear, no merge commit ➡️"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Branch and Merge Workflow",
+      "scenario": "You're working on a project. Create a feature branch, make changes, and merge it back to main. Simulate the complete branching workflow.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "branches",
+            "columns": ["branch_name", "commits", "status"],
+            "sampleData": [
+              ["main", ["Initial commit"], "active"],
+              ["feature-login", ["Add login form", "Add validation"], "merged"]
+            ]
+          }
+        ]
+      },
+      "problem": "Simulate Git branching: create branch, add commits, merge to main, and handle the workflow.",
+      "expectedOutput": "Created branch: feature-login\nCommitted: Add login form\nCommitted: Add validation\nMerged feature-login into main\nMain now has 3 commits",
+      "hints": [
+        "Create a Branch class to represent branches",
+        "Track commits in each branch",
+        "Implement merge() to combine branch commits into main",
+        "Keep track of current branch"
+      ],
+      "solution": "class GitBranching:\n    def __init__(self):\n        self.branches = {'main': []}\n        self.current_branch = 'main'\n    \n    def create_branch(self, name):\n        # Copy current branch commits to new branch\n        self.branches[name] = self.branches[self.current_branch].copy()\n        print(f\"Created branch: {name}\")\n    \n    def checkout(self, name):\n        if name in self.branches:\n            self.current_branch = name\n            print(f\"Switched to branch: {name}\")\n        else:\n            print(f\"Branch {name} does not exist\")\n    \n    def commit(self, message):\n        self.branches[self.current_branch].append(message)\n        print(f\"Committed: {message}\")\n    \n    def merge(self, branch_name):\n        if branch_name not in self.branches:\n            print(f\"Branch {branch_name} does not exist\")\n            return\n        \n        # Get commits from branch that aren't in current branch\n        branch_commits = self.branches[branch_name]\n        current_commits = self.branches[self.current_branch]\n        \n        # Add new commits from branch\n        for commit in branch_commits:\n            if commit not in current_commits:\n                current_commits.append(commit)\n        \n        print(f\"Merged {branch_name} into {self.current_branch}\")\n    \n    def log(self):\n        commits = self.branches[self.current_branch]\n        print(f\"{self.current_branch} now has {len(commits)} commits\")\n        for commit in commits:\n            print(f\"  - {commit}\")\n\n# Usage\ngit = GitBranching()\n\n# Initial commit on main\ngit.commit(\"Initial commit\")\n\n# Create and switch to feature branch\ngit.create_branch(\"feature-login\")\ngit.checkout(\"feature-login\")\n\n# Work on feature\ngit.commit(\"Add login form\")\ngit.commit(\"Add validation\")\n\n# Switch back to main and merge\ngit.checkout(\"main\")\ngit.merge(\"feature-login\")\ngit.log()",
+      "explanation": "This simulates Git branching: create_branch() creates new branch, checkout() switches branches, commit() adds commits to current branch, merge() combines branch commits into current branch. In real Git: git branch, git checkout, git commit, git merge."
+    },
+    "quiz": [
+      {
+        "question": "What is a branch in Git?",
+        "options": [
+          "A separate line of development",
+          "A type of commit",
+          "A remote repository",
+          "A merge conflict"
+        ],
+        "correctAnswer": 0,
+        "explanation": "A branch is a separate line of development where you can work independently without affecting other branches. It's like a parallel version of your code.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "Why use branches?",
+        "options": [
+          "To delete code",
+          "To work on features safely without breaking main code",
+          "To slow down development",
+          "To create conflicts"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Branches allow safe parallel development. You can work on features, fix bugs, and experiment without affecting the main codebase. Essential for team collaboration!",
+        "difficulty": "easy"
+      },
+      {
+        "question": "How to create a new branch?",
+        "options": [
+          "git merge branch-name",
+          "git branch branch-name",
+          "git delete branch-name",
+          "git push branch-name"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git branch branch-name creates a new branch. To switch to it, use git checkout branch-name. Shortcut: git checkout -b branch-name (creates and switches).",
+        "difficulty": "easy"
+      },
+      {
+        "question": "How to switch to a different branch?",
+        "options": [
+          "git branch branch-name",
+          "git checkout branch-name or git switch branch-name",
+          "git merge branch-name",
+          "git delete branch-name"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git checkout branch-name switches to the branch. Newer syntax: git switch branch-name. Both work the same way.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What does 'git merge' do?",
+        "options": [
+          "Deletes a branch",
+          "Combines changes from one branch into another",
+          "Creates a new branch",
+          "Pushes to remote"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git merge combines changes from one branch into your current branch. Usually used to merge feature branches into main. First checkout main, then git merge feature-branch.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is a merge conflict?",
+        "options": [
+          "When Git crashes",
+          "When two branches modify the same code differently",
+          "When branch is deleted",
+          "When push fails"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Merge conflict occurs when two branches change the same lines of code differently. Git can't automatically decide which to keep, so you must manually resolve it.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is fast-forward merge?",
+        "options": [
+          "A very quick merge",
+          "When main hasn't changed, Git moves pointer forward",
+          "A type of conflict",
+          "A branch deletion"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Fast-forward merge happens when main branch hasn't changed since feature branch was created. Git simply moves main pointer forward to include feature commits. No merge commit needed!",
+        "difficulty": "hard"
+      },
+      {
+        "question": "Best practice before merging?",
+        "options": [
+          "Delete all branches",
+          "Pull latest changes from main and test your branch",
+          "Never test",
+          "Push immediately"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Before merging: 1) Pull latest main changes, 2) Merge main into your branch, 3) Test everything works, 4) Then merge your branch into main. Prevents conflicts and bugs!",
+        "difficulty": "hard"
+      },
+      {
+        "question": "How to delete a branch after merging?",
+        "options": [
+          "git branch -d branch-name",
+          "git delete branch-name",
+          "git remove branch-name",
+          "git merge -d branch-name"
+        ],
+        "correctAnswer": 0,
+        "explanation": "git branch -d branch-name deletes a branch after it's been merged. Use -D (capital D) to force delete unmerged branch. Good practice to clean up merged branches!",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

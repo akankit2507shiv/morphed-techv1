@@ -1,0 +1,882 @@
+// AWS Topics Content
+const awsContent = {
+
+  's3': {
+    title: "Amazon S3 - Simple Storage Service",
+    subtitle: "Data Lake Foundation",
+    icon: "🪣",
+    difficulty: "Beginner",
+    duration: "~60 min",
+    ready: true,
+
+    objective: "Understand Amazon S3 as object storage and data lake foundation for AWS data engineering",
+
+    coreConcept: {
+      thinking: "Store unlimited data in cloud with high durability",
+      awsMapping: "S3 = Object Storage (Buckets + Objects + Keys)"
+    },
+
+    realTimeScenario: {
+      sources: ["CSV Files", "JSON Data", "Parquet Files", "Images", "Videos"],
+      problem: "Where to store massive amounts of data safely and cost-effectively?",
+      wrongApproach: [
+        "Using local storage (limited capacity)",
+        "Storing directly in database (expensive)",
+        "No backup or disaster recovery plan"
+      ],
+      correctApproach: "Use Amazon S3 as data lake to store raw, processed, and curated data with proper folder structure and storage classes"
+    },
+
+    services: [
+      {
+        name: "Amazon S3",
+        type: "Object Storage",
+        icon: "🪣",
+        whatItDoes: [
+          "Stores objects (files) in buckets (containers)",
+          "Provides 99.999999999% (11 9's) durability",
+          "Supports unlimited storage capacity",
+          "Integrates with all AWS services"
+        ],
+        whyUse: [
+          "Cost-effective storage for big data",
+          "Foundation of data lakes",
+          "Highly scalable and durable",
+          "Supports multiple storage classes"
+        ],
+        interviewLine: "S3 is used as a data lake to store raw and processed data with high durability and scalability"
+      },
+      {
+        name: "S3 Storage Classes",
+        type: "Cost Optimization",
+        icon: "💰",
+        whatItDoes: [
+          "Standard - frequent access",
+          "IA (Infrequent Access) - monthly access",
+          "Glacier - archival storage"
+        ],
+        whyUse: [
+          "Optimize cost based on access patterns",
+          "Automatic lifecycle transitions"
+        ],
+        interviewLine: "We use different storage classes to optimize cost - Standard for frequent access, Glacier for archives"
+      },
+      {
+        name: "S3 Bucket",
+        type: "Container",
+        icon: "🗄️",
+        whatItDoes: [
+          "Top-level container for objects",
+          "Must have globally unique name",
+          "Can have folders (prefixes) for organization"
+        ],
+        whyUse: [
+          "Organize data logically",
+          "Apply security policies at bucket level"
+        ],
+        interviewLine: "Buckets are containers that hold objects, with globally unique names and folder-like structure"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create S3 Bucket", command: "aws s3 mb s3://morphex-data-lake" },
+      { step: 2, action: "Upload file to S3", command: "aws s3 cp data.csv s3://morphex-data-lake/raw/" },
+      { step: 3, action: "List objects in bucket", command: "aws s3 ls s3://morphex-data-lake/raw/" },
+      { step: 4, action: "Read data using PySpark", command: "df = spark.read.csv('s3://morphex-data-lake/raw/data.csv', header=True)" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is Amazon S3?", answer: "S3 is an object storage service for storing and retrieving any amount of data from anywhere with 99.999999999% durability" },
+      { question: "What is a bucket in S3?", answer: "A bucket is a top-level container that holds objects, similar to a folder, with a globally unique name" },
+      { question: "What is an object in S3?", answer: "An object is the actual file stored in S3, consisting of data, metadata, and a unique key (path)" },
+      { question: "Why is S3 used in ETL pipelines?", answer: "S3 acts as a data lake to store raw input data and processed output data, providing scalable and cost-effective storage" },
+      { question: "Can S3 be used as a database?", answer: "No, S3 is object storage, not a database. Use Athena or Redshift for querying data stored in S3" },
+      { question: "Which storage class for archival data?", answer: "Glacier is used for long-term archival with low cost and rare access, with retrieval times in hours" },
+      { question: "What is S3 durability?", answer: "S3 provides 11 nines (99.999999999%) durability by replicating data across multiple facilities" },
+      { question: "How to organize data in S3?", answer: "Use folder structure like raw/, processed/, curated/ and apply partitioning for better query performance" },
+      { question: "Real project example?", answer: "We stored raw sales data in S3, processed it using Glue, and stored results back in S3 for Athena queries" }
+    ],
+
+    commonMistakes: [
+      "Using S3 as a database (it's storage, not a query engine)",
+      "Not using proper folder structure",
+      "Ignoring storage classes for cost optimization",
+      "Storing all data in Standard class (expensive for infrequent access)"
+    ],
+
+    memoryTrick: {
+      line: "S3 = Storage Service, Simple!",
+      flow: "Bucket (container) → Object (file) → Key (path)"
+    },
+
+    finalInterviewStatement: "Amazon S3 is a scalable object storage service used as a data lake to store large volumes of structured and unstructured data. It provides high durability, multiple storage classes, and integrates with services like AWS Glue, Athena, and Redshift for data processing and analytics."
+  },
+
+  'aws-flow-1': {
+    title: "AATMA FLOW 1: Data Ingestion",
+    subtitle: "Store First, Think Later",
+    icon: "📥",
+    difficulty: "Beginner",
+    duration: "~50 min",
+    ready: true,
+
+    objective: "Understand how data enters AWS pipeline and why S3 is used as raw data lake",
+
+    coreConcept: {
+      thinking: "First STORE then PROCESS",
+      awsMapping: "Source -> S3 (Raw Layer)"
+    },
+
+    realTimeScenario: {
+      sources: ["Oracle Database", "CSV Files", "APIs"],
+      problem: "Where should incoming data be stored?",
+      wrongApproach: [
+        "Directly storing in database",
+        "Processing data immediately"
+      ],
+      correctApproach: "Store data in S3 raw layer before any processing"
+    },
+
+    services: [
+      {
+        name: "Amazon S3",
+        type: "Storage (Data Lake)",
+        icon: "🪣",
+        whatItDoes: [
+          "Stores files like CSV, JSON, Parquet",
+          "Provides unlimited scalable storage",
+          "Ensures high durability"
+        ],
+        whyUse: [
+          "Cost-effective storage",
+          "Central data lake",
+          "Scalable for big data"
+        ],
+        interviewLine: "S3 is used as raw data lake to store incoming data before processing"
+      },
+      {
+        name: "AWS DMS",
+        type: "Data Ingestion / Migration",
+        icon: "🔄",
+        whatItDoes: [
+          "Moves data from source databases to AWS",
+          "Supports real-time replication"
+        ],
+        whyUse: [
+          "No manual coding required",
+          "Supports continuous data ingestion"
+        ],
+        interviewLine: "DMS is used to continuously ingest data from source systems into S3"
+      },
+      {
+        name: "IAM",
+        type: "Security",
+        icon: "🔐",
+        whatItDoes: [
+          "Manages access permissions",
+          "Controls who can access resources"
+        ],
+        whyUse: [
+          "Ensures secure access",
+          "Implements least privilege principle"
+        ],
+        interviewLine: "IAM roles are used to securely allow services to access S3"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create S3 Bucket", command: "aws s3 mb s3://morphex-raw" },
+      { step: 2, action: "Upload File", command: "aws s3 cp data.csv s3://morphex-raw/raw/" },
+      { step: 3, action: "Verify Structure", command: "morphex-raw/raw/data.csv" }
+    ],
+
+    interviewQuestions: [
+      { question: "Where do you store incoming data?", answer: "We store incoming data in Amazon S3 as raw layer to ensure scalability, durability, and preserve original data for reprocessing" },
+      { question: "Why S3 instead of database?", answer: "S3 is cost-effective and scalable for large data, while databases are expensive and not suitable for raw storage" },
+      { question: "What is raw layer?", answer: "Raw layer stores original unprocessed data exactly as received from source" },
+      { question: "What if data gets corrupted?", answer: "We can reprocess data from raw layer stored in S3" },
+      { question: "What is AWS DMS?", answer: "AWS DMS is used to migrate or replicate data from source systems into AWS services like S3" },
+      { question: "Batch vs real-time ingestion?", answer: "Batch ingestion loads data at intervals, while real-time ingestion continuously streams data" },
+      { question: "How do you secure S3?", answer: "Using IAM roles and policies with least privilege principle" },
+      { question: "What is a bucket?", answer: "A bucket is a container in S3 used to store objects (files)" },
+      { question: "Explain real project usage", answer: "We used DMS to ingest data from Oracle into S3 raw layer, ensuring scalability and easy reprocessing" }
+    ],
+
+    commonMistakes: [
+      "Directly storing data in database",
+      "Not maintaining raw layer",
+      "No security control using IAM",
+      "Mixing raw and processed data"
+    ],
+
+    memoryTrick: {
+      line: "Don't touch data, store first",
+      flow: "Source -> S3"
+    },
+
+    finalInterviewStatement: "In our pipeline, we first ingest data into S3 raw layer using services like DMS, ensuring scalability, durability, and reprocessing capability"
+  },
+
+  'aws-flow-2': {
+    title: "AATMA FLOW 2: Data Organization",
+    subtitle: "Organize Before You Optimize",
+    icon: "📂",
+    difficulty: "Beginner",
+    duration: "~50 min",
+    ready: true,
+
+    objective: "Understand how to structure data in S3 using proper folder design and partitioning for performance and cost optimization",
+
+    coreConcept: {
+      thinking: "Clean and organize data before processing",
+      awsMapping: "S3 (raw -> processed -> curated) + Partitioning"
+    },
+
+    realTimeScenario: {
+      problem: "Data is stored in S3 but files are messy and difficult to query efficiently",
+      wrongApproach: [
+        "Storing all files in one folder",
+        "No structure or naming convention",
+        "No partitioning"
+      ],
+      correctApproach: "Use proper folder structure (raw, processed, curated) and partition data based on columns like date, region, etc."
+    },
+
+    services: [
+      {
+        name: "Amazon S3",
+        type: "Storage (Data Lake)",
+        icon: "🪣",
+        whatItDoes: [
+          "Stores structured and unstructured data",
+          "Supports hierarchical folder-like structure",
+          "Works with query engines like Athena"
+        ],
+        whyUse: [
+          "Organizes large datasets efficiently",
+          "Improves query performance with partitioning",
+          "Reduces cost when querying data"
+        ],
+        interviewLine: "We use S3 partitioning and structured folders to optimize query performance and reduce cost"
+      },
+      {
+        name: "AWS Athena",
+        type: "Query Engine",
+        icon: "🔍",
+        whatItDoes: [
+          "Runs SQL queries directly on S3 data",
+          "Reads only required partitions"
+        ],
+        whyUse: [
+          "Serverless querying",
+          "Cost based on data scanned"
+        ],
+        interviewLine: "Athena benefits from partitioning as it scans only required data, reducing cost and improving performance"
+      }
+    ],
+
+    practicalSteps: [
+      {
+        step: 1,
+        action: "Create folder structure in S3",
+        command: "morphex-data-lake/\n  ├── raw/\n  ├── processed/\n  └── curated/"
+      },
+      {
+        step: 2,
+        action: "Apply partitioning (example)",
+        command: "s3://morphex-data-lake/raw/sales/year=2025/month=04/day=07/data.csv"
+      },
+      {
+        step: 3,
+        action: "Upload partitioned data",
+        command: "aws s3 cp data.csv s3://morphex-data-lake/raw/sales/year=2025/month=04/day=07/"
+      }
+    ],
+
+    interviewQuestions: [
+      { question: "Why do we need folder structure in S3?", answer: "Folder structure helps organize data into layers like raw, processed, and curated, making it easier to manage and process data" },
+      { question: "What is partitioning in S3?", answer: "Partitioning is dividing data into smaller parts based on columns like date or region to improve query performance" },
+      { question: "Why is partitioning important?", answer: "Partitioning reduces data scanned by query engines like Athena, improving performance and reducing cost" },
+      { question: "What happens if you don't use partitioning?", answer: "Query performance becomes slow and cost increases because full data is scanned" },
+      { question: "How does Athena use partitioning?", answer: "Athena reads only relevant partitions instead of scanning the entire dataset" },
+      { question: "What is raw, processed, curated?", answer: "Raw is original data, processed is cleaned data, and curated is business-ready data" },
+      { question: "Give real project example", answer: "We stored sales data in S3 using partitioning by year and month, which improved Athena query performance and reduced cost significantly" },
+      { question: "Which columns should be used for partitioning?", answer: "Columns with high filtering usage like date, region, or category are ideal for partitioning" },
+      { question: "Is partitioning mandatory?", answer: "Not mandatory, but highly recommended for performance and cost optimization" },
+      { question: "Difference between folder and partition?", answer: "Folders are logical grouping, while partitions are structured folders used by query engines to optimize data scanning" }
+    ],
+
+    commonMistakes: [
+      "Storing all data in a single folder",
+      "Not using partitioning",
+      "Using wrong partition columns",
+      "Mixing raw and processed data"
+    ],
+
+    memoryTrick: {
+      line: "Organize data like folders in your system",
+      flow: "raw -> processed -> curated"
+    },
+
+    finalInterviewStatement: "In our pipeline, we structured data in S3 using raw, processed, and curated layers, and applied partitioning based on date to optimize query performance and reduce cost"
+  },
+
+  'aws-flow-3': {
+    title: "AATMA FLOW 3: Data Processing (ETL)",
+    subtitle: "Transform Data into Value",
+    icon: "⚙️",
+    difficulty: "Intermediate",
+    duration: "~55 min",
+    ready: true,
+
+    objective: "Understand how to process raw data using AWS Glue, apply transformations, and implement incremental data processing",
+
+    coreConcept: {
+      thinking: "Take raw data → clean → transform → make usable",
+      awsMapping: "S3 (raw) -> Glue -> S3 (processed)"
+    },
+
+    realTimeScenario: {
+      problem: "Raw data is unclean and not usable for business. It contains nulls, duplicates, and incorrect formats",
+      wrongApproach: [
+        "Using raw data directly for reporting",
+        "Running full load every time",
+        "No transformation logic"
+      ],
+      correctApproach: "Use AWS Glue to clean, transform, and process data, and store it in processed layer with incremental logic"
+    },
+
+    services: [
+      {
+        name: "AWS Glue",
+        type: "ETL (Extract, Transform, Load)",
+        icon: "🔧",
+        whatItDoes: [
+          "Reads data from S3",
+          "Applies transformations using Spark",
+          "Writes processed data back to S3 or Redshift"
+        ],
+        whyUse: [
+          "Serverless ETL service",
+          "Built on Apache Spark",
+          "Easy integration with S3 and Data Catalog"
+        ],
+        interviewLine: "Glue is used to process raw data into structured format using ETL logic"
+      },
+      {
+        name: "Glue Crawler",
+        type: "Metadata Discovery",
+        icon: "🔍",
+        whatItDoes: [
+          "Scans data in S3",
+          "Infers schema automatically",
+          "Creates tables in Data Catalog"
+        ],
+        whyUse: [
+          "Automates schema detection",
+          "Saves manual effort"
+        ],
+        interviewLine: "Crawler is used to automatically detect schema and create tables in Data Catalog"
+      },
+      {
+        name: "Glue Data Catalog",
+        type: "Metadata Repository",
+        icon: "📋",
+        whatItDoes: [
+          "Stores table definitions",
+          "Acts as central metadata layer"
+        ],
+        whyUse: [
+          "Used by Athena, Glue, Redshift Spectrum",
+          "Central schema management"
+        ],
+        interviewLine: "Data Catalog stores metadata which is used by multiple AWS services"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Run Glue Crawler on raw data", command: "Result: Creates table in Data Catalog" },
+      { step: 2, action: "Create Glue Job", command: "Read from raw S3 → Apply transformations → Write to processed S3" },
+      { step: 3, action: "Enable Job Bookmark", command: "Purpose: Process only new data (incremental load)" },
+      { step: 4, action: "Run Glue Job", command: "Result: Processed data stored in processed layer" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is AWS Glue?", answer: "AWS Glue is a serverless ETL service used to extract, transform, and load data using Apache Spark" },
+      { question: "What is ETL?", answer: "ETL stands for Extract, Transform, Load, where data is extracted from source, transformed, and loaded into target system" },
+      { question: "What is Glue Crawler?", answer: "Glue Crawler scans data in S3 and automatically detects schema and creates tables in Data Catalog" },
+      { question: "What is Data Catalog?", answer: "It is a centralized metadata repository that stores table definitions used by AWS services" },
+      { question: "What is Job Bookmark?", answer: "Job Bookmark helps process only new data by tracking previously processed data" },
+      { question: "Full load vs Incremental load?", answer: "Full load processes entire dataset every time, while incremental load processes only new or changed data" },
+      { question: "Why incremental load is important?", answer: "It reduces processing time, cost, and avoids reprocessing old data" },
+      { question: "Where does Glue read and write data?", answer: "Glue reads data from S3 and writes processed data back to S3 or Redshift" },
+      { question: "Real project example?", answer: "We used Glue to process raw sales data, removed duplicates, applied transformations, and stored processed data in S3 using incremental logic" },
+      { question: "Why not use raw data directly?", answer: "Raw data is unclean and not suitable for reporting, so transformation is required" }
+    ],
+
+    commonMistakes: [
+      "Using raw data directly",
+      "Running full load every time",
+      "Not using job bookmarks",
+      "Ignoring data quality issues"
+    ],
+
+    memoryTrick: {
+      line: "Raw data is dirty, clean it before use",
+      flow: "S3 (raw) -> Glue -> S3 (processed)"
+    },
+
+    finalInterviewStatement: "In our pipeline, we used AWS Glue to process raw data from S3, applied transformations, and used job bookmarks for incremental loading to improve performance and reduce cost"
+  },
+
+  'aws-flow-4': {
+    title: "AATMA FLOW 4: Data Storage (Warehouse)",
+    subtitle: "Store Smart, Query Fast",
+    icon: "🏛️",
+    difficulty: "Intermediate",
+    duration: "~55 min",
+    ready: true,
+
+    objective: "Understand how to store processed data in a data warehouse using Redshift and optimize it for fast querying",
+
+    coreConcept: {
+      thinking: "Processed data should be stored in structured format for analytics",
+      awsMapping: "S3 (processed) -> Redshift (warehouse)"
+    },
+
+    realTimeScenario: {
+      problem: "Processed data is available in S3 but business users need fast SQL queries and reporting",
+      wrongApproach: [
+        "Running heavy queries directly on S3",
+        "No structured storage for analytics",
+        "Ignoring performance tuning"
+      ],
+      correctApproach: "Load processed data into Redshift using optimized design (distribution key, sort key) for fast querying"
+    },
+
+    services: [
+      {
+        name: "Amazon Redshift",
+        type: "Data Warehouse",
+        icon: "🏛️",
+        whatItDoes: [
+          "Stores structured data in tables",
+          "Supports complex SQL queries",
+          "Handles large-scale analytics workloads"
+        ],
+        whyUse: [
+          "Fast query performance",
+          "Columnar storage for analytics",
+          "Scales for big data workloads"
+        ],
+        interviewLine: "Redshift is used as a data warehouse to store processed data and enable fast analytical queries"
+      },
+      {
+        name: "COPY Command",
+        type: "Data Loading",
+        icon: "📥",
+        whatItDoes: [
+          "Loads bulk data from S3 into Redshift",
+          "Parallel data loading for high performance"
+        ],
+        whyUse: [
+          "Faster than INSERT statements",
+          "Efficient for large datasets"
+        ],
+        interviewLine: "We use COPY command to efficiently load large data from S3 into Redshift"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create Redshift Table", command: "CREATE TABLE sales (id INT, name VARCHAR, amount INT);" },
+      { step: 2, action: "Load data using COPY command", command: "COPY sales FROM 's3://morphex-data-lake/processed/sales/' IAM_ROLE 'your-role' FORMAT AS CSV;" },
+      { step: 3, action: "Verify data", command: "SELECT * FROM sales LIMIT 10;" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is Amazon Redshift?", answer: "Amazon Redshift is a fully managed data warehouse used for storing and analyzing large datasets using SQL" },
+      { question: "Why use Redshift instead of S3?", answer: "S3 is storage, while Redshift is optimized for fast SQL queries and analytics" },
+      { question: "What is COPY command?", answer: "COPY command is used to load large amounts of data from S3 into Redshift efficiently" },
+      { question: "Why COPY over INSERT?", answer: "COPY is faster as it loads data in parallel, while INSERT is slower for large data" },
+      { question: "What is Distribution Key?", answer: "It determines how data is distributed across nodes to improve query performance" },
+      { question: "What is Sort Key?", answer: "It defines how data is sorted within nodes to speed up query filtering" },
+      { question: "What happens if no optimization is done?", answer: "Queries become slow and inefficient due to poor data distribution and sorting" },
+      { question: "Real project example?", answer: "We loaded processed sales data into Redshift using COPY command and optimized performance using sort and distribution keys" },
+      { question: "When to use Redshift?", answer: "When we need fast SQL-based analytics on large structured data" },
+      { question: "Can Redshift query S3?", answer: "Yes, using Redshift Spectrum, it can query data directly from S3" }
+    ],
+
+    commonMistakes: [
+      "Using INSERT instead of COPY for large data",
+      "Ignoring distribution and sort keys",
+      "Running heavy queries directly on S3",
+      "Poor table design"
+    ],
+
+    memoryTrick: {
+      line: "Store clean data for fast queries",
+      flow: "S3 (processed) -> Redshift"
+    },
+
+    finalInterviewStatement: "In our pipeline, we load processed data from S3 into Redshift using COPY command and optimize performance using distribution and sort keys for fast analytics"
+  },
+
+  'aws-flow-5': {
+    title: "AATMA FLOW 5: Data Query (Analysis)",
+    subtitle: "Query Smart, Pay Less",
+    icon: "🔍",
+    difficulty: "Intermediate",
+    duration: "~50 min",
+    ready: true,
+
+    objective: "Understand how to query data directly from S3 using Athena and optimize queries for performance and cost",
+
+    coreConcept: {
+      thinking: "Don't move data, query where it is",
+      awsMapping: "S3 -> Athena (SQL Query Engine)"
+    },
+
+    realTimeScenario: {
+      problem: "Business needs quick insights from data stored in S3 without loading into warehouse",
+      wrongApproach: [
+        "Loading data into Redshift for every query",
+        "Scanning full data without filters",
+        "Ignoring cost while querying"
+      ],
+      correctApproach: "Use Athena to run SQL queries directly on S3 data with partitioning to reduce cost and improve performance"
+    },
+
+    services: [
+      {
+        name: "AWS Athena",
+        type: "Serverless Query Engine",
+        icon: "🔍",
+        whatItDoes: [
+          "Runs SQL queries directly on S3 data",
+          "Does not require infrastructure setup",
+          "Charges based on data scanned"
+        ],
+        whyUse: [
+          "Quick ad-hoc analysis",
+          "No need to move data",
+          "Cost-effective for selective queries"
+        ],
+        interviewLine: "Athena is used to query data directly from S3 using SQL without moving data"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create table in Athena", command: "CREATE EXTERNAL TABLE sales (id INT, name STRING, amount INT) LOCATION 's3://morphex-data-lake/processed/sales/';" },
+      { step: 2, action: "Run query", command: "SELECT * FROM sales WHERE amount > 1000;" },
+      { step: 3, action: "Use partition filter", command: "SELECT * FROM sales WHERE year=2025 AND month=04;" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is AWS Athena?", answer: "AWS Athena is a serverless query engine used to run SQL queries directly on data stored in S3" },
+      { question: "Why use Athena?", answer: "It allows quick analysis without moving data and charges only for data scanned" },
+      { question: "How Athena charges?", answer: "Athena charges based on the amount of data scanned during query execution" },
+      { question: "How to reduce Athena cost?", answer: "Use partitioning, filtering, and columnar formats like Parquet to reduce data scanned" },
+      { question: "Athena vs Redshift?", answer: "Athena is serverless and used for ad-hoc queries, while Redshift is a data warehouse for high-performance analytics" },
+      { question: "What happens without partitioning?", answer: "Athena scans full dataset, leading to higher cost and slower performance" },
+      { question: "What file formats are best for Athena?", answer: "Columnar formats like Parquet or ORC are best for performance and cost optimization" },
+      { question: "Real project example?", answer: "We used Athena to analyze processed data in S3 with partition filters, reducing query cost significantly" },
+      { question: "Can Athena query raw data?", answer: "Yes, but it is recommended to query processed or curated data for better performance" },
+      { question: "When to use Athena?", answer: "When quick analysis is needed without loading data into a warehouse" }
+    ],
+
+    commonMistakes: [
+      "Querying without filters",
+      "Not using partitioning",
+      "Using CSV instead of Parquet",
+      "Running unnecessary queries"
+    ],
+
+    memoryTrick: {
+      line: "Query where data lives",
+      flow: "S3 -> Athena"
+    },
+
+    finalInterviewStatement: "In our pipeline, we use Athena to query processed data directly from S3 using partitioning and optimized formats to reduce cost and improve performance"
+  },
+
+  'aws-flow-6': {
+    title: "AATMA FLOW 6: Automation (Event-Driven Pipeline)",
+    subtitle: "No Manual Work, System Runs Itself",
+    icon: "⚡",
+    difficulty: "Advanced",
+    duration: "~55 min",
+    ready: true,
+
+    objective: "Understand how to automate data pipelines using AWS Lambda and event-driven architecture",
+
+    coreConcept: {
+      thinking: "Don't run pipeline manually, trigger it automatically",
+      awsMapping: "S3 Event -> Lambda -> Glue Job"
+    },
+
+    realTimeScenario: {
+      problem: "Data pipeline is running manually which causes delays and human dependency",
+      wrongApproach: [
+        "Running Glue jobs manually",
+        "Using cron jobs without real-time triggers",
+        "No automation in pipeline"
+      ],
+      correctApproach: "Use event-driven architecture where S3 triggers Lambda, which then triggers Glue job automatically"
+    },
+
+    services: [
+      {
+        name: "AWS Lambda",
+        type: "Serverless Compute",
+        icon: "λ",
+        whatItDoes: [
+          "Executes code without managing servers",
+          "Triggers based on events",
+          "Integrates with multiple AWS services"
+        ],
+        whyUse: [
+          "No infrastructure management",
+          "Automatic scaling",
+          "Real-time processing"
+        ],
+        interviewLine: "Lambda is used to trigger Glue jobs automatically when new data arrives in S3"
+      },
+      {
+        name: "S3 Event Notification",
+        type: "Event Trigger",
+        icon: "🔔",
+        whatItDoes: [
+          "Detects file upload in S3",
+          "Triggers Lambda function"
+        ],
+        whyUse: [
+          "Real-time pipeline triggering",
+          "Removes manual dependency"
+        ],
+        interviewLine: "We configure S3 events to trigger Lambda when new files arrive"
+      },
+      {
+        name: "AWS Glue",
+        type: "ETL",
+        icon: "🔧",
+        whatItDoes: [
+          "Processes incoming data"
+        ],
+        whyUse: [
+          "Automated ETL execution"
+        ],
+        interviewLine: "Glue job is triggered by Lambda for automated data processing"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create Lambda function", command: "Purpose: Trigger Glue job" },
+      { step: 2, action: "Write Lambda code", command: "import boto3\n\ndef lambda_handler(event, context):\n    client = boto3.client('glue')\n    client.start_job_run(JobName='morphex-glue-job')" },
+      { step: 3, action: "Configure S3 trigger", command: "Trigger Lambda on file upload" },
+      { step: 4, action: "Test pipeline", command: "Upload file → Lambda triggers → Glue job runs" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is AWS Lambda?", answer: "AWS Lambda is a serverless compute service that runs code in response to events without managing servers" },
+      { question: "Why use Lambda in pipeline?", answer: "Lambda helps automate pipeline by triggering processes based on events like file upload" },
+      { question: "What is event-driven architecture?", answer: "It is a design where system reacts to events automatically instead of manual triggers" },
+      { question: "How does S3 trigger Lambda?", answer: "S3 event notification is configured to invoke Lambda when a file is uploaded" },
+      { question: "How do you trigger Glue job automatically?", answer: "We use Lambda to call Glue job using AWS SDK when triggered by S3 event" },
+      { question: "Lambda vs EC2?", answer: "Lambda is serverless and event-driven, while EC2 requires server management" },
+      { question: "What are Lambda limitations?", answer: "Limited execution time, memory constraints, and not suitable for long-running jobs" },
+      { question: "Real project example?", answer: "We configured S3 to trigger Lambda on file upload, which automatically triggered Glue job for processing" },
+      { question: "Why not manual pipeline?", answer: "Manual pipelines are slow, error-prone, and not scalable" },
+      { question: "What happens when file arrives?", answer: "S3 triggers Lambda, which then triggers Glue job to process data" }
+    ],
+
+    commonMistakes: [
+      "Running pipelines manually",
+      "Not using event triggers",
+      "Poor error handling in Lambda",
+      "Using Lambda for long-running jobs"
+    ],
+
+    memoryTrick: {
+      line: "Event comes, system runs",
+      flow: "S3 -> Lambda -> Glue"
+    },
+
+    finalInterviewStatement: "In our pipeline, we implemented event-driven architecture where S3 triggers Lambda on file arrival, and Lambda automatically triggers Glue job for processing"
+  },
+
+  'aws-flow-7': {
+    title: "AATMA FLOW 7: Control System (Security + Cost + Monitoring)",
+    subtitle: "Control Everything or System Fails",
+    icon: "🛡️",
+    difficulty: "Advanced",
+    duration: "~55 min",
+    ready: true,
+
+    objective: "Understand how to secure AWS pipeline, optimize cost, and monitor system for production readiness",
+
+    coreConcept: {
+      thinking: "Build pipeline is easy, controlling it is real engineering",
+      awsMapping: "IAM + Cost Optimization + Monitoring"
+    },
+
+    realTimeScenario: {
+      problem: "Pipeline is working but is insecure, costly, and lacks monitoring",
+      wrongApproach: [
+        "Giving full access permissions",
+        "Ignoring cost usage",
+        "No logging or monitoring setup"
+      ],
+      correctApproach: "Implement IAM roles with least privilege, optimize cost using lifecycle policies, and monitor system using logs and alerts"
+    },
+
+    services: [
+      {
+        name: "IAM (Identity and Access Management)",
+        type: "Security",
+        icon: "🔐",
+        whatItDoes: [
+          "Manages user access and permissions",
+          "Controls which service can access resources"
+        ],
+        whyUse: [
+          "Secure pipeline",
+          "Follow least privilege principle"
+        ],
+        interviewLine: "We use IAM roles with least privilege to secure access between services"
+      },
+      {
+        name: "AWS CloudWatch",
+        type: "Monitoring",
+        icon: "📊",
+        whatItDoes: [
+          "Tracks logs and metrics",
+          "Monitors performance of services",
+          "Creates alerts for failures"
+        ],
+        whyUse: [
+          "Detect failures early",
+          "Monitor pipeline health"
+        ],
+        interviewLine: "CloudWatch is used to monitor logs and set alerts for pipeline failures"
+      },
+      {
+        name: "S3 Lifecycle Policy",
+        type: "Cost Optimization",
+        icon: "💰",
+        whatItDoes: [
+          "Moves data to cheaper storage classes",
+          "Deletes old data automatically"
+        ],
+        whyUse: [
+          "Reduce storage cost",
+          "Manage data lifecycle efficiently"
+        ],
+        interviewLine: "We use S3 lifecycle policies to move old data to cheaper storage and reduce cost"
+      }
+    ],
+
+    practicalSteps: [
+      { step: 1, action: "Create IAM Role", command: "Allow Glue/Lambda to access S3 securely" },
+      { step: 2, action: "Attach policies", command: "S3 read/write permissions with limited access" },
+      { step: 3, action: "Enable CloudWatch logs", command: "Track Glue and Lambda execution" },
+      { step: 4, action: "Set S3 lifecycle policy", command: "Move data to Glacier after 30 days" }
+    ],
+
+    interviewQuestions: [
+      { question: "What is IAM?", answer: "IAM is a service used to manage access and permissions for AWS resources" },
+      { question: "What is least privilege principle?", answer: "It means giving only required permissions to users or services, nothing extra" },
+      { question: "How do you secure S3?", answer: "Using IAM roles, bucket policies, and restricting public access" },
+      { question: "What is CloudWatch?", answer: "CloudWatch is used for monitoring logs, metrics, and setting alerts in AWS" },
+      { question: "Why monitoring is important?", answer: "It helps detect failures, debug issues, and maintain system health" },
+      { question: "How to reduce AWS cost?", answer: "Use lifecycle policies, partitioning, and efficient data formats like Parquet" },
+      { question: "What is S3 lifecycle policy?", answer: "It automatically moves or deletes data based on rules to reduce storage cost" },
+      { question: "Real project example?", answer: "We used IAM roles for secure access, CloudWatch for monitoring, and lifecycle policies to reduce S3 storage cost" },
+      { question: "What happens without IAM?", answer: "System becomes insecure and vulnerable to unauthorized access" },
+      { question: "What happens without monitoring?", answer: "Failures go unnoticed and debugging becomes difficult" }
+    ],
+
+    commonMistakes: [
+      "Giving full access permissions",
+      "Ignoring cost optimization",
+      "Not setting up monitoring",
+      "No alert system for failures"
+    ],
+
+    memoryTrick: {
+      line: "Secure it, monitor it, optimize it",
+      flow: "IAM -> CloudWatch -> Cost Control"
+    },
+
+    finalInterviewStatement: "In our pipeline, we secured resources using IAM roles with least privilege, monitored system using CloudWatch logs and alerts, and optimized cost using S3 lifecycle policies and partitioning"
+  },
+
+  'aws-premium-project': {
+    title: "End-to-End AWS Data Engineering Pipeline",
+    subtitle: "From Raw Data to Business Insights",
+    icon: "🏆",
+    difficulty: "Advanced",
+    duration: "~90 min",
+    ready: true,
+    isProject: true,
+
+    objective: "Build a complete AWS data pipeline from ingestion to analytics with automation, security, and cost optimization",
+
+    coreConcept: {
+      thinking: "All 7 flows combined into one production pipeline",
+      awsMapping: "Oracle -> DMS -> S3 -> Glue -> Redshift -> Athena -> Lambda -> SNS"
+    },
+
+    architectureDiagram: {
+      title: "AWS Data Pipeline Architecture",
+      flowText: "Oracle -> DMS -> S3 (raw) -> Glue -> S3 (processed) -> Redshift -> Athena -> Lambda -> SNS",
+      nodes: [
+        { id: "1", name: "Oracle", type: "source" },
+        { id: "2", name: "DMS", type: "ingestion" },
+        { id: "3", name: "S3 Raw", type: "storage" },
+        { id: "4", name: "Glue", type: "processing" },
+        { id: "5", name: "S3 Processed", type: "storage" },
+        { id: "6", name: "Redshift", type: "warehouse" },
+        { id: "7", name: "Athena", type: "query" },
+        { id: "8", name: "Lambda", type: "automation" },
+        { id: "9", name: "SNS", type: "notification" }
+      ]
+    },
+
+    stepCards: [
+      { step: 1, title: "Data Ingestion", description: "Ingest data from Oracle using DMS into S3 raw layer", services: ["DMS", "S3"], output: "Raw data stored in S3" },
+      { step: 2, title: "Data Organization", description: "Organize data into raw, processed, and curated layers with partitioning", services: ["S3"], output: "Structured data lake" },
+      { step: 3, title: "Data Processing", description: "Use Glue to clean, transform, and process raw data", services: ["Glue"], output: "Processed data in S3" },
+      { step: 4, title: "Data Storage", description: "Load processed data into Redshift using COPY command", services: ["Redshift"], output: "Data available for analytics" },
+      { step: 5, title: "Data Query", description: "Query data directly using Athena for quick analysis", services: ["Athena"], output: "Insights generated" },
+      { step: 6, title: "Automation", description: "Trigger Glue jobs automatically using Lambda on file arrival", services: ["Lambda"], output: "Automated pipeline" },
+      { step: 7, title: "Notification", description: "Send alerts using SNS on success or failure", services: ["SNS"], output: "Real-time alerts" },
+      { step: 8, title: "Monitoring & Control", description: "Monitor logs using CloudWatch and secure using IAM", services: ["CloudWatch", "IAM"], output: "Secure and monitored system" }
+    ],
+
+    keyFeatures: [
+      "Incremental Data Load using Glue Job Bookmark",
+      "SCD Type 2 implementation",
+      "Partitioned data in S3",
+      "Automated pipeline using Lambda triggers",
+      "Monitoring using CloudWatch",
+      "Notifications using SNS",
+      "Cost optimization using lifecycle policies"
+    ],
+
+    interviewQuestions: [
+      { question: "Explain your end-to-end project", answer: "In our project, we ingested data from Oracle using DMS into S3 raw layer, processed it using Glue with incremental logic, stored it in Redshift, queried using Athena, and automated the pipeline using Lambda with SNS notifications and CloudWatch monitoring" },
+      { question: "How did you implement incremental load?", answer: "We used Glue job bookmarks to process only new data instead of full load" },
+      { question: "How did you handle slowly changing data?", answer: "We implemented SCD Type 2 to track historical changes in data" },
+      { question: "How did you optimize performance?", answer: "We used partitioning in S3, Parquet format, and optimized Redshift using sort and distribution keys" },
+      { question: "How did you automate pipeline?", answer: "We used S3 event triggers to invoke Lambda, which then triggered Glue jobs" }
+    ],
+
+    memoryTrick: {
+      line: "Store -> Process -> Load -> Query -> Automate -> Control",
+      flow: "S3 -> Glue -> Redshift -> Athena -> Lambda -> IAM"
+    },
+
+    finalInterviewStatement: "We built an end-to-end AWS data pipeline where data was ingested into S3, processed using Glue, stored in Redshift, queried using Athena, automated using Lambda, and monitored using CloudWatch with SNS alerts"
+  }
+
+};

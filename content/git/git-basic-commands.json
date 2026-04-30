@@ -1,0 +1,264 @@
+{
+  "id": "git-basic-commands",
+  "title": "Git Basic Commands",
+  "icon": "⚙️",
+  "difficulty": "Beginner",
+  "duration": "60 min",
+  "description": "Essential commands for daily Git work",
+  "prerequisites": ["git-workflow-core"],
+  "nextTopics": [],
+  "content": {
+    "comicStory": {
+      "title": "The Chef's Recipe Management",
+      "panels": [
+        {
+          "image": "👨‍🍳",
+          "text": "Chef manages recipes. Old way: Write on paper, lose track of changes, can't share with team!"
+        },
+        {
+          "image": "😰",
+          "text": "No history of modifications. Chaos in the kitchen!"
+        },
+        {
+          "image": "📝",
+          "text": "With Git commands: git add (prepare ingredients), git commit (save recipe version)"
+        },
+        {
+          "image": "📤",
+          "text": "git push (share with team), git pull (get team updates)"
+        },
+        {
+          "image": "📚",
+          "text": "git log (recipe history), git diff (compare versions)"
+        },
+        {
+          "image": "✨",
+          "text": "Now: Track all changes, share instantly, see complete history, debug recipe problems!"
+        }
+      ],
+      "twist": "Git commands = Your kitchen management system! Each command has a specific job!",
+      "lesson": "Master these commands = Master Git! Use them together for smooth workflow!"
+    },
+    "deepDive": {
+      "whatItIs": "Git basic commands are the essential tools for daily development: staging changes (git add), saving versions (git commit), syncing with remote (git push/pull/fetch), and viewing history (git log/diff/show). These commands form the foundation of all Git workflows.",
+      "whyItMatters": "Without these commands, you can't save changes, collaborate with teams, or track project history. They're used hundreds of times daily by developers worldwide. Mastering them is essential for professional development.",
+      "whereUsed": [
+        "Daily development: add → commit → push workflow",
+        "Team collaboration: pull updates, push changes",
+        "Debugging: use log and diff to find issues",
+        "Code review: check changes before committing",
+        "History tracking: view who changed what and when"
+      ],
+      "visualExamples": [
+        {
+          "title": "git add - Staging Changes",
+          "description": "Prepare changes for commit",
+          "diagram": "git add file.txt      # Add specific file\ngit add .             # Add all files\ngit add *.js          # Add all JS files\ngit add -A            # Add all changes\n\nMoves: Working Directory → Staging Area"
+        },
+        {
+          "title": "git commit - Save Changes",
+          "description": "Create permanent snapshot",
+          "diagram": "git commit -m \"Add feature\"     # Commit with message\ngit commit -am \"Update\"         # Commit all tracked\ngit commit --amend              # Amend last commit\n\nCreates: Permanent snapshot in Local Repo"
+        },
+        {
+          "title": "git push/pull - Sync with Remote",
+          "description": "Share and get updates",
+          "diagram": "git push origin main    # Upload to remote\ngit pull origin main    # Download + merge\ngit fetch origin        # Download only\n\npush: Local → Remote\npull: Remote → Local (with merge)\nfetch: Remote → Local (no merge)"
+        },
+        {
+          "title": "git log/diff - View History",
+          "description": "Track changes and debug",
+          "diagram": "git log --oneline      # Compact history\ngit diff                # Show unstaged changes\ngit diff --staged       # Show staged changes\ngit show abc123         # Show specific commit\n\nUse for: Debugging, tracking, reviewing"
+        }
+      ],
+      "keyPoints": [
+        "git add: Stage changes (Working → Staging)",
+        "git commit: Save permanently (Staging → Local Repo)",
+        "git push: Upload to remote (Local → Remote)",
+        "git pull: Download + merge (Remote → Local)",
+        "git fetch: Download only (safer than pull)",
+        "git log: View commit history",
+        "git diff: Show changes between versions",
+        "Always check git status before committing"
+      ]
+    },
+    "interactiveQA": [
+      {
+        "question": "What does 'git add' do?",
+        "answer": "Stages changes for commit.",
+        "explanation": "git add moves changes from Working Directory to Staging Area, preparing them for commit. Doesn't save permanently yet. Example: git add file.txt or git add .",
+        "memoryTrick": "git add = Stage changes 📝"
+      },
+      {
+        "question": "What does 'git commit' do?",
+        "answer": "Saves staged changes permanently with a message.",
+        "explanation": "git commit creates a permanent snapshot, records author and timestamp, generates unique commit ID, and saves to local history. Example: git commit -m \"Add feature\"",
+        "memoryTrick": "git commit = Save permanently 💾"
+      },
+      {
+        "question": "What does 'git push' do?",
+        "answer": "Uploads local commits to remote repository.",
+        "explanation": "git push uploads commits to GitHub/GitLab, updates remote repository, shares with team, and creates cloud backup. Example: git push origin main",
+        "memoryTrick": "git push = Upload to remote 📤"
+      },
+      {
+        "question": "What does 'git pull' do?",
+        "answer": "Fetches and merges remote changes.",
+        "explanation": "git pull downloads remote changes and merges into current branch, updating local repository. Combines fetch + merge. Example: git pull origin main",
+        "memoryTrick": "git pull = Download + Merge 📥"
+      },
+      {
+        "question": "What's the difference between 'git fetch' and 'git pull'?",
+        "answer": "fetch downloads only, pull downloads and merges.",
+        "explanation": "git fetch downloads changes without merging (safe, no conflicts). git pull downloads and merges automatically (may cause conflicts). fetch is safer!",
+        "memoryTrick": "fetch = Download, pull = Download+Merge 🔄"
+      },
+      {
+        "question": "What does 'git log' show?",
+        "answer": "Commit history with author, date, and message.",
+        "explanation": "git log shows: commit ID, author name/email, date/time, and commit message. Useful for tracking changes, debugging, and finding commits. Use --oneline for compact view.",
+        "memoryTrick": "git log = History 📚"
+      }
+    ],
+    "codingChallenge": {
+      "title": "Git Commands Workflow",
+      "scenario": "You're working on a data engineering project. Simulate the complete Git command workflow: modify files, check status, stage with git add, commit with message, push to remote, and view history.",
+      "dataset": {
+        "tables": [
+          {
+            "name": "commands",
+            "columns": ["command", "purpose", "stage"],
+            "sampleData": [
+              ["git add", "Stage changes", "Working → Staging"],
+              ["git commit", "Save changes", "Staging → Local"],
+              ["git push", "Upload changes", "Local → Remote"],
+              ["git log", "View history", "Read-only"]
+            ]
+          }
+        ]
+      },
+      "problem": "Create a class that simulates Git commands: modify file, add, commit, push, and view log.",
+      "expectedOutput": "Modified: app.js\nStaged: 1 file\nCommitted: Add login function\nPushed: Success\nHistory: 1 commit",
+      "hints": [
+        "Track files in different stages: working, staged, committed, remote",
+        "modify() adds to working files",
+        "add() moves to staged",
+        "commit() saves to commits list",
+        "push() uploads to remote",
+        "log() shows commit history"
+      ],
+      "solution": "class GitCommands:\n    def __init__(self):\n        self.working_files = []\n        self.staged_files = []\n        self.commits = []\n        self.remote_commits = []\n    \n    def modify(self, filename, changes):\n        self.working_files.append({'file': filename, 'changes': changes})\n        print(f\"Modified: {filename}\")\n    \n    def add(self, filename):\n        for file in self.working_files:\n            if file['file'] == filename:\n                self.staged_files.append(file)\n                print(f\"Staged: {len(self.staged_files)} file\")\n                break\n    \n    def commit(self, message):\n        commit = {\n            'message': message,\n            'files': self.staged_files.copy()\n        }\n        self.commits.append(commit)\n        self.staged_files.clear()\n        print(f\"Committed: {message}\")\n    \n    def push(self):\n        self.remote_commits.extend(self.commits)\n        self.commits.clear()\n        print(\"Pushed: Success\")\n    \n    def log(self):\n        print(f\"History: {len(self.remote_commits)} commit\")\n        for commit in self.remote_commits:\n            print(f\"  - {commit['message']}\")\n\n# Usage\ngit = GitCommands()\ngit.modify(\"app.js\", \"Added login function\")\ngit.add(\"app.js\")\ngit.commit(\"Add login function\")\ngit.push()\ngit.log()",
+      "explanation": "This simulates Git commands: modify() creates changes, add() stages them, commit() saves with message, push() uploads to remote, log() shows history. In real Git: git add, git commit -m, git push, git log."
+    },
+    "quiz": [
+      {
+        "question": "What does 'git add' do?",
+        "options": [
+          "Deletes files",
+          "Stages changes for commit",
+          "Pushes to remote",
+          "Shows history"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git add stages changes, moving them from Working Directory to Staging Area. Prepares files for commit but doesn't save permanently yet.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git commit' do?",
+        "options": [
+          "Stages files",
+          "Saves staged changes permanently with message",
+          "Uploads to remote",
+          "Shows diff"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git commit saves staged changes permanently in Local Repository with a commit message. Creates a snapshot that can be reverted to anytime.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git push' do?",
+        "options": [
+          "Downloads changes",
+          "Uploads local commits to Remote Repository",
+          "Stages files",
+          "Shows log"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git push uploads commits from Local Repository to Remote Repository (GitHub/GitLab), sharing work with team and creating cloud backup.",
+        "difficulty": "easy"
+      },
+      {
+        "question": "What does 'git pull' do?",
+        "options": [
+          "Only downloads",
+          "Fetches and merges remote changes",
+          "Stages files",
+          "Shows history"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git pull fetches remote changes and merges them into current branch, updating local repository. Combines fetch + merge in one command.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Difference between 'git fetch' and 'git pull'?",
+        "options": [
+          "Same thing",
+          "fetch = download only, pull = download + merge",
+          "fetch is faster",
+          "pull is safer"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git fetch downloads changes without merging (safe, no conflicts). git pull downloads and merges automatically (may cause conflicts). fetch is safer for reviewing changes first!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What does 'git log' show?",
+        "options": [
+          "Current changes",
+          "Commit history with author, date, and message",
+          "Staged files",
+          "Remote URL"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git log shows commit history including: commit ID, author name/email, date/time, and commit message. Useful for tracking changes and debugging.",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What does 'git diff' show?",
+        "options": [
+          "Commit history",
+          "Differences between file versions",
+          "Remote URL",
+          "Branch list"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git diff shows line-by-line differences: added lines (green +), removed lines (red -), and modified files. Use before committing to review changes!",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Best practice before pushing?",
+        "options": [
+          "Nothing needed",
+          "Always pull first to get latest changes",
+          "Delete files",
+          "Change branch"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Always pull before pushing: 1) git pull origin main, 2) resolve conflicts if any, 3) git push origin main. Prevents conflicts and keeps in sync!",
+        "difficulty": "hard"
+      },
+      {
+        "question": "What does 'git show' do?",
+        "options": [
+          "Shows all commits",
+          "Shows detailed info about specific commit",
+          "Shows branches",
+          "Shows remote"
+        ],
+        "correctAnswer": 1,
+        "explanation": "git show displays detailed information about a specific commit: author, date, message, and changes made. Example: git show abc123",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

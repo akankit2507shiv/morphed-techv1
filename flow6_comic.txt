@@ -1,0 +1,81 @@
+    comic: `📖 1
+Your ETL pipeline is working great! 🎉
+But there's a problem...
+
+Every day at 9 AM:
+- New sales file arrives in S3
+- You manually trigger Glue job
+- Wait for processing
+- Then run Athena queries
+- Finally update dashboard
+
+This takes 30 minutes of manual work daily! 😫
+
+📖 2
+😰 Problems with Manual Pipeline:
+- Need to check S3 every hour for new files
+- Forget to run job → data delayed
+- Weekend/holiday → no one to run it
+- Multiple files → run job multiple times
+- Human error → wrong job triggered
+- Not scalable for real-time needs
+
+📖 3
+🤔 Solution
+
+Event-Driven Automation!
+
+Concept: File arrives → Automatic processing
+
+AWS Services:
+1️⃣ S3 Event → Triggers on file upload
+2️⃣ Lambda → Lightweight automation
+3️⃣ EventBridge → Event routing
+4️⃣ Step Functions → Workflow orchestration
+
+📖 4
+⚡ Event-Driven Flow:
+
+Step 1: File uploaded to S3
+  ↓ (S3 Event Notification)
+Step 2: Lambda function triggered
+  ↓ (Starts Glue Job)
+Step 3: Glue processes data
+  ↓ (Completion Event)
+Step 4: Lambda updates Athena
+  ↓ (Notification)
+Step 5: SNS sends email "Data Ready!"
+
+All happens in 5 minutes, AUTOMATICALLY! 🚀
+
+📖 5
+✨ Real-World Example:
+
+Before (Manual):
+- 9:00 AM - Check S3
+- 9:05 AM - Start Glue job
+- 9:20 AM - Job completes
+- 9:25 AM - Run Athena
+- 9:30 AM - Update dashboard
+Total: 30 min + manual effort
+
+After (Automated):
+- 9:00 AM - File arrives
+- 9:05 AM - Everything done automatically!
+Total: 5 min, ZERO manual work ✨
+
+📖 6
+💡 Aha Moment:
+
+Manual Pipeline = Slow + Error-prone 🐌
+- Requires human intervention
+- Delays in processing
+- Can't scale
+
+Event-Driven = Fast + Reliable 🚀
+- Fully automatic
+- Real-time processing
+- Scales infinitely
+- Works 24/7
+
+Real-world: S3 Event → Lambda → Glue → SNS → Dashboard (All Automatic!)`,

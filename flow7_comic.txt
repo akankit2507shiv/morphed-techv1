@@ -1,0 +1,89 @@
+    comic: `📖 1
+Your automated pipeline is running perfectly! 🎉
+Files arrive → Process → Load → Dashboard
+
+Everything works... until it doesn't! 😱
+
+One day:
+- Dashboard shows no data
+- Business team complains
+- You have NO IDEA what went wrong!
+
+📖 2
+😰 Problems without Monitoring:
+- Glue job failed at 3 AM (you didn't know)
+- S3 file was corrupted (no alert)
+- Lambda ran out of memory (silent failure)
+- Redshift query timed out (no notification)
+- Cost suddenly increased 5x (discovered after bill!)
+- No logs to debug issues 🤷
+
+📖 3
+🤔 Solution
+
+Monitoring + Logging + Alerts!
+
+AWS CloudWatch provides:
+1️⃣ Logs → Track everything
+2️⃣ Metrics → Monitor performance
+3️⃣ Alarms → Get notified
+4️⃣ Dashboards → Visualize health
+
+📖 4
+🛡️ CloudWatch Components:
+
+📊 CloudWatch Logs:
+- Glue job logs
+- Lambda execution logs
+- Error messages
+- Debug information
+
+📈 CloudWatch Metrics:
+- Job duration
+- Data processed
+- Error count
+- Cost tracking
+
+🚨 CloudWatch Alarms:
+IF Glue job fails → Send SNS email
+IF cost > $100 → Alert team
+IF Lambda errors > 10 → Notify
+
+📖 5
+✨ Production-Ready Pipeline:
+
+Normal Flow:
+S3 → Glue → Redshift → Dashboard
+     ↓
+CloudWatch monitors everything
+
+When Error Occurs:
+1. CloudWatch detects failure
+2. Alarm triggers
+3. SNS sends email/SMS
+4. Team investigates logs
+5. Fix issue quickly
+
+Result:
+✔ Know exactly what's happening
+✔ Get alerted immediately on failures
+✔ Debug issues with logs
+✔ Track costs in real-time
+✔ 99.9% uptime!
+
+📖 6
+💡 Aha Moment:
+
+Without Monitoring = Blind System 😵
+- Don't know if pipeline is working
+- Discover failures too late
+- Can't debug issues
+- Business loses trust
+
+With Monitoring = Controlled System 🎯
+- Real-time visibility
+- Instant failure alerts
+- Easy debugging with logs
+- Proactive issue resolution
+
+Real-world: Pipeline + CloudWatch Logs + Alarms + SNS = Production-Ready!`,
