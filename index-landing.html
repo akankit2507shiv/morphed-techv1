@@ -49,12 +49,32 @@
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.03;
+      opacity: 0.08;
       pointer-events: none;
       z-index: 0;
       background-image: 
-        repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(124, 60, 255, 0.1) 100px, rgba(124, 60, 255, 0.1) 101px),
-        repeating-linear-gradient(-45deg, transparent, transparent 100px, rgba(0, 212, 255, 0.1) 100px, rgba(0, 212, 255, 0.1) 101px);
+        repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(124, 60, 255, 0.15) 80px, rgba(124, 60, 255, 0.15) 82px),
+        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(0, 212, 255, 0.15) 80px, rgba(0, 212, 255, 0.15) 82px);
+    }
+    
+    .trishul-pattern::before {
+      content: '🔱';
+      position: absolute;
+      font-size: 120px;
+      top: 10%;
+      left: 5%;
+      opacity: 0.05;
+      transform: rotate(-15deg);
+    }
+    
+    .trishul-pattern::after {
+      content: '🔱';
+      position: absolute;
+      font-size: 150px;
+      bottom: 15%;
+      right: 8%;
+      opacity: 0.06;
+      transform: rotate(25deg);
     }
     
     .gradient-text {
@@ -79,37 +99,13 @@
     }
 
     /* Premium Animations */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-
     @keyframes pulse-glow {
       0%, 100% { box-shadow: 0 0 20px rgba(255, 61, 129, 0.4); }
-      50% { box-shadow: 0 0 40px rgba(255, 61, 129, 0.8), 0 0 60px rgba(124, 60, 255, 0.6); }
-    }
-
-    @keyframes slide-up {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-float {
-      animation: float 3s ease-in-out infinite;
+      50% { box-shadow: 0 0 30px rgba(255, 61, 129, 0.6); }
     }
 
     .animate-pulse-glow {
       animation: pulse-glow 2s ease-in-out infinite;
-    }
-
-    .animate-slide-up {
-      animation: slide-up 0.6s ease-out forwards;
     }
 
     /* CTA Button Premium */
@@ -141,17 +137,7 @@
       box-shadow: 0 8px 30px rgba(255, 61, 129, 0.6), 0 0 40px rgba(124, 60, 255, 0.4);
     }
 
-    /* Salary Badge */
-    .salary-badge {
-      background: linear-gradient(135deg, #FFD700, #FFA500);
-      color: #000;
-      font-weight: 800;
-      padding: 0.5rem 1.5rem;
-      border-radius: 2rem;
-      display: inline-block;
-      box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
-      animation: pulse-glow 2s ease-in-out infinite;
-    }
+
 
     /* Stats Counter */
     .stat-card {
@@ -230,6 +216,34 @@
         padding: 2rem;
       }
     }
+
+    /* Sticky CTA Enhancements */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    #stickyCtaBar {
+      animation: slideUpBounce 0.5s ease-out;
+    }
+    
+    @keyframes slideUpBounce {
+      0% { transform: translateY(100%); }
+      60% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+
+    /* Card Hover Enhancements */
+    .glass-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(255, 61, 129, 0.2);
+    }
+
+    /* Horizontal Scroll Cards */
+    .snap-x { scroll-snap-type: x mandatory; }
+    .snap-start { scroll-snap-align: start; }
   </style>
 </head>
 <body class="text-white">
@@ -241,10 +255,30 @@
   <nav class="fixed top-0 w-full z-50 bg-dark/80 backdrop-blur-xl border-b border-white/10">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-          <span class="text-white font-bold text-xl">M</span>
+        <svg width="40" height="40" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="mpGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#7C3AED"/>
+              <stop offset="100%" stop-color="#06B6D4"/>
+            </linearGradient>
+            <filter id="mpGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#mpGlow)">
+            <path d="M20 90 L45 35 L70 65 L95 35 L120 90" stroke="url(#mpGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M70 65 L110 25" stroke="url(#mpGrad)" stroke-width="6" stroke-linecap="round"/>
+            <path d="M110 25 L98 28 M110 25 L106 37" stroke="url(#mpGrad)" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div>
+          <span class="text-2xl font-extrabold gradient-text">MORPHED TECH</span>
+          <div class="text-xs text-gray-400 -mt-1">Data Engineering Platform</div>
         </div>
-        <span class="text-2xl font-extrabold gradient-text">MORPHED TECH</span>
       </div>
       <div class="flex items-center gap-4" id="navButtons">
         <!-- Will be populated by JavaScript -->
@@ -255,24 +289,22 @@
   <!-- Hero Section -->
   <section class="relative pt-32 pb-20 px-6 overflow-hidden">
     <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12 animate-slide-up">
+      <div class="text-center mb-12">
         <!-- Trust Badge -->
         <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-6">
-          <span class="text-green-400">✓</span>
-          <span class="text-sm text-gray-300">Trusted by 500+ Data Engineers</span>
+          <span class="text-xl">🔱</span>
+          <span class="text-sm text-gray-300">Blessed by 500+ Data Engineers</span>
         </div>
 
         <!-- Main Headline -->
         <h1 class="hero-title text-5xl md:text-7xl font-black mb-6 leading-tight">
-          From <span class="text-gray-400">Confused Learner</span><br>
-          to <span class="gradient-text">Interview-Ready Data Engineer</span>
+          Crack Data Engineering Jobs<br>
+          <span class="gradient-text">Paying ₹25+ LPA</span>
         </h1>
 
         <!-- Subheadline -->
-        <p class="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto leading-relaxed">
-          Master SQL, PySpark, AWS, Real Projects,<br>
-          Resume Building, Mock Interviews and Job Preparation<br>
-          <span class="text-accent font-semibold">in one platform.</span>
+        <p class="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
+          Build real projects. Clear interviews. Get hired.
         </p>
 
         <!-- Salary Potential Badge -->
@@ -315,7 +347,7 @@
       </div>
 
       <!-- Before/After Transformation Visual -->
-      <div class="glass-card p-8 md:p-12 max-w-5xl mx-auto animate-slide-up" style="animation-delay: 0.2s;">
+      <div class="glass-card p-8 md:p-12 max-w-5xl mx-auto">
         <div class="grid md:grid-cols-2 gap-8 md:gap-12">
           <!-- Before Column -->
           <div class="relative">
@@ -351,7 +383,7 @@
 
           <!-- Arrow -->
           <div class="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-            <div class="w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center animate-pulse-glow">
+            <div class="w-16 h-16 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
               <span class="text-3xl">→</span>
             </div>
           </div>
@@ -397,6 +429,247 @@
     </div>
   </section>
 
+  <!-- Companies Section -->
+  <section class="py-16 px-6 relative">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-12">
+        <div class="inline-block px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-4">
+          <span class="text-green-400 font-semibold text-sm">✅ STUDENT PLACEMENTS</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-black mb-4">
+          <span class="gradient-text">Our Students Work At</span>
+        </h2>
+        <p class="text-xl text-gray-300">Top companies trust our training</p>
+      </div>
+
+      <div class="glass-card p-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+          <!-- TCS -->
+          <div class="flex items-center justify-center p-6 bg-white rounded-xl hover:scale-105 transition-all">
+            <div class="text-center w-full">
+              <div class="h-16 flex items-center justify-center mb-2">
+                <span class="text-3xl font-black" style="color: #0066cc;">TCS</span>
+              </div>
+              <p class="text-xs text-gray-600 font-medium">Tata Consultancy Services</p>
+            </div>
+          </div>
+          <!-- Wipro -->
+          <div class="flex items-center justify-center p-6 bg-white rounded-xl hover:scale-105 transition-all">
+            <div class="text-center w-full">
+              <div class="h-16 flex items-center justify-center mb-2">
+                <span class="text-3xl font-black" style="color: #7B68EE;">Wipro</span>
+              </div>
+              <p class="text-xs text-gray-600 font-medium">Wipro Limited</p>
+            </div>
+          </div>
+          <!-- IBM -->
+          <div class="flex items-center justify-center p-6 bg-white rounded-xl hover:scale-105 transition-all">
+            <div class="text-center w-full">
+              <div class="h-16 flex items-center justify-center mb-2">
+                <span class="text-3xl font-black" style="color: #0530AD;">IBM</span>
+              </div>
+              <p class="text-xs text-gray-600 font-medium">International Business Machines</p>
+            </div>
+          </div>
+          <!-- LTIMindtree -->
+          <div class="flex items-center justify-center p-6 bg-white rounded-xl hover:scale-105 transition-all">
+            <div class="text-center w-full">
+              <div class="h-16 flex items-center justify-center mb-2">
+                <span class="text-2xl font-black" style="color: #00A651;">LTIMindtree</span>
+              </div>
+              <p class="text-xs text-gray-600 font-medium">LTI + Mindtree</p>
+            </div>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-white/10">
+          <div class="text-center">
+            <div class="text-3xl font-black gradient-text mb-1">500+</div>
+            <div class="text-sm text-gray-400">Students Placed</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-black gradient-text mb-1">₹25L</div>
+            <div class="text-sm text-gray-400">Highest Package</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-black gradient-text mb-1">4+</div>
+            <div class="text-sm text-gray-400">Top Companies</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Most Candidates Fail Section - CLEAN MODERN -->
+  <section class="py-20 px-6 relative">
+    <div class="max-w-6xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-16">
+        <div class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full mb-4">
+          <span class="text-red-400 font-semibold text-sm">⚠️ WHY 95% FAIL</span>
+        </div>
+        <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
+          <span class="text-red-400">6 Mistakes</span> Killing Your<br>
+          <span class="gradient-text">Data Engineering Career</span>
+        </h2>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto">
+          Which one is stopping YOU?
+        </p>
+      </div>
+
+      <!-- Clean Pain Points Grid -->
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <!-- Mistake 1 -->
+        <div class="glass-card p-8 border-l-4 border-red-500 hover:border-red-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">🚫</div>
+            <div>
+              <div class="text-red-400 text-xs font-bold mb-1">MISTAKE #1</div>
+              <h3 class="text-2xl font-black text-white">Weak SQL Skills</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            Can't solve window functions or CTEs.<br>
+            <span class="text-red-400 font-bold">Interview ends in 10 minutes.</span>
+          </p>
+          <div class="bg-red-500/10 border-l-2 border-red-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"I couldn't solve the SQL question. Interview ended."</p>
+          </div>
+        </div>
+
+        <!-- Mistake 2 -->
+        <div class="glass-card p-8 border-l-4 border-orange-500 hover:border-orange-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">📄</div>
+            <div>
+              <div class="text-orange-400 text-xs font-bold mb-1">MISTAKE #2</div>
+              <h3 class="text-2xl font-black text-white">Generic Resume</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            No projects, no numbers, no impact.<br>
+            <span class="text-orange-400 font-bold">ATS rejects you instantly.</span>
+          </p>
+          <div class="bg-orange-500/10 border-l-2 border-orange-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"100+ applications. Only 2 calls. Resume was the issue."</p>
+          </div>
+        </div>
+
+        <!-- Mistake 3 -->
+        <div class="glass-card p-8 border-l-4 border-yellow-500 hover:border-yellow-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">💔</div>
+            <div>
+              <div class="text-yellow-400 text-xs font-bold mb-1">MISTAKE #3</div>
+              <h3 class="text-2xl font-black text-white">Can't Explain Projects</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            Fumble when asked about your work.<br>
+            <span class="text-yellow-400 font-bold">Lose credibility instantly.</span>
+          </p>
+          <div class="bg-yellow-500/10 border-l-2 border-yellow-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"Couldn't structure my answer. Interviewer looked disappointed."</p>
+          </div>
+        </div>
+
+        <!-- Mistake 4 -->
+        <div class="glass-card p-8 border-l-4 border-purple-500 hover:border-purple-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">😰</div>
+            <div>
+              <div class="text-purple-400 text-xs font-bold mb-1">MISTAKE #4</div>
+              <h3 class="text-2xl font-black text-white">Interview Panic</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            Mind goes blank under pressure.<br>
+            <span class="text-purple-400 font-bold">Forget basic concepts.</span>
+          </p>
+          <div class="bg-purple-500/10 border-l-2 border-purple-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"I knew the answer but panicked. Couldn't speak."</p>
+          </div>
+        </div>
+
+        <!-- Mistake 5 -->
+        <div class="glass-card p-8 border-l-4 border-blue-500 hover:border-blue-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">📚</div>
+            <div>
+              <div class="text-blue-400 text-xs font-bold mb-1">MISTAKE #5</div>
+              <h3 class="text-2xl font-black text-white">No Real Practice</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            Watched 100 videos, built nothing.<br>
+            <span class="text-blue-400 font-bold">Can't write actual code.</span>
+          </p>
+          <div class="bg-blue-500/10 border-l-2 border-blue-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"Understood theory but couldn't code in the interview."</p>
+          </div>
+        </div>
+
+        <!-- Mistake 6 -->
+        <div class="glass-card p-8 border-l-4 border-pink-500 hover:border-pink-400 transition-all duration-300 group">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="text-4xl">💸</div>
+            <div>
+              <div class="text-pink-400 text-xs font-bold mb-1">MISTAKE #6</div>
+              <h3 class="text-2xl font-black text-white">Poor Negotiation</h3>
+            </div>
+          </div>
+          <p class="text-gray-300 text-base mb-4 leading-relaxed">
+            Accept first offer without negotiation.<br>
+            <span class="text-pink-400 font-bold">Leave ₹5-10L on table.</span>
+          </p>
+          <div class="bg-pink-500/10 border-l-2 border-pink-500/50 pl-4 py-2">
+            <p class="text-gray-400 text-sm italic">"Got ₹8 LPA. My friend got ₹15 LPA with same skills."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- The Solution - Clean -->
+      <div class="glass-card p-10 md:p-16 border-2 border-green-500/30 relative overflow-hidden mt-8">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10 text-center">
+          <div class="inline-block px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-6">
+            <span class="text-green-400 font-semibold text-sm">✓ THE SOLUTION</span>
+          </div>
+          <h3 class="text-3xl md:text-5xl font-black mb-6">
+            <span class="gradient-text">We Fix All 6 Problems</span>
+          </h3>
+          <p class="text-xl text-gray-300 max-w-2xl mx-auto mb-10">
+            Transform from struggling candidate to confident professional
+          </p>
+
+          <div class="grid md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto">
+            <div class="bg-white/5 rounded-2xl p-6 hover:bg-white/10 transition-all">
+              <div class="text-4xl mb-3">💪</div>
+              <h4 class="text-lg font-bold text-white mb-2">Master Core Skills</h4>
+              <p class="text-sm text-gray-400">SQL + Python + PySpark</p>
+            </div>
+            <div class="bg-white/5 rounded-2xl p-6 hover:bg-white/10 transition-all">
+              <div class="text-4xl mb-3">🎯</div>
+              <h4 class="text-lg font-bold text-white mb-2">Build Real Projects</h4>
+              <p class="text-sm text-gray-400">7 industry-level projects</p>
+            </div>
+            <div class="bg-white/5 rounded-2xl p-6 hover:bg-white/10 transition-all">
+              <div class="text-4xl mb-3">🤖</div>
+              <h4 class="text-lg font-bold text-white mb-2">Practice Interviews</h4>
+              <p class="text-sm text-gray-400">AI mock interviews</p>
+            </div>
+          </div>
+
+          <a href="student-login.html?tab=signup" class="inline-block px-10 py-5 cta-button text-white font-black rounded-xl text-xl">
+            🚀 Fix These Problems Now
+          </a>
+          <p class="text-sm text-gray-500 mt-4">500+ students already transformed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
   <!-- Pricing Section -->
   <section id="pricing" class="py-20 px-6 relative">
     <div class="max-w-7xl mx-auto">
@@ -406,7 +679,7 @@
           <span class="text-primary font-semibold text-sm">💰 LIMITED TIME OFFER</span>
         </div>
         <h2 class="text-4xl md:text-5xl font-black mb-4">
-          <span class="gradient-text">Launch Offer</span> - First 100 Students Only
+          <span class="gradient-text">Launch Offer</span> - First 54 Students Only
         </h2>
         <p class="text-xl text-gray-300">Invest in your future. Start earning ₹25+ LPA</p>
       </div>
@@ -440,14 +713,15 @@
       </div>
 
       <!-- Pricing Card -->
-      <div class="max-w-2xl mx-auto">
-        <div class="pricing-card relative z-10">
-          <!-- Popular Badge -->
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <div class="px-6 py-2 bg-gradient-to-r from-primary to-secondary rounded-full text-white font-bold text-sm shadow-lg">
-              🔥 MOST POPULAR
-            </div>
+      <div class="max-w-2xl mx-auto relative pt-6">
+        <!-- Popular Badge -->
+        <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 z-20">
+          <div class="px-6 py-2 bg-gradient-to-r from-primary to-secondary rounded-full text-white font-bold text-sm shadow-lg">
+            🔥 MOST POPULAR
           </div>
+        </div>
+        
+        <div class="pricing-card relative z-10">
 
           <div class="relative z-10">
             <!-- Plan Name -->
@@ -459,11 +733,11 @@
             <!-- Pricing -->
             <div class="text-center mb-8">
               <div class="flex items-center justify-center gap-4 mb-4">
-                <div class="text-gray-500 line-through text-2xl">₹6,999</div>
-                <div class="text-6xl font-black gradient-text-gold">₹1,111</div>
+                <div class="text-gray-500 line-through text-2xl" id="regularPrice">₹11,111</div>
+                <div class="text-6xl font-black gradient-text-gold" id="offerPrice">₹7,777</div>
               </div>
               <div class="inline-block px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                <span class="text-green-400 font-bold">💰 Save ₹5,888 (84% OFF) - First 100 Students Only!</span>
+                <span class="text-green-400 font-bold" id="savingsBadge">💰 Save ₹3,334 (30% OFF) - First 54 Students Only!</span>
               </div>
             </div>
 
@@ -528,8 +802,8 @@
             </div>
 
             <!-- CTA Button -->
-            <a href="student-login.html?tab=signup" class="block w-full py-5 cta-button text-white font-black rounded-xl text-xl text-center mb-4">
-              🚀 Enroll Now at ₹1,111
+            <a href="student-login.html?tab=signup" class="block w-full py-5 cta-button text-white font-black rounded-xl text-xl text-center mb-4" id="enrollBtn">
+              🚀 Enroll Now at ₹7,777
             </a>
 
             <!-- Trust Badges -->
@@ -549,497 +823,69 @@
             </div>
           </div>
         </div>
-
-        <!-- Money Back Guarantee -->
-        <div class="text-center mt-8">
-          <div class="inline-block glass-card px-6 py-4">
-            <div class="flex items-center gap-3">
-              <span class="text-3xl">🛡️</span>
-              <div class="text-left">
-                <div class="text-white font-bold">7-Day Money Back Guarantee</div>
-                <div class="text-sm text-gray-400">Not satisfied? Get full refund, no questions asked</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- Why Most Candidates Fail Section -->
-  <section class="py-20 px-6 relative">
-    <div class="max-w-7xl mx-auto">
-      <!-- Section Header -->
-      <div class="text-center mb-16">
-        <div class="inline-block px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-full mb-4">
-          <span class="text-red-400 font-semibold text-sm">⚠️ REALITY CHECK</span>
-        </div>
-        <h2 class="text-4xl md:text-5xl font-black mb-4">
-          Why <span class="text-red-400">95% Candidates Fail</span><br>
-          <span class="gradient-text">Data Engineering Interviews</span>
-        </h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-          Most candidates make these critical mistakes. Are you making them too?
-        </p>
-      </div>
+  <!-- Spacing before footer -->
+  <div style="height:80px;"></div>
 
-      <!-- Pain Points Grid -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <!-- Mistake 1 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">❌</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">Weak SQL Skills</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Can't solve window functions, CTEs, or complex joins. Fail 80% of technical rounds in first 10 minutes.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"I couldn't solve the SQL question. Interview ended in 15 minutes."</div>
+  <!-- Footer -->
+  <footer style="background:rgba(5,8,22,0.95);border-top:1px solid rgba(255,255,255,0.07);padding:3rem 1.5rem;margin-top:6rem;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <svg width="40" height="40" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="mpGradFooter" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#7C3AED"/>
+                <stop offset="100%" stop-color="#06B6D4"/>
+              </linearGradient>
+              <filter id="mpGlowFooter" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="6" result="blur"/>
+                <feMerge>
+                  <feMergeNode in="blur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+            <g filter="url(#mpGlowFooter)">
+              <path d="M20 90 L45 35 L70 65 L95 35 L120 90" stroke="url(#mpGradFooter)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <path d="M70 65 L110 25" stroke="url(#mpGradFooter)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M110 25 L98 28 M110 25 L106 37" stroke="url(#mpGradFooter)" stroke-width="6" stroke-linecap="round"/>
+            </g>
+          </svg>
+          <div>
+            <div style="font-weight:800;font-size:1.125rem;background:linear-gradient(135deg,#7C3AED,#22D3EE);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">MORPHED TECH</div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:2px;">Data Engineering Career Platform</div>
           </div>
         </div>
-
-        <!-- Mistake 2 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">📄</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">Poor Resume</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Generic resume with no projects. ATS rejects before human sees it. No quantifiable achievements.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"Applied to 100+ jobs. Got only 2 calls. Resume was the problem."</div>
-          </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:2rem;font-size:0.875rem;color:rgba(255,255,255,0.5);">
+          <a href="student-login.html" style="color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Login</a>
+          <a href="student-login.html?tab=signup" style="color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Register</a>
+          <a href="#pricing" style="color:rgba(255,255,255,0.5);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Pricing</a>
         </div>
-
-        <!-- Mistake 3 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">🗣️</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">No Project Storytelling</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Can't explain projects clearly. Fumble when asked "Walk me through your project." Lose credibility instantly.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"Interviewer asked about my project. I couldn't structure my answer."</div>
-          </div>
-        </div>
-
-        <!-- Mistake 4 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">😰</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">Panic Under Pressure</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Nervous during interviews. Mind goes blank. Can't think clearly. Forget even basic concepts under stress.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"I knew the answer but panicked. Couldn't speak properly."</div>
-          </div>
-        </div>
-
-        <!-- Mistake 5 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">🎓</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">Only Theory, No Practice</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Watched 100 YouTube videos. Read 50 articles. But never built anything real. Can't apply knowledge.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"I understood theory but couldn't write actual code in interview."</div>
-          </div>
-        </div>
-
-        <!-- Mistake 6 -->
-        <div class="glass-card p-6 border-l-4 border-red-500 hover:scale-105 transition-transform duration-300">
-          <div class="flex items-start gap-4 mb-4">
-            <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span class="text-2xl">💼</span>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold text-white mb-2">Poor Salary Negotiation</h3>
-              <p class="text-gray-400 text-sm leading-relaxed">
-                Accept first offer without negotiation. Don't know market rates. Leave ₹5-10 lakhs on the table.
-              </p>
-            </div>
-          </div>
-          <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-            <div class="text-red-400 text-xs font-semibold mb-1">Real Impact:</div>
-            <div class="text-gray-300 text-sm">"I accepted ₹8 LPA. My friend with same skills got ₹15 LPA."</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- The Solution -->
-      <div class="glass-card p-8 md:p-12 border-2 border-primary/30 relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-        <div class="relative z-10">
-          <div class="text-center mb-8">
-            <div class="inline-block px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full mb-4">
-              <span class="text-green-400 font-semibold text-sm">✓ THE SOLUTION</span>
-            </div>
-            <h3 class="text-3xl md:text-4xl font-black mb-4">
-              <span class="gradient-text">We Fix All These Problems</span>
-            </h3>
-            <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-              Our proven system transforms struggling candidates into confident, interview-ready professionals
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-6">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <span class="text-3xl">💪</span>
-              </div>
-              <h4 class="text-lg font-bold text-white mb-2">Master SQL & Python</h4>
-              <p class="text-sm text-gray-400">15 SQL + 14 Python topics with hands-on practice</p>
-            </div>
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-violet-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <span class="text-3xl">🎯</span>
-              </div>
-              <h4 class="text-lg font-bold text-white mb-2">Build Real Projects</h4>
-              <p class="text-sm text-gray-400">7 industry projects for impressive portfolio</p>
-            </div>
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <span class="text-3xl">🤖</span>
-              </div>
-              <h4 class="text-lg font-bold text-white mb-2">AI Mock Interviews</h4>
-              <p class="text-sm text-gray-400">Practice until you're confident & calm</p>
-            </div>
-          </div>
-
-          <div class="text-center mt-8">
-            <a href="student-login.html?tab=signup" class="inline-block px-8 py-4 cta-button text-white font-bold rounded-xl text-lg">
-              🚀 Start Your Transformation Now
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Smart Interview Tips Section -->
-  <section class="py-20 px-6 relative bg-gradient-to-b from-transparent to-secondary/5">
-    <div class="max-w-7xl mx-auto">
-      <!-- Section Header -->
-      <div class="text-center mb-16">
-        <div class="inline-block px-4 py-2 bg-accent/20 border border-accent/30 rounded-full mb-4">
-          <span class="text-accent font-semibold text-sm">💡 INSIDER SECRETS</span>
-        </div>
-        <h2 class="text-4xl md:text-5xl font-black mb-4">
-          <span class="gradient-text">Smart Interview Hacks</span><br>
-          That Actually Work
-        </h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-          Simple psychological tricks that make interviewers say "YES"
-        </p>
-      </div>
-
-      <!-- Tips Grid -->
-      <div class="grid md:grid-cols-2 gap-8 mb-12">
-        <!-- Tip 1: Introduction -->
-        <div class="glass-card p-8 border-l-4 border-accent hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">👋</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">Perfect Introduction Formula</h3>
-              <div class="inline-block px-3 py-1 bg-accent/20 rounded-full text-accent text-xs font-bold mb-3">
-                ⏱️ 60 SECONDS
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div class="text-accent font-bold text-sm mb-2">❌ WRONG WAY:</div>
-              <p class="text-gray-400 text-sm italic">"Hi, I'm John. I have 3 years experience. I know SQL, Python..."</p>
-              <div class="text-red-400 text-xs mt-2">→ Boring, no impact, forgettable</div>
-            </div>
-            
-            <div class="bg-gradient-to-r from-green-500/10 to-cyan-500/10 rounded-lg p-4 border border-green-500/30">
-              <div class="text-green-400 font-bold text-sm mb-2">✓ RIGHT WAY:</div>
-              <p class="text-white text-sm font-medium mb-3">"I'm John, a Data Engineer who reduced ETL runtime by 60% at XYZ Corp using PySpark optimization. I specialize in building scalable data pipelines that process 10TB+ daily."</p>
-              <div class="text-green-400 text-xs">→ Specific, impressive, memorable</div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-accent/10 border border-accent/20 rounded-lg p-4">
-            <div class="text-accent font-bold text-sm mb-2">🎯 THE FORMULA:</div>
-            <div class="text-gray-300 text-sm space-y-1">
-              <div>1. Name + Role</div>
-              <div>2. One impressive achievement (with numbers)</div>
-              <div>3. Your specialty/strength</div>
-              <div>4. What you're looking for</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tip 2: Pause Before Answering -->
-        <div class="glass-card p-8 border-l-4 border-primary hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-pink-500 to-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">⏸️</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">The 3-Second Pause Trick</h3>
-              <div class="inline-block px-3 py-1 bg-primary/20 rounded-full text-primary text-xs font-bold mb-3">
-                🧠 PSYCHOLOGY HACK
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div class="text-red-400 font-bold text-sm mb-2">❌ COMMON MISTAKE:</div>
-              <p class="text-gray-400 text-sm">Answering immediately → Looks nervous, unprepared, desperate</p>
-            </div>
-            
-            <div class="bg-gradient-to-r from-green-500/10 to-cyan-500/10 rounded-lg p-4 border border-green-500/30">
-              <div class="text-green-400 font-bold text-sm mb-2">✓ SMART MOVE:</div>
-              <p class="text-white text-sm font-medium mb-2">Pause 3 seconds → Think → Then answer</p>
-              <div class="text-green-400 text-xs">→ Looks confident, thoughtful, composed</div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-primary/10 border border-primary/20 rounded-lg p-4">
-            <div class="text-primary font-bold text-sm mb-2">💡 WHY IT WORKS:</div>
-            <div class="text-gray-300 text-sm space-y-2">
-              <div>• Shows you think before speaking</div>
-              <div>• Demonstrates calmness under pressure</div>
-              <div>• Gives you time to structure answer</div>
-              <div>• Makes interviewer respect you more</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tip 3: Project Explanation -->
-        <div class="glass-card p-8 border-l-4 border-secondary hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">🏗️</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">STAR Method for Projects</h3>
-              <div class="inline-block px-3 py-1 bg-secondary/20 rounded-full text-secondary text-xs font-bold mb-3">
-                📊 STRUCTURED ANSWER
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-gradient-to-r from-secondary/10 to-primary/10 rounded-lg p-4 border border-secondary/30">
-              <div class="text-secondary font-bold text-sm mb-3">🎯 THE STAR FRAMEWORK:</div>
-              <div class="space-y-3">
-                <div>
-                  <div class="text-white font-semibold text-sm">S - Situation</div>
-                  <div class="text-gray-400 text-xs">"Company had 5TB daily data, ETL took 8 hours"</div>
-                </div>
-                <div>
-                  <div class="text-white font-semibold text-sm">T - Task</div>
-                  <div class="text-gray-400 text-xs">"Reduce processing time to under 2 hours"</div>
-                </div>
-                <div>
-                  <div class="text-white font-semibold text-sm">A - Action</div>
-                  <div class="text-gray-400 text-xs">"Implemented PySpark with partitioning + caching"</div>
-                </div>
-                <div>
-                  <div class="text-white font-semibold text-sm">R - Result</div>
-                  <div class="text-gray-400 text-xs">"Reduced to 1.5 hours (80% faster), saved $50K/year"</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-secondary/10 border border-secondary/20 rounded-lg p-4">
-            <div class="text-secondary font-bold text-sm mb-2">⚡ PRO TIP:</div>
-            <p class="text-gray-300 text-sm">Always include numbers (time saved, cost reduced, data volume, performance improvement)</p>
-          </div>
-        </div>
-
-        <!-- Tip 4: Unknown Questions -->
-        <div class="glass-card p-8 border-l-4 border-amber-400 hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">❓</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">Handle "I Don't Know"</h3>
-              <div class="inline-block px-3 py-1 bg-amber-400/20 rounded-full text-amber-400 text-xs font-bold mb-3">
-                🎭 HONESTY WINS
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div class="text-red-400 font-bold text-sm mb-2">❌ NEVER SAY:</div>
-              <p class="text-gray-400 text-sm italic">"I don't know" (and stay silent)</p>
-              <div class="text-red-400 text-xs mt-2">→ Looks unprepared, gives up easily</div>
-            </div>
-            
-            <div class="bg-gradient-to-r from-green-500/10 to-cyan-500/10 rounded-lg p-4 border border-green-500/30">
-              <div class="text-green-400 font-bold text-sm mb-2">✓ SMART RESPONSE:</div>
-              <p class="text-white text-sm font-medium mb-3">"I haven't worked with that specific tool, but I've used similar technologies like X and Y. I'm a quick learner and can pick it up within a week. How critical is this skill for the role?"</p>
-              <div class="text-green-400 text-xs">→ Honest + Shows learning ability + Asks smart question</div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-amber-400/10 border border-amber-400/20 rounded-lg p-4">
-            <div class="text-amber-400 font-bold text-sm mb-2">🎯 THE FORMULA:</div>
-            <div class="text-gray-300 text-sm space-y-1">
-              <div>1. Be honest (don't fake it)</div>
-              <div>2. Show related experience</div>
-              <div>3. Emphasize learning ability</div>
-              <div>4. Ask a smart follow-up question</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tip 5: Resume Communication -->
-        <div class="glass-card p-8 border-l-4 border-green-400 hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">📄</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">Resume Red Flags to Avoid</h3>
-              <div class="inline-block px-3 py-1 bg-green-400/20 rounded-full text-green-400 text-xs font-bold mb-3">
-                ⚠️ INSTANT REJECTION
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-3">
-            <div class="flex items-start gap-3">
-              <span class="text-red-400 text-lg flex-shrink-0">❌</span>
-              <div>
-                <div class="text-white font-semibold text-sm">"Responsible for data analysis"</div>
-                <div class="text-gray-400 text-xs">Too vague, no impact</div>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <span class="text-green-400 text-lg flex-shrink-0">✓</span>
-              <div>
-                <div class="text-white font-semibold text-sm">"Analyzed 2M+ customer records using SQL, identified $500K revenue opportunity"</div>
-                <div class="text-green-400 text-xs">Specific, quantified, impactful</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-green-400/10 border border-green-400/20 rounded-lg p-4">
-            <div class="text-green-400 font-bold text-sm mb-2">💡 POWER WORDS:</div>
-            <div class="flex flex-wrap gap-2 mt-3">
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Optimized</span>
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Reduced</span>
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Increased</span>
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Automated</span>
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Implemented</span>
-              <span class="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Designed</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tip 6: Salary Negotiation -->
-        <div class="glass-card p-8 border-l-4 border-gold hover:scale-105 transition-all duration-300">
-          <div class="flex items-start gap-4 mb-6">
-            <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span class="text-3xl">💰</span>
-            </div>
-            <div>
-              <h3 class="text-2xl font-black text-white mb-2">Salary Negotiation Basics</h3>
-              <div class="inline-block px-3 py-1 bg-gold/20 rounded-full text-gold text-xs font-bold mb-3">
-                💎 EARN MORE
-              </div>
-            </div>
-          </div>
-          
-          <div class="space-y-4">
-            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div class="text-red-400 font-bold text-sm mb-2">❌ NEVER SAY FIRST:</div>
-              <p class="text-gray-400 text-sm">"My current salary is ₹8 LPA"</p>
-              <div class="text-red-400 text-xs mt-2">→ Anchors negotiation to low number</div>
-            </div>
-            
-            <div class="bg-gradient-to-r from-green-500/10 to-cyan-500/10 rounded-lg p-4 border border-green-500/30">
-              <div class="text-green-400 font-bold text-sm mb-2">✓ SMART RESPONSE:</div>
-              <p class="text-white text-sm font-medium mb-3">"Based on my skills in PySpark, AWS, and 3 years experience, I'm looking for ₹15-18 LPA. What's the budget for this role?"</p>
-              <div class="text-green-400 text-xs">→ Sets high anchor, asks them to reveal first</div>
-            </div>
-          </div>
-
-          <div class="mt-6 bg-gold/10 border border-gold/20 rounded-lg p-4">
-            <div class="text-gold font-bold text-sm mb-2">🎯 GOLDEN RULES:</div>
-            <div class="text-gray-300 text-sm space-y-1">
-              <div>• Always negotiate (even if offer seems good)</div>
-              <div>• Research market rates on Glassdoor/AmbitionBox</div>
-              <div>• Ask for 20-30% more than current salary</div>
-              <div>• Never accept first offer immediately</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bonus Section -->
-      <div class="glass-card p-8 md:p-12 border-2 border-accent/30 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
-        <div class="relative z-10 text-center">
-          <div class="inline-block px-4 py-2 bg-accent/20 border border-accent/30 rounded-full mb-4">
-            <span class="text-accent font-semibold text-sm">🎁 BONUS</span>
-          </div>
-          <h3 class="text-3xl md:text-4xl font-black mb-4">
-            <span class="gradient-text">Get All These Tips + 50 More</span>
-          </h3>
-          <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Inside our course, you'll get complete interview preparation with AI mock interviews, resume templates, and salary negotiation scripts
-          </p>
-          <a href="student-login.html?tab=signup" class="inline-block px-8 py-4 cta-button text-white font-bold rounded-xl text-lg">
-            🚀 Access Full Interview Mastery
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.3);">
+          Built by
+          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer"
+            style="color:#7C3AED;font-weight:700;text-decoration:none;margin-left:4px;transition:color 0.2s;"
+            onmouseover="this.style.color='#22D3EE'" onmouseout="this.style.color='#7C3AED'">
+            Morphex Technologies
           </a>
         </div>
       </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.05);margin-top:2rem;padding-top:2rem;text-align:center;">
+        <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);">© 2024 Morphed Tech. All rights reserved.</p>
+      </div>
     </div>
-  </section>
+  </footer>
+
   <script>
-    // Set countdown to 3 days from now
-    const countdownDate = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
+    // Set countdown — date set dynamically after pricing loads, fallback to 3 days
+    window._countdownDate = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
 
     const countdown = setInterval(function() {
       const now = new Date().getTime();
-      const distance = countdownDate - now;
+      const distance = (window._countdownDate || new Date().getTime() + 86400000) - now;
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -1068,6 +914,48 @@
       });
     });
 
+    // Load dynamic pricing from admin CMS
+    function loadPricing() {
+      // First try localStorage (admin settings)
+      const savedPricing = JSON.parse(localStorage.getItem('landingPricing') || '{}');
+      
+      let reg = savedPricing.regularPrice || 11111;
+      let offer = savedPricing.offerPrice || 7777;
+      let seats = savedPricing.limitedSeats || 54;
+      let days = savedPricing.offerDays || 3;
+      
+      // Then try API (if backend is running)
+      fetch('/api/landing/pricing')
+        .then(r => r.json())
+        .then(data => {
+          reg = data.regular_price || reg;
+          offer = data.offer_price || offer;
+          seats = data.limited_seats || seats;
+          days = data.offer_days || days;
+          updatePricingUI(reg, offer, seats, days);
+        })
+        .catch(() => {
+          // Use localStorage or defaults
+          updatePricingUI(reg, offer, seats, days);
+        });
+    }
+    
+    function updatePricingUI(reg, offer, seats, days) {
+      const saved = reg - offer;
+      const pct = Math.round((saved / reg) * 100);
+      
+      document.getElementById('regularPrice').textContent = '₹' + reg.toLocaleString('en-IN');
+      document.getElementById('offerPrice').textContent = '₹' + offer.toLocaleString('en-IN');
+      document.getElementById('savingsBadge').textContent = `💰 Save ₹${saved.toLocaleString('en-IN')} (${pct}% OFF) - First ${seats} Students Only!`;
+      document.getElementById('enrollBtn').textContent = `🚀 Enroll Now at ₹${offer.toLocaleString('en-IN')}`;
+      
+      // Update countdown
+      window._countdownDate = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
+    }
+    
+    // Load pricing on page load
+    loadPricing();
+
     // Dynamic Navigation based on login status
     const navButtons = document.getElementById('navButtons');
     
@@ -1080,6 +968,8 @@
         Register Now
       </a>
     `;
+
+    // Sticky CTA Bar removed - was causing footer overlap
   </script>
 </body>
 </html>

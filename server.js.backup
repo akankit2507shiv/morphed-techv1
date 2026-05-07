@@ -9,21 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const rateLimit = require('express-rate-limit');
-
-// Rate limiting for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
-  message: 'Too many login attempts, please try again later',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5000',
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
@@ -66,6 +52,7 @@ function initDatabase() {
   db.run(`ALTER TABLE users ADD COLUMN experience_level TEXT`, () => {});
   db.run(`ALTER TABLE users ADD COLUMN learning_pace TEXT`, () => {});
   db.run(`ALTER TABLE users ADD COLUMN onboarding_completed BOOLEAN DEFAULT 0`, () => {});
+  db.run(`ALTER TABLE users ADD COLUMN plain_password TEXT`, () => {});
 
   db.run(`ALTER TABLE syllabus_access ADD COLUMN projects_access INTEGER DEFAULT 0`, () => {});
   db.run(`ALTER TABLE syllabus_access ADD COLUMN aws_access INTEGER DEFAULT 0`, () => {});
@@ -223,7 +210,7 @@ const authenticateAdmin = (req, res, next) => {
 // ==================== AUTH ROUTES ====================
 
 // Register new student
-app.post('/api/auth/register', authLimiter, async (req, res) => {
+app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
@@ -243,8 +230,8 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
       // Insert user
       db.run(
-        'INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)',
-        [name, email, hashedPassword, phone],
+        'INSERT INTO users (name, email, password, plain_password, phone) VALUES (?, ?, ?, ?, ?)',
+        [name, email, hashedPassword, password, phone],
         function(err) {
           if (err) {
             return res.status(500).json({ error: 'Registration failed' });
@@ -271,7 +258,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 });
 
 // Login
-app.post('/api/auth/login', authLimiter, async (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -512,8 +499,8 @@ app.put('/api/admin/students/:id/password', authenticateToken, authenticateAdmin
     const hashedPassword = await bcrypt.hash(password, 10);
     
     db.run(
-      'UPDATE users SET password = ? WHERE id = ? AND role = "student"',
-      [hashedPassword, studentId],
+      'UPDATE users SET password = ?, plain_password = ? WHERE id = ? AND role = "student"',
+      [hashedPassword, password, studentId],
       function(err) {
         if (err) {
           return res.status(500).json({ error: 'Password update failed' });

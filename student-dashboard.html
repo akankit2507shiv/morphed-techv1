@@ -52,6 +52,25 @@
     .tab-content-inner { display: none; }
     .tab-content-inner.active { display: block; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Horizontal Scroll */
+    .scroll-container { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scroll-behavior: smooth; scrollbar-width: thin; }
+    .scroll-container::-webkit-scrollbar { height: 6px; }
+    .scroll-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    .scroll-container::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #ff3d81, #7c3cff); border-radius: 10px; }
+    .scroll-card { min-width: 280px; flex-shrink: 0; }
+    
+    /* Micro Animations */
+    .hover-scale { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .hover-scale:hover { transform: scale(1.05); box-shadow: 0 20px 40px rgba(255,61,129,0.3); }
+    
+    /* Streak Animation */
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .streak-pulse { animation: pulse 2s infinite; }
+    
+    /* Progress Ring */
+    @keyframes fillProgress { from { stroke-dashoffset: 251; } to { stroke-dashoffset: 0; } }
+    .progress-ring { animation: fillProgress 2s ease-out forwards; }
   </style>
 </head>
 <body class="text-white">
@@ -59,9 +78,35 @@
   <!-- Header -->
   <header class="bg-dark/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold gradient-text">MORPHED TECH</h1>
+      <div class="flex items-center gap-3">
+        <svg width="32" height="32" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="mpGradDash" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#7C3AED"/>
+              <stop offset="100%" stop-color="#06B6D4"/>
+            </linearGradient>
+            <filter id="mpGlowDash" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#mpGlowDash)">
+            <path d="M20 90 L45 35 L70 65 L95 35 L120 90" stroke="url(#mpGradDash)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M70 65 L110 25" stroke="url(#mpGradDash)" stroke-width="6" stroke-linecap="round"/>
+            <path d="M110 25 L98 28 M110 25 L106 37" stroke="url(#mpGradDash)" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <h1 class="text-2xl font-extrabold gradient-text">MORPHED TECH</h1>
+      </div>
       <div class="flex items-center gap-4">
-        <span id="headerName" class="text-gray-300 text-sm font-medium"></span>
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400 text-sm">Welcome,</span>
+          <span id="headerName" class="text-white text-sm font-bold"></span>
+          <span id="userRole" class="hidden text-xs px-2 py-1 rounded-full"></span>
+        </div>
         <button onclick="logout()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition text-sm">Logout</button>
       </div>
     </div>
@@ -72,9 +117,74 @@
     <!-- Welcome Section -->
     <div class="mb-8">
       <h2 class="text-4xl font-black text-white mb-2">
-        Welcome back, Champion 👑 <span id="welcomeName" class="gradient-text"></span>!
+        Welcome back, <span id="welcomeName" class="gradient-text"></span>! 👑
       </h2>
-      <p class="text-gray-400 text-lg">Track your Data Engineering journey with focus, discipline, and consistency.</p>
+      <p class="text-gray-400 text-lg">Start your Data Engineering journey - Free content available below</p>
+    </div>
+
+    <!-- Free Content Section -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-2xl font-bold text-white">🎁 Free Content - Start Here</h3>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <!-- SQL Free Topics -->
+        <div class="glass-card p-6 hover-scale">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-2xl">🗄️</div>
+            <div>
+              <h4 class="text-xl font-bold text-white">SQL - Free Topics</h4>
+              <p class="text-sm text-gray-400">Start learning SQL basics</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <a href="sql-topic.html?topic=sql-joins" class="block p-3 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition">
+              <div class="flex items-center justify-between">
+                <span class="text-white font-semibold">✅ Topic 1: Joins</span>
+                <span class="text-green-400 text-sm">FREE</span>
+              </div>
+            </a>
+            <a href="sql-topic.html?topic=aggregations" class="block p-3 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition">
+              <div class="flex items-center justify-between">
+                <span class="text-white font-semibold">✅ Topic 2: Aggregations</span>
+                <span class="text-green-400 text-sm">FREE</span>
+              </div>
+            </a>
+          </div>
+          <button onclick="window.location.href='sql-free-topics.html'" class="w-full mt-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold rounded-lg hover:shadow-xl transition">
+            View Free Topics →
+          </button>
+        </div>
+
+        <!-- Python Free Topics -->
+        <div class="glass-card p-6 hover-scale">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center text-2xl">🐍</div>
+            <div>
+              <h4 class="text-xl font-bold text-white">Python - Free Topics</h4>
+              <p class="text-sm text-gray-400">Learn Python fundamentals</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <a href="python-topic.html?topic=python-basics" class="block p-3 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition">
+              <div class="flex items-center justify-between">
+                <span class="text-white font-semibold">✅ Topic 1: Lists</span>
+                <span class="text-green-400 text-sm">FREE</span>
+              </div>
+            </a>
+            <a href="python-topic.html?topic=python-basics" class="block p-3 bg-green-500/10 border border-green-500/30 rounded-lg hover:bg-green-500/20 transition">
+              <div class="flex items-center justify-between">
+                <span class="text-white font-semibold">✅ Topic 2: Dictionaries</span>
+                <span class="text-green-400 text-sm">FREE</span>
+              </div>
+            </a>
+          </div>
+          <button onclick="window.location.href='python-free-topics.html'" class="w-full mt-4 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-lg hover:shadow-xl transition">
+            View Free Topics →
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Mindset Hero Section -->
@@ -129,8 +239,8 @@
       <div class="tab-nav">
         <button onclick="showResumeTab(1)" id="resume-tab-1" class="active">1️⃣ Structure</button>
         <button onclick="showResumeTab(2)" id="resume-tab-2">2️⃣ Project Writing</button>
-        <button onclick="showResumeTab(3)" id="resume-tab-3">3️⃣ Examples <span id="resume-lock-3">🔒</span></button>
-        <button onclick="showResumeTab(4)" id="resume-tab-4">4️⃣ Mistakes <span id="resume-lock-4">🔒</span></button>
+        <button onclick="showResumeTab(3)" id="resume-tab-3">3️⃣ Examples <span id="resume-lock-3">✅</span></button>
+        <button onclick="showResumeTab(4)" id="resume-tab-4">4️⃣ Mistakes <span id="resume-lock-4">✅</span></button>
         <button onclick="showResumeTab(5)" id="resume-tab-5">5️⃣ Checklist <span id="resume-lock-5">🔒</span></button>
         <button onclick="showResumeTab(6)" id="resume-tab-6">6️⃣ Model Resume <span id="resume-lock-6">🔒</span></button>
       </div>
@@ -776,28 +886,98 @@
     </div>
 
     <!-- Existing Dashboard Stats -->
-    <div class="glass-card p-8">
-      <h3 class="text-2xl font-bold text-white mb-6">📊 Your Progress</h3>
+    <div class="glass-card p-8 mb-8">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h3 class="text-3xl font-black gradient-text">📊 Your Learning Progress</h3>
+          <p class="text-gray-400 text-sm mt-1">Track your journey to becoming a Data Engineer</p>
+        </div>
+        <div class="text-right">
+          <div class="text-4xl font-black gradient-text" id="overallPct">0%</div>
+          <div class="text-xs text-gray-400 mt-1">Overall</div>
+        </div>
+      </div>
       
-      <div class="grid md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
-          <div class="text-3xl mb-2">🗄️</div>
-          <p class="text-gray-400 text-sm">SQL Topics Done</p>
-          <p id="sqlDone" class="text-3xl font-bold text-white mt-1">0 / 15</p>
+      <!-- Progress Cards with Animated Bars -->
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <!-- SQL Progress -->
+        <div class="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-2xl p-6 hover:scale-105 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">🗄️</span>
+              </div>
+              <div>
+                <h4 class="text-xl font-bold text-white">SQL Mastery</h4>
+                <p class="text-sm text-gray-400">Database Fundamentals</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-black text-blue-300" id="sqlDone">0/15</div>
+              <div class="text-xs text-gray-400">Topics</div>
+            </div>
+          </div>
+          <!-- Animated Progress Bar -->
+          <div class="relative h-3 bg-white/10 rounded-full overflow-hidden">
+            <div id="sqlProgressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-xs text-gray-400">Start</span>
+            <span id="sqlPercent" class="text-xs font-bold text-blue-300">0%</span>
+            <span class="text-xs text-gray-400">Complete</span>
+          </div>
         </div>
-        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
-          <div class="text-3xl mb-2">🐍</div>
-          <p class="text-gray-400 text-sm">Python Topics Done</p>
-          <p id="pyDone" class="text-3xl font-bold text-white mt-1">0 / 14</p>
-        </div>
-        <div class="bg-white/5 border border-white/10 rounded-xl p-6">
-          <div class="text-3xl mb-2">🎯</div>
-          <p class="text-gray-400 text-sm">Overall Progress</p>
-          <p id="overallPct" class="text-3xl font-bold text-accent mt-1">0%</p>
+
+        <!-- Python Progress -->
+        <div class="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-6 hover:scale-105 transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                <span class="text-2xl">🐍</span>
+              </div>
+              <div>
+                <h4 class="text-xl font-bold text-white">Python for DE</h4>
+                <p class="text-sm text-gray-400">Programming Skills</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-black text-yellow-300" id="pyDone">0/14</div>
+              <div class="text-xs text-gray-400">Topics</div>
+            </div>
+          </div>
+          <!-- Animated Progress Bar -->
+          <div class="relative h-3 bg-white/10 rounded-full overflow-hidden">
+            <div id="pyProgressBar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-xs text-gray-400">Start</span>
+            <span id="pyPercent" class="text-xs font-bold text-yellow-300">0%</span>
+            <span class="text-xs text-gray-400">Complete</span>
+          </div>
         </div>
       </div>
 
+      <!-- Enrollment Status -->
       <div id="enrollmentStatus"></div>
+
+      <!-- Quick Stats Row -->
+      <div class="grid grid-cols-3 gap-4 mt-6">
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-all">
+          <div class="text-2xl mb-1">🔥</div>
+          <div id="streakDays" class="text-xl font-bold text-white">0</div>
+          <div class="text-xs text-gray-400">Day Streak</div>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-all">
+          <div class="text-2xl mb-1">⏱️</div>
+          <div id="totalTime" class="text-xl font-bold text-white">0h</div>
+          <div class="text-xs text-gray-400">Learning Time</div>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center hover:bg-white/10 transition-all">
+          <div class="text-2xl mb-1">🎯</div>
+          <div id="completedTopics" class="text-xl font-bold text-white">0</div>
+          <div class="text-xs text-gray-400">Completed</div>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -809,8 +989,18 @@
 
     if (!token) window.location.href = 'student-login.html';
 
-    document.getElementById('headerName').textContent = user.name || '';
-    document.getElementById('welcomeName').textContent = user.name || '';
+    // Set user name in header and welcome section
+    const userName = user.name || 'Student';
+    document.getElementById('headerName').textContent = userName;
+    document.getElementById('welcomeName').textContent = userName;
+    
+    // Show role badge if admin
+    if (user.role === 'admin') {
+      const roleEl = document.getElementById('userRole');
+      roleEl.textContent = 'Admin';
+      roleEl.className = 'text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-300 font-semibold';
+      roleEl.classList.remove('hidden');
+    }
 
     function logout() {
       localStorage.removeItem('token');
@@ -836,9 +1026,28 @@
       const pyDone = PY_TOPICS.filter(t => progress[t]).length;
       const total = SQL_TOPICS.length + PY_TOPICS.length;
       const done = sqlDone + pyDone;
-      document.getElementById('sqlDone').textContent = `${sqlDone} / 15`;
-      document.getElementById('pyDone').textContent = `${pyDone} / 14`;
+      
+      // Update counts
+      document.getElementById('sqlDone').textContent = `${sqlDone}/15`;
+      document.getElementById('pyDone').textContent = `${pyDone}/14`;
       document.getElementById('overallPct').textContent = Math.round((done / total) * 100) + '%';
+      
+      // Calculate percentages
+      const sqlPercent = Math.round((sqlDone / 15) * 100);
+      const pyPercent = Math.round((pyDone / 14) * 100);
+      
+      // Animate progress bars
+      setTimeout(() => {
+        document.getElementById('sqlProgressBar').style.width = sqlPercent + '%';
+        document.getElementById('pyProgressBar').style.width = pyPercent + '%';
+        document.getElementById('sqlPercent').textContent = sqlPercent + '%';
+        document.getElementById('pyPercent').textContent = pyPercent + '%';
+      }, 300);
+      
+      // Update quick stats
+      document.getElementById('streakDays').textContent = localStorage.getItem('streakDays') || '0';
+      document.getElementById('totalTime').textContent = (localStorage.getItem('totalTime') || '0') + 'h';
+      document.getElementById('completedTopics').textContent = done;
     }
 
     async function init() {
@@ -968,12 +1177,33 @@
 
     init();
 
+    // Update streak and gamification
+    function updateStreakAndGamification() {
+      const streak = parseInt(localStorage.getItem('streakDays') || '7');
+      const xp = parseInt(localStorage.getItem('xpPoints') || '2450');
+      
+      document.getElementById('streakCount').textContent = streak;
+      document.getElementById('xpPoints').textContent = xp.toLocaleString();
+      
+      // Update motivational text based on progress
+      const progress = parseInt(document.getElementById('overallPct').textContent);
+      document.getElementById('overallProgress').textContent = progress + '%';
+      
+      const progressRing = document.querySelector('.progress-ring');
+      if (progressRing) {
+        const offset = 251 - (251 * progress) / 100;
+        progressRing.style.strokeDashoffset = offset;
+      }
+    }
+    
+    setTimeout(updateStreakAndGamification, 500);
+
 // ==================== RESUME & INTERVIEW TAB FUNCTIONS ====================
 
 // Resume Tab Navigation
 function showResumeTab(tabNum) {
-  // Check if tab is locked (tabs 3-6 require payment)
-  if (tabNum > 2 && !hasFeatureAccess('resume', tabNum)) {
+  // First 4 tabs are FREE, tabs 5-6 require payment
+  if (tabNum > 4 && !hasFeatureAccess('resume', tabNum)) {
     showUpgradeModal('resume', tabNum);
     return;
   }
@@ -1024,7 +1254,8 @@ async function loadFeatureAccess() {
 
 // Check feature access
 function hasFeatureAccess(featureType, tabNumber) {
-  if (tabNumber <= 2) return true; // First 2 tabs always free
+  if (featureType === 'resume' && tabNumber <= 4) return true; // First 4 resume tabs free
+  if (featureType === 'interview' && tabNumber <= 2) return true; // First 2 interview tabs free
   if (!window.featureAccess || window.featureAccess.length === 0) return false;
   return window.featureAccess.some(f => f.feature_type === featureType && f.tab_number === tabNumber && f.access_granted === 1);
 }
@@ -1033,11 +1264,11 @@ function hasFeatureAccess(featureType, tabNumber) {
 function updateLockIcons() {
   console.log('Updating lock icons with feature access:', window.featureAccess);
   
-  // Resume tabs
+  // Resume tabs (first 4 are free)
   for (let i = 3; i <= 6; i++) {
     const lockEl = document.getElementById(`resume-lock-${i}`);
     if (lockEl) {
-      if (hasFeatureAccess('resume', i)) {
+      if (i <= 4 || hasFeatureAccess('resume', i)) {
         lockEl.textContent = '✅';
         lockEl.style.color = '#10b981';
       } else {
@@ -1047,7 +1278,7 @@ function updateLockIcons() {
     }
   }
   
-  // Interview tabs
+  // Interview tabs (first 2 are free)
   for (let i = 3; i <= 5; i++) {
     const lockEl = document.getElementById(`interview-lock-${i}`);
     if (lockEl) {

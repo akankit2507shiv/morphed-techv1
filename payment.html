@@ -38,7 +38,29 @@
   <!-- Header -->
   <header class="bg-dark/80 backdrop-blur-xl border-b border-white/10">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold gradient-text">MORPHED TECH</h1>
+      <div class="flex items-center gap-3">
+        <svg width="40" height="40" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="mpGradPayment" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#7C3AED"/>
+              <stop offset="100%" stop-color="#22D3EE"/>
+            </linearGradient>
+            <filter id="mpGlowPayment" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#mpGlowPayment)">
+            <path d="M20 90 L45 35 L70 65 L95 35 L120 90" stroke="url(#mpGradPayment)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M70 65 L110 25" stroke="url(#mpGradPayment)" stroke-width="6" stroke-linecap="round"/>
+            <path d="M110 25 L98 28 M110 25 L106 37" stroke="url(#mpGradPayment)" stroke-width="6" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <h1 class="text-2xl font-extrabold gradient-text">MORPHED TECH</h1>
+      </div>
       <a href="student-dashboard.html" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition text-sm">← Back to Dashboard</a>
     </div>
   </header>
@@ -119,13 +141,13 @@
         <div class="mt-8 pt-6 border-t border-white/10">
           <div class="flex items-center justify-between mb-2">
             <span class="text-gray-400">Regular Price</span>
-            <span class="text-gray-500 line-through text-xl">₹6,999</span>
+            <span class="text-gray-500 line-through text-xl">₹11,111</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-white font-bold text-lg">Special Offer Price</span>
-            <span class="text-accent font-black text-4xl">₹1,111</span>
+            <span class="text-accent font-black text-4xl">₹7,777</span>
           </div>
-          <p class="text-sm text-green-400 mt-2">🔥 Save ₹5,888 (84% OFF)</p>
+          <p class="text-sm text-green-400 mt-2">🔥 Save ₹3,334 (30% OFF)</p>
         </div>
       </div>
 
@@ -146,7 +168,7 @@
           <div class="bg-white/10 rounded-lg p-4 mb-4">
             <p class="text-sm text-gray-400 mb-2">UPI ID</p>
             <div class="flex items-center justify-between bg-white/5 rounded-lg p-3">
-              <p class="text-white font-mono font-bold" id="upiId">morphedtech@paytm</p>
+              <p class="text-white font-mono font-bold" id="upiId">7038376253@ybl</p>
               <button onclick="copyUPI()" class="px-3 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded text-sm transition">
                 Copy
               </button>
@@ -155,13 +177,13 @@
 
           <div class="bg-white/10 rounded-lg p-4 mb-4">
             <p class="text-sm text-gray-400 mb-2">Amount to Pay</p>
-            <p class="text-3xl font-black text-accent">₹1,111</p>
+            <p class="text-3xl font-black text-accent">₹7,777</p>
           </div>
 
           <div class="space-y-3 text-sm text-gray-300">
             <p>📌 <strong>Step 1:</strong> Copy the UPI ID above</p>
             <p>📌 <strong>Step 2:</strong> Open any UPI app (GPay, PhonePe, Paytm)</p>
-            <p>📌 <strong>Step 3:</strong> Send ₹1,111 to the UPI ID</p>
+            <p>📌 <strong>Step 3:</strong> Send ₹7,777 to the UPI ID</p>
             <p>📌 <strong>Step 4:</strong> Enter Transaction ID below</p>
           </div>
         </div>
@@ -216,10 +238,6 @@
         <div>
           <p class="font-bold text-white mb-2">❓ What if I face issues?</p>
           <p class="text-gray-400 text-sm">Contact support with your transaction ID for immediate help.</p>
-        </div>
-        <div>
-          <p class="font-bold text-white mb-2">❓ Can I get a refund?</p>
-          <p class="text-gray-400 text-sm">Yes, 7-day money-back guarantee if you're not satisfied.</p>
         </div>
       </div>
     </div>
@@ -305,11 +323,44 @@
     // Load UPI details from server
     async function loadPaymentDetails() {
       try {
-        const res = await fetch(`${API}/landing/pricing`);
-        const data = await res.json();
-        // You can update price dynamically if needed
+        const savedPricing = JSON.parse(localStorage.getItem('landingPricing') || '{}');
+        
+        let reg = savedPricing.regularPrice || 11111;
+        let offer = savedPricing.offerPrice || 7777;
+        
+        // Update all pricing displays
+        const saved = reg - offer;
+        const pct = Math.round((saved / reg) * 100);
+        
+        // Update Regular Price (strikethrough)
+        const regularPriceEl = document.querySelector('.line-through');
+        if (regularPriceEl) regularPriceEl.textContent = '₹' + reg.toLocaleString('en-IN');
+        
+        // Update Offer Price in pricing card (first occurrence)
+        const pricingCard = document.querySelector('.glass-card');
+        if (pricingCard) {
+          const offerPriceInCard = pricingCard.querySelectorAll('.text-accent')[0];
+          if (offerPriceInCard) offerPriceInCard.textContent = '₹' + offer.toLocaleString('en-IN');
+        }
+        
+        // Update Savings
+        const savingsEl = document.querySelector('.text-green-400');
+        if (savingsEl) savingsEl.textContent = `🔥 Save ₹${saved.toLocaleString('en-IN')} (${pct}% OFF)`;
+        
+        // Update Amount to Pay section
+        const amountSection = document.querySelector('.bg-white\\/10 .text-accent');
+        if (amountSection) amountSection.textContent = '₹' + offer.toLocaleString('en-IN');
+        
+        // Update Step 3 text
+        const steps = document.querySelectorAll('.space-y-3 p');
+        steps.forEach(step => {
+          if (step.textContent.includes('Step 3:')) {
+            step.innerHTML = `📌 <strong>Step 3:</strong> Send ₹${offer.toLocaleString('en-IN')} to the UPI ID`;
+          }
+        });
+        
       } catch(e) {
-        console.error('Failed to load pricing');
+        console.error('Failed to load pricing:', e);
       }
     }
 

@@ -1,0 +1,24 @@
+Variable Name,Current Value,File Location,Purpose/Usage,Environment,Severity,Recommended ENV Name
+API_BASE_URL,http://localhost:5000/api,Multiple HTML files,Backend API endpoint,Development,Critical,VITE_API_BASE_URL
+JWT_SECRET,your_super_secret_jwt_key_change_this_in_production,.env,JWT token signing,Production,Critical,JWT_SECRET
+ADMIN_EMAIL,!Mahadev007!@gmail.com,.env,Admin login email,Production,Critical,ADMIN_EMAIL
+ADMIN_PASSWORD,!Mahakal007!@,.env,Admin login password,Production,Critical,ADMIN_PASSWORD
+ADMIN_PASSWORD_HARDCODED,!Mahakal007!@,debug-api.html,Test admin password,Development,Critical,REMOVE_FILE
+UPI_ID,morphedtech@paytm,.env,Payment UPI ID,Production,High,UPI_ID
+UPI_NAME,Morphed Tech,.env,Payment display name,Production,Medium,UPI_NAME
+COURSE_PRICE,1111,.env,Course pricing,Production,High,COURSE_PRICE
+PORT,5000,.env,Server port,Production,Low,PORT
+DATABASE_PATH,./morphed-tech.db,server.js,SQLite database path,Production,High,DATABASE_PATH
+CORS_ORIGIN,*,server.js,CORS allowed origins,Production,Critical,CORS_ORIGIN
+DEFAULT_REGULAR_PRICE,11111,Multiple files,Landing page pricing,Production,Medium,DEFAULT_REGULAR_PRICE
+DEFAULT_OFFER_PRICE,3333,Multiple files,Landing page offer price,Production,Medium,DEFAULT_OFFER_PRICE
+DEFAULT_LIMITED_SEATS,54,Multiple files,Limited seats count,Production,Low,DEFAULT_LIMITED_SEATS
+FRONTEND_URL,http://localhost:3000,Not set,Frontend URL for CORS,Production,High,FRONTEND_URL
+SESSION_SECRET,Not set,Missing,Session encryption,Production,Critical,SESSION_SECRET
+SMTP_HOST,Not configured,Missing,Email service,Production,Medium,SMTP_HOST
+SMTP_PORT,Not configured,Missing,Email port,Production,Medium,SMTP_PORT
+SMTP_USER,Not configured,Missing,Email username,Production,Medium,SMTP_USER
+SMTP_PASSWORD,Not configured,Missing,Email password,Production,Medium,SMTP_PASSWORD
+SENTRY_DSN,Not configured,Missing,Error tracking,Production,Low,SENTRY_DSN
+ANALYTICS_ID,Not configured,Missing,Google Analytics,Production,Low,ANALYTICS_ID
+NODE_ENV,Not set,Missing,Environment mode,Production,High,NODE_ENV
