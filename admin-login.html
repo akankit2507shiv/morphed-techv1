@@ -3,137 +3,244 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <title>Admin Login - Morphed Tech</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#7C3AED',
-            secondary: '#A78BFA',
-            accent: '#06B6D4',
-            dark: '#1E1B4B',
-          }
-        }
-      }
-    }
-  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-      min-height: 100vh;
+    /* DOPAMINE PRO ADMIN UI */
+    :root {
+      --bg-1: #080912;
+      --bg-2: #0b1020;
+      --bg-3: #121827;
+      --panel: rgba(18, 22, 37, 0.82);
+      --border: rgba(255, 255, 255, 0.10);
+      --text: #f8fafc;
+      --muted: #a7b0c3;
+      --pink: #ff3d81;
+      --violet: #7c3cff;
+      --cyan: #00d4ff;
+      --lime: #b8ff3c;
+      --amber: #ffbf3c;
     }
-    
-    /* Toggle Switch */
-    .toggle { position: relative; display: inline-block; width: 50px; height: 26px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.1); border-radius: 26px; transition: 0.3s; border: 1px solid rgba(255, 255, 255, 0.2); }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-    input:checked + .slider { background: linear-gradient(135deg, #7C3AED, #06B6D4); border-color: transparent; }
-    input:checked + .slider:before { transform: translateX(24px); }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255, 61, 129, 0.5), transparent 35%),
+        radial-gradient(circle at 82% 6%, rgba(0, 212, 255, 0.45), transparent 32%),
+        radial-gradient(circle at 72% 82%, rgba(124, 60, 255, 0.48), transparent 38%),
+        linear-gradient(135deg, #050816 0%, #0b1020 48%, #070812 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      padding: 48px 40px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--pink), var(--violet), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradient-shift 4s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .label {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input::placeholder { color: var(--muted); }
+
+    .input:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--violet);
+      box-shadow: 0 0 0 4px rgba(124, 60, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, var(--pink), var(--violet), var(--cyan));
+      box-shadow: 0 4px 16px rgba(255, 61, 129, 0.4);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 61, 129, 0.5);
+    }
+
+    .btn-primary:hover::before { left: 100%; }
+
+    .logo-glow {
+      filter: drop-shadow(0 0 30px rgba(255, 61, 129, 0.6));
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { filter: drop-shadow(0 0 30px rgba(255, 61, 129, 0.6)); }
+      50% { filter: drop-shadow(0 0 40px rgba(124, 60, 255, 0.8)); }
+    }
+
+    .info-box {
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 24px;
+    }
+
+    .badge-success {
+      color: #071018;
+      background: linear-gradient(135deg, var(--lime), var(--cyan));
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .badge-error {
+      color: white;
+      background: rgba(255, 61, 129, 0.2);
+      border: 1px solid var(--pink);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .link {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .link:hover {
+      color: var(--violet);
+    }
   </style>
 </head>
-<body class="text-white">
+<body>
 
-  <div class="min-h-screen flex items-center justify-center px-4 py-12">
-    <div class="max-w-md w-full">
-      
-      <!-- Logo -->
-      <div class="text-center mb-8">
-        <div class="flex items-center justify-center mb-4">
-          <svg width="60" height="60" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
+    <div style="max-width: 480px; width: 100%;">
+
+      <!-- Logo Section -->
+      <div style="text-align: center; margin-bottom: 48px;">
+        <div class="logo-glow" style="display: inline-block; margin-bottom: 20px;">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="80" height="80" rx="20" fill="url(#admin-gradient)"/>
+            <path d="M40 25L50 35H45V50H35V35H30L40 25Z" fill="white"/>
+            <rect x="30" y="52" width="20" height="3" rx="1.5" fill="white"/>
             <defs>
-              <linearGradient id="mpGradAdmin" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#7C3AED"/>
-                <stop offset="100%" stop-color="#06B6D4"/>
+              <linearGradient id="admin-gradient" x1="0" y1="0" x2="80" y2="80">
+                <stop offset="0%" stop-color="#ff3d81"/>
+                <stop offset="50%" stop-color="#7c3cff"/>
+                <stop offset="100%" stop-color="#00d4ff"/>
               </linearGradient>
-              <filter id="mpGlowAdmin" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="6" result="blur"/>
-                <feMerge>
-                  <feMergeNode in="blur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
             </defs>
-            <g filter="url(#mpGlowAdmin)">
-              <path d="M20 90 L45 35 L70 65 L95 35 L120 90" stroke="url(#mpGradAdmin)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              <path d="M70 65 L110 25" stroke="url(#mpGradAdmin)" stroke-width="6" stroke-linecap="round"/>
-              <path d="M110 25 L98 28 M110 25 L106 37" stroke="url(#mpGradAdmin)" stroke-width="6" stroke-linecap="round"/>
-            </g>
           </svg>
         </div>
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-          MORPHED TECH
-        </h1>
-        <p class="text-gray-400 mt-2">Admin Portal</p>
+        <h1 class="gradient-text" style="font-size: 52px; font-weight: 900; margin-bottom: 8px; letter-spacing: -2px; line-height: 1;">ADMIN PORTAL</h1>
+        <p style="color: var(--muted); font-size: 16px; font-weight: 600;">Morphed Tech Management</p>
       </div>
 
-      <!-- Login Form -->
-      <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
-        
-        <!-- Admin/Student Switch -->
-        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 0.75rem;">
-          <span style="font-size: 0.9rem; font-weight: 600; color: #9CA3AF;">Student Login</span>
-          <label class="toggle" style="cursor: pointer;">
-            <input type="checkbox" id="loginModeSwitch" checked onchange="toggleLoginMode()">
-            <span class="slider"></span>
-          </label>
-          <span style="font-size: 0.9rem; font-weight: 600; color: #9CA3AF;">Admin Login</span>
-        </div>
-        
-        <form id="adminLoginForm" class="space-y-4">
+      <!-- Login Card -->
+      <div class="panel">
+
+        <form id="adminLoginForm" style="display: flex; flex-direction: column; gap: 20px;">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Admin Email</label>
-            <input type="email" id="adminEmail" placeholder="Enter admin email" required
-              class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder-gray-500">
+            <label class="label">Admin Email</label>
+            <input type="email" id="adminEmail" placeholder="Enter admin email" required class="input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-            <input type="password" id="adminPassword" placeholder="Enter password" required
-              class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder-gray-500">
+            <label class="label">Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter password" required class="input">
           </div>
-          <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg hover:shadow-xl transition">
-            Login as Admin
-          </button>
+          <button type="submit" class="btn-primary" style="margin-top: 8px;">Login as Admin</button>
         </form>
 
-        <!-- Message -->
-        <div id="message" class="mt-4 p-3 rounded-lg hidden"></div>
+        <!-- Message Box -->
+        <div id="message" style="display: none; margin-top: 24px;"></div>
 
-        <!-- Student Link (Hidden - use toggle instead) -->
-        <div class="mt-6 text-center" style="display: none;">
-          <a href="student-login.html" class="text-sm text-gray-400 hover:text-primary transition">
-            ← Student Login
-          </a>
+<!-- Student Link -->
+        <div style="margin-top: 32px; text-align: center; padding-top: 24px; border-top: 1px solid var(--border);">
+          <a href="student-login.html" class="link" style="font-size: 14px;">← Student Login</a>
         </div>
       </div>
 
+      <!-- Footer Text -->
+      <div style="text-align: center; margin-top: 32px; color: var(--muted); font-size: 13px;">
+        <p>Secure Admin Access • Premium Management</p>
+      </div>
     </div>
   </div>
 
   <script>
     const API_URL = 'https://kaal-morphed-tech.onrender.com/api';
 
-    // Toggle between Student and Admin login
-    function toggleLoginMode() {
-      const isAdmin = document.getElementById('loginModeSwitch').checked;
-      if (!isAdmin) {
-        window.location.href = 'student-login.html';
-      }
-    }
-
     function showMessage(text, type) {
       const messageDiv = document.getElementById('message');
       messageDiv.textContent = text;
-      messageDiv.className = `mt-4 p-3 rounded-lg ${type === 'success' ? 'bg-green-500/20 text-green-300 border border-green-500/50' : 'bg-red-500/20 text-red-300 border border-red-500/50'}`;
-      messageDiv.classList.remove('hidden');
-      setTimeout(() => messageDiv.classList.add('hidden'), 5000);
+      messageDiv.className = type === 'success' ? 'badge-success' : 'badge-error';
+      messageDiv.style.display = 'block';
+      setTimeout(() => messageDiv.style.display = 'none', 5000);
     }
 
     // Admin Login
@@ -166,8 +273,7 @@
           showMessage(data.error || 'Login failed', 'error');
         }
       } catch (error) {
-        console.error('Login error:', error);
-        showMessage('Server error: ' + error.message + '. Check console for details.', 'error');
+        showMessage('Server error. Please try again.', 'error');
       }
     });
 
@@ -176,8 +282,6 @@
     if (localStorage.getItem('token') && user.role === 'admin') {
       window.location.href = 'admin-dashboard.html';
     }
-    // Remove default credentials hint in production
-
   </script>
 
 </body>
