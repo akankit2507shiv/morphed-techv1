@@ -3,6 +3,8 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sqlite3 = require('sqlite3').verbose();
+const QRCode = require('qrcode');
+const { sendPaymentNotification } = require('./telegram-helper');
 require('dotenv').config();
 
 const app = express();
@@ -402,7 +404,7 @@ app.post('/api/enrollment/create', authenticateToken, (req, res) => {
 });
 
 // Confirm payment
-app.post('/api/enrollment/confirm-payment', authenticateToken, (req, res) => {
+app.post('/api/enrollment/confirm-payment', authenticateToken, async (req, res) => {
   const { enrollmentId, transactionId } = req.body;
 
   if (!transactionId) {
@@ -424,6 +426,24 @@ app.post('/api/enrollment/confirm-payment', authenticateToken, (req, res) => {
       if (this.changes === 0) {
         return res.status(404).json({ error: 'Enrollment not found' });
       }
+
+      // Get user details for Telegram notification
+      db.get('SELECT u.name, u.email, u.phone, e.payment_amount FROM users u JOIN enrollments e ON u.id = e.user_id WHERE e.id = ?', 
+        [enrollmentId], 
+        async (err, user) => {
+          if (!err && user) {
+            // Send Telegram notification
+            await sendPaymentNotification({
+              studentName: user.name,
+              studentEmail: user.email,
+              phone: user.phone,
+              amount: user.payment_amount,
+              transactionId: transactionId,
+              status: 'completed'
+            });
+          }
+        }
+      );
 
       res.json({
         message: 'Payment confirmed successfully! You now have access to all courses.',
@@ -914,6 +934,40 @@ app.post('/api/landing/pricing', authenticateToken, authenticateAdmin, (req, res
       res.json({ message: 'Pricing saved successfully' });
     }
   );
+});
+
+// ==================== UPI QR CODE ROUTE ====================
+
+// Generate UPI QR Code
+app.get('/api/payment/qr-code', async (req, res) => {
+  try {
+    const upiId = process.env.UPI_ID;
+    const upiName = process.env.UPI_NAME;
+    const amount = process.env.COURSE_PRICE;
+    
+    // UPI payment string format
+    const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('MORPHED TECH Course Payment')}`;
+    
+    // Generate QR code as data URL
+    const qrCodeDataURL = await QRCode.toDataURL(upiString, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    });
+    
+    res.json({
+      qrCode: qrCodeDataURL,
+      upiId: upiId,
+      upiName: upiName,
+      amount: amount
+    });
+  } catch (error) {
+    console.error('QR Code generation error:', error);
+    res.status(500).json({ error: 'Failed to generate QR code' });
+  }
 });
 
 // Start server
