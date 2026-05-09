@@ -970,6 +970,13 @@ app.get('/api/payment/qr-code', async (req, res) => {
   }
 });
 
+// Test Telegram notification
+app.get('/api/test-telegram', async (req, res) => {
+  const { sendTestNotification } = require('./telegram-helper');
+  const result = await sendTestNotification();
+  res.json(result);
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
