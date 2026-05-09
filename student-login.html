@@ -231,7 +231,7 @@
           localStorage.setItem('user', JSON.stringify(d.user));
           showMsg('✅ Login successful! Redirecting...', true);
           setTimeout(() => {
-            window.location.href = d.user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
+            window.location.href = d.user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard-new.html';
           }, 800);
         } else {
           showMsg(d.error || 'Login failed', false);
@@ -263,7 +263,7 @@
           localStorage.setItem('token', d.token);
           localStorage.setItem('user', JSON.stringify(d.user));
           showMsg('✅ Account created! Redirecting...', true);
-          setTimeout(() => window.location.href = 'student-dashboard.html', 800);
+          setTimeout(() => window.location.href = 'student-dashboard-new.html', 800);
         } else {
           showMsg(d.error || 'Registration failed', false);
           setLoading('signupBtn', false);
