@@ -513,7 +513,7 @@
           <td class="py-4 px-4">
             ${s.enrollment_id
               ? `<button onclick="openPayModal(${s.enrollment_id},'${s.payment_status||'pending'}',${s.payment_amount||0},'${s.transaction_id||''}')" class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs transition">Edit</button>`
-              : '<span class="text-gray-600 text-xs">No enrollment</span>'}
+              : `<button onclick="createEnrollmentForStudent(${s.id})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition">Add Payment</button>`}
           </td>
         </tr>
       `).join('');
@@ -558,6 +558,42 @@
       loadStats();
       renderPayments();
       alert('✅ Payment updated!');
+    }
+
+    async function createEnrollmentForStudent(userId) {
+      const amount = prompt('Enter payment amount (₹):', '7777');
+      const txnId = prompt('Enter transaction ID:', 'ADMIN_CREATED');
+      
+      if (!amount || !txnId) return;
+      
+      try {
+        // Create enrollment via admin
+        const response = await fetch(`${API}/admin/enrollments/create`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            payment_amount: parseFloat(amount),
+            payment_method: 'UPI',
+            payment_status: 'completed',
+            transaction_id: txnId
+          })
+        });
+        
+        if (response.ok) {
+          alert('✅ Payment record created!');
+          await loadStudents();
+          loadStats();
+          renderPayments();
+        } else {
+          alert('❌ Failed to create payment record');
+        }
+      } catch(e) {
+        alert('❌ Error: ' + e.message);
+      }
     }
 
     // ── ACCESS CONTROL ─────────────────────────────────────────────

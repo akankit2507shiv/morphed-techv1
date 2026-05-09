@@ -554,6 +554,27 @@ app.put('/api/admin/enrollments/:id', authenticateToken, authenticateAdmin, (req
   );
 });
 
+// Admin: Create enrollment for a student
+app.post('/api/admin/enrollments/create', authenticateToken, authenticateAdmin, (req, res) => {
+  const { user_id, payment_amount, payment_method, payment_status, transaction_id } = req.body;
+
+  db.run(
+    `INSERT INTO enrollments (user_id, payment_amount, payment_method, payment_status, transaction_id, payment_date) 
+     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+    [user_id, payment_amount, payment_method || 'UPI', payment_status || 'completed', transaction_id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to create enrollment' });
+      }
+
+      res.json({ 
+        message: 'Enrollment created successfully',
+        enrollmentId: this.lastID
+      });
+    }
+  );
+});
+
 // Admin: grant/revoke single module access quickly
 app.put('/api/admin/access/:userId', authenticateToken, authenticateAdmin, (req, res) => {
   const { module, value } = req.body;
