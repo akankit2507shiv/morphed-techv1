@@ -35,11 +35,7 @@ app.get('/learning-data.json', (req, res) => {
 });
 
 // Database setup
-const dbPath = process.env.NODE_ENV === 'production' 
-  ? '/opt/render/project/src/data/morphed-tech.db'
-  : './morphed-tech.db';
-
-const db = new sqlite3.Database(dbPath, (err) => {
+const db = new sqlite3.Database('./morphed-tech.db', (err) => {
   if (err) {
     console.error('Database connection error:', err);
   } else {
