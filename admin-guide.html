@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Step by Step Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #050816 0%, #0b1020 48%, #070812 100%);
+      min-height: 100vh; 
+      color: white;
+    }
+    .card { 
+      background: rgba(18, 22, 37, 0.9); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 1rem; 
+      padding: 2rem;
+      margin: 1rem 0;
+    }
+    .step { 
+      background: rgba(124, 60, 255, 0.1);
+      border-left: 4px solid #7c3cff;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0.5rem;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .warning { color: #f59e0b; }
+    .btn { 
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white; }
+    .btn-primary:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(255, 61, 129, 0.4); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.1); color: white; }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
+  </style>
+</head>
+<body class="p-8">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+      🚀 MORPHED TECH - Admin Dashboard Guide
+    </h1>
+    <p class="text-gray-400 mb-8">Follow these steps to access and test all admin modules</p>
+
+    <!-- System Status -->
+    <div class="card">
+      <h2 class="text-2xl font-bold mb-4">📊 System Status</h2>
+      <div id="status" class="space-y-2">
+        <p>⏳ Checking system status...</p>
+      </div>
+    </div>
+
+    <!-- Step 1: Login -->
+    <div class="step">
+      <h3 class="text-xl font-bold mb-3">Step 1: Admin Login</h3>
+      <p class="text-gray-300 mb-4">First, you need to login with admin credentials</p>
+      <div class="bg-black/30 p-4 rounded-lg mb-4">
+        <p class="text-sm text-gray-400">Email:</p>
+        <p class="text-white font-mono">admin@morphedtech.com</p>
+        <p class="text-sm text-gray-400 mt-2">Password:</p>
+        <p class="text-white font-mono">MorphedTech@2024!Secure</p>
+      </div>
+      <a href="http://localhost:5000/admin-login.html" target="_blank" class="btn btn-primary">
+        🔐 Go to Admin Login
+      </a>
+    </div>
+
+    <!-- Step 2: Dashboard -->
+    <div class="step">
+      <h3 class="text-xl font-bold mb-3">Step 2: Access Dashboard</h3>
+      <p class="text-gray-300 mb-4">After login, you'll be redirected to the admin dashboard</p>
+      <a href="http://localhost:5000/admin-dashboard.html" target="_blank" class="btn btn-secondary">
+        📊 Open Admin Dashboard
+      </a>
+    </div>
+
+    <!-- Step 3: Test Tabs -->
+    <div class="step">
+      <h3 class="text-xl font-bold mb-3">Step 3: Test All Tabs</h3>
+      <p class="text-gray-300 mb-4">Click each tab to verify it's working:</p>
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">👥 Students</p>
+          <p class="text-sm text-gray-400">View and manage all students</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">💳 Payments</p>
+          <p class="text-sm text-gray-400">View payment records</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">🔐 Numerology Access</p>
+          <p class="text-sm text-gray-400">Opens in new tab</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">🔐 Module Access</p>
+          <p class="text-sm text-gray-400">Control module permissions</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">📝 Resume & Interview</p>
+          <p class="text-sm text-gray-400">Feature access control</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">📚 Syllabus & Content</p>
+          <p class="text-sm text-gray-400">View all courses</p>
+        </div>
+        <div class="bg-black/30 p-4 rounded-lg">
+          <p class="font-bold">🎨 Landing Page CMS</p>
+          <p class="text-sm text-gray-400">Opens in new tab</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Browser Console -->
+    <div class="step">
+      <h3 class="text-xl font-bold mb-3">Step 4: Check Browser Console</h3>
+      <p class="text-gray-300 mb-4">Open browser developer tools to see detailed logs:</p>
+      <div class="bg-black/30 p-4 rounded-lg">
+        <p class="text-sm text-gray-400">Press:</p>
+        <p class="text-white font-mono">F12 or Cmd+Option+I (Mac) or Ctrl+Shift+I (Windows)</p>
+        <p class="text-sm text-gray-400 mt-2">Then click on "Console" tab</p>
+      </div>
+      <p class="text-sm text-gray-400 mt-4">You should see logs like:</p>
+      <div class="bg-black/30 p-4 rounded-lg mt-2 font-mono text-sm">
+        <p class="success">✅ Admin authenticated successfully</p>
+        <p class="text-cyan-400">🚀 Admin Dashboard Script Loading...</p>
+        <p class="success">✅ Loaded 6 students</p>
+        <p class="text-cyan-400">📂 Switching to tab: payments</p>
+      </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="card">
+      <h2 class="text-2xl font-bold mb-4">🔧 Troubleshooting</h2>
+      <div class="space-y-4">
+        <div>
+          <p class="font-bold text-yellow-400">❌ Tabs not clickable?</p>
+          <p class="text-gray-300">1. Clear browser cache (Cmd+Shift+R or Ctrl+Shift+R)</p>
+          <p class="text-gray-300">2. Check browser console for JavaScript errors</p>
+          <p class="text-gray-300">3. Make sure you're logged in as admin</p>
+        </div>
+        <div>
+          <p class="font-bold text-yellow-400">❌ Redirected to login page?</p>
+          <p class="text-gray-300">Your session expired. Login again with admin credentials.</p>
+        </div>
+        <div>
+          <p class="font-bold text-yellow-400">❌ Data not loading?</p>
+          <p class="text-gray-300">1. Check if server is running (should see "Server RUNNING" above)</p>
+          <p class="text-gray-300">2. Check browser console for API errors</p>
+          <p class="text-gray-300">3. Verify JWT token in localStorage</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card">
+      <h2 class="text-2xl font-bold mb-4">🔗 Quick Links</h2>
+      <div class="flex flex-wrap gap-4">
+        <a href="http://localhost:5000/" target="_blank" class="btn btn-secondary">🏠 Landing Page</a>
+        <a href="http://localhost:5000/admin-login.html" target="_blank" class="btn btn-secondary">🔐 Admin Login</a>
+        <a href="http://localhost:5000/admin-dashboard.html" target="_blank" class="btn btn-secondary">📊 Dashboard</a>
+        <a href="http://localhost:5000/admin-access-control.html" target="_blank" class="btn btn-secondary">🔐 Access Control</a>
+        <a href="http://localhost:5000/admin-landing-cms.html" target="_blank" class="btn btn-secondary">🎨 CMS</a>
+        <a href="http://localhost:5000/admin-diagnostic.html" target="_blank" class="btn btn-secondary">🔍 Diagnostic</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function checkStatus() {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = '<p class="text-gray-400">⏳ Checking system status...</p>';
+      
+      try {
+        // Check server
+        const response = await fetch('http://localhost:5000/api/landing/pricing');
+        if (response.ok) {
+          statusDiv.innerHTML += '<p class="success">✅ Server is running on http://localhost:5000</p>';
+        } else {
+          statusDiv.innerHTML += '<p class="error">❌ Server responded with error</p>';
+        }
+
+        // Check localStorage
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        
+        if (token && user) {
+          const userData = JSON.parse(user);
+          if (userData.role === 'admin') {
+            statusDiv.innerHTML += '<p class="success">✅ You are logged in as admin</p>';
+            statusDiv.innerHTML += '<p class="text-gray-400">   User: ' + userData.name + ' (' + userData.email + ')</p>';
+          } else {
+            statusDiv.innerHTML += '<p class="warning">⚠️  You are logged in but not as admin</p>';
+          }
+        } else {
+          statusDiv.innerHTML += '<p class="warning">⚠️  You are not logged in. Please login first.</p>';
+        }
+
+        // Check database
+        if (token) {
+          const statsResponse = await fetch('http://localhost:5000/api/admin/stats', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            statusDiv.innerHTML += '<p class="success">✅ Database connected</p>';
+            statusDiv.innerHTML += '<p class="text-gray-400">   Students: ' + stats.totalStudents + ' | Paid: ' + stats.paidStudents + ' | Revenue: ₹' + stats.totalRevenue + '</p>';
+          }
+        }
+
+      } catch (e) {
+        statusDiv.innerHTML += '<p class="error">❌ Error: ' + e.message + '</p>';
+      }
+    }
+
+    checkStatus();
+  </script>
+</body>
+</html>

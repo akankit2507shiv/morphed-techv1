@@ -522,7 +522,7 @@
     // ═══════════════════════════════════════════════════════════════
     // API CONFIGURATION
     // ═══════════════════════════════════════════════════════════════
-    const API = 'https://kaal-morphed-tech.onrender.com/api';
+    const API = window.location.origin + '/api';
 
     // Redirect if already logged in
     if (localStorage.getItem('token')) {

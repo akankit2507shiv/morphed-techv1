@@ -6,18 +6,9 @@
   <title>Admin Dashboard - Morphed Tech</title>
   <script>
     // IMMEDIATE AUTH CHECK - Before page loads
-    try {
-      const token = localStorage.getItem('token');
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      console.log('Auth check:', { hasToken: !!token, userRole: user.role });
-      if (!token || user.role !== 'admin') {
-        console.warn('Not authenticated as admin, redirecting...');
-        window.location.href = 'admin-login.html';
-      } else {
-        console.log('✅ Admin authenticated successfully');
-      }
-    } catch (e) {
-      console.error('Auth check error:', e);
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!token || user.role !== 'admin') {
       window.location.href = 'admin-login.html';
     }
   </script>
@@ -92,6 +83,7 @@
     <div class="flex gap-6 border-b border-white/10 mb-8 overflow-x-auto">
       <button onclick="showTab('students')" id="tab-students" class="tab-btn active pb-3 font-semibold text-secondary whitespace-nowrap">👥 Students</button>
       <button onclick="showTab('payments')" id="tab-payments" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">💳 Payments</button>
+      <button onclick="openNewPage('admin-access-control.html')" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🔐 Numerology Access</button>
       <button onclick="showTab('access')" id="tab-access" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🔐 Module Access</button>
       <button onclick="showTab('features')" id="tab-features" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📝 Resume & Interview</button>
       <button onclick="showTab('syllabus')" id="tab-syllabus" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📚 Syllabus & Content</button>
@@ -353,17 +345,10 @@
   </div>
 
   <script>
-    console.log('🚀 Admin Dashboard Script Loading...');
     const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    console.log('API Base:', API);
-    console.log('Token exists:', !!token);
-    console.log('User:', user);
-    if (!token || user.role !== 'admin') {
-      console.error('❌ Auth failed in main script');
-      window.location.href = 'admin-login.html';
-    }
+    if (!token || user.role !== 'admin') window.location.href = 'admin-login.html';
 
     let allStudents = [];
     const MODULES = [
@@ -383,12 +368,10 @@
     }
 
     function openNewPage(url) {
-      console.log('Opening new page:', url);
       window.open(url, '_blank');
     }
 
     async function showTab(name) {
-      console.log('📂 Switching to tab:', name);
       ['students','payments','access','features','syllabus'].forEach(t => {
         const content = document.getElementById('content-' + t);
         if (content) content.classList.add('hidden');
@@ -432,18 +415,12 @@
 
     // ── STUDENTS ───────────────────────────────────────────────────
     async function loadStudents() {
-      console.log('👥 Loading students...');
       try {
         const r = await fetch(`${API}/admin/students`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!r.ok) {
-          throw new Error(`HTTP ${r.status}: ${r.statusText}`);
-        }
         allStudents = await r.json();
-        console.log(`✅ Loaded ${allStudents.length} students`);
         renderStudents(allStudents);
       } catch(e) {
-        console.error('❌ Failed to load students:', e);
-        document.getElementById('studentsBody').innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Failed to load: ' + e.message + '</td></tr>';
+        document.getElementById('studentsBody').innerHTML = '<tr><td colspan="6" class="text-center py-8 text-red-400">Failed to load</td></tr>';
       }
     }
 
@@ -869,50 +846,11 @@
 
     // ── INIT ───────────────────────────────────────────────────────
     async function init() {
-      console.log('🎬 Initializing admin dashboard...');
-      try {
-        await loadStudents();
-        loadStats();
-        console.log('✅ Dashboard initialized successfully');
-      } catch (e) {
-        console.error('❌ Dashboard initialization error:', e);
-      }
+      await loadStudents();
+      loadStats();
     }
 
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-    
-    // Add click listeners to tabs as fallback
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('🔗 Setting up tab click listeners...');
-      const tabButtons = {
-        'tab-students': 'students',
-        'tab-payments': 'payments',
-        'tab-access': 'access',
-        'tab-features': 'features',
-        'tab-syllabus': 'syllabus'
-      };
-      
-      Object.keys(tabButtons).forEach(btnId => {
-        const btn = document.getElementById(btnId);
-        if (btn) {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('Tab clicked:', tabButtons[btnId]);
-            showTab(tabButtons[btnId]);
-          });
-          console.log('✅ Listener added to', btnId);
-        } else {
-          console.warn('⚠️  Button not found:', btnId);
-        }
-      });
-    });
-    
-    console.log('✅ Admin Dashboard Script Loaded');
+    init();
   </script>
 </body>
 </html>

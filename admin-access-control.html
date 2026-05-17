@@ -321,7 +321,7 @@
   </main>
 
   <script>
-    const API = 'https://kaal-morphed-tech.onrender.com/api';
+    const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
     let currentUserId = null;
     let accessData = {};

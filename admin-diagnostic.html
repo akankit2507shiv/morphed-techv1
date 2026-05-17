@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard Test - Morphed Tech</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #050816 0%, #0b1020 48%, #070812 100%);
+      min-height: 100vh; 
+      color: white;
+    }
+    .card { 
+      background: rgba(18, 22, 37, 0.82); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 1rem; 
+      padding: 2rem;
+      margin: 1rem 0;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .warning { color: #f59e0b; }
+  </style>
+</head>
+<body class="p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">🔍 Admin Dashboard Diagnostic Test</h1>
+    
+    <div class="card">
+      <h2 class="text-xl font-bold mb-4">Test Results:</h2>
+      <div id="results"></div>
+    </div>
+
+    <div class="card mt-4">
+      <h2 class="text-xl font-bold mb-4">Quick Actions:</h2>
+      <button onclick="window.location.href='http://localhost:5000/admin-login.html'" 
+              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg mr-4">
+        Go to Admin Login
+      </button>
+      <button onclick="window.location.href='http://localhost:5000/admin-dashboard.html'" 
+              class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg">
+        Go to Admin Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:5000/api';
+    const results = document.getElementById('results');
+
+    function log(message, type = 'info') {
+      const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : '';
+      results.innerHTML += `<p class="${className}">• ${message}</p>`;
+    }
+
+    async function runTests() {
+      log('Starting diagnostic tests...', 'info');
+      
+      // Test 1: Check if server is running
+      try {
+        const response = await fetch(`${API}/landing/pricing`);
+        if (response.ok) {
+          log('✅ Server is running and responding', 'success');
+        } else {
+          log('❌ Server responded with error: ' + response.status, 'error');
+        }
+      } catch (e) {
+        log('❌ Cannot connect to server: ' + e.message, 'error');
+        return;
+      }
+
+      // Test 2: Check localStorage
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      if (token) {
+        log('✅ Token found in localStorage', 'success');
+        log('Token: ' + token.substring(0, 30) + '...', 'info');
+      } else {
+        log('⚠️  No token in localStorage - need to login first', 'warning');
+      }
+
+      if (user) {
+        log('✅ User data found in localStorage', 'success');
+        const userData = JSON.parse(user);
+        log(`User: ${userData.name} (${userData.email}) - Role: ${userData.role}`, 'info');
+        
+        if (userData.role !== 'admin') {
+          log('❌ User is not an admin!', 'error');
+        } else {
+          log('✅ User has admin role', 'success');
+        }
+      } else {
+        log('⚠️  No user data in localStorage', 'warning');
+      }
+
+      // Test 3: Test admin API with token
+      if (token) {
+        try {
+          const statsResponse = await fetch(`${API}/admin/stats`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          
+          if (statsResponse.ok) {
+            const stats = await statsResponse.json();
+            log('✅ Admin API is accessible', 'success');
+            log(`Stats: ${stats.totalStudents} students, ${stats.paidStudents} paid, ₹${stats.totalRevenue} revenue`, 'info');
+          } else {
+            log('❌ Admin API returned error: ' + statsResponse.status, 'error');
+            if (statsResponse.status === 403) {
+              log('Token might be expired or invalid', 'warning');
+            }
+          }
+        } catch (e) {
+          log('❌ Error calling admin API: ' + e.message, 'error');
+        }
+      }
+
+      // Test 4: Check admin dashboard file
+      try {
+        const dashResponse = await fetch('http://localhost:5000/admin-dashboard.html');
+        if (dashResponse.ok) {
+          log('✅ Admin dashboard HTML file is accessible', 'success');
+        } else {
+          log('❌ Cannot access admin dashboard HTML', 'error');
+        }
+      } catch (e) {
+        log('❌ Error loading admin dashboard: ' + e.message, 'error');
+      }
+
+      log('', 'info');
+      log('=== DIAGNOSTIC COMPLETE ===', 'info');
+      log('', 'info');
+      
+      if (!token || !user) {
+        log('📝 ACTION REQUIRED: Please login first using the button below', 'warning');
+      } else {
+        log('✅ You can now access the admin dashboard', 'success');
+      }
+    }
+
+    // Run tests on page load
+    runTests();
+  </script>
+</body>
+</html>
