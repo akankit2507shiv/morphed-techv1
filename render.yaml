@@ -11,17 +11,21 @@ services:
     envVars:
       - key: PORT
         value: 10000
+      - key: NODE_ENV
+        value: production
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
-        value: !Mahadev007!@gmail.com
+        value: YOUR_ADMIN_EMAIL
       - key: ADMIN_PASSWORD
-        value: !Mahakal007!@
+        value: YOUR_ADMIN_PASSWORD
       - key: UPI_ID
-        value: morphedtech@paytm
+        value: YOUR_UPI_ID
       - key: UPI_NAME
         value: Morphed Tech
       - key: COURSE_PRICE
-        value: 1111
-      - key: NODE_ENV
-        value: production
+        value: 7777
+      - key: TELEGRAM_BOT_TOKEN
+        value: YOUR_TELEGRAM_BOT_TOKEN
+      - key: TELEGRAM_CHAT_ID
+        value: YOUR_TELEGRAM_CHAT_ID

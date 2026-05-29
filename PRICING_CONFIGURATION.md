@@ -64,8 +64,8 @@ SELECT * FROM landing_pricing;
 1. **Login to Admin:**
    ```
    URL: http://localhost:5000/admin-login.html
-   Email: !Mahadev007!@gmail.com
-   Password: [Check .env]
+   Email: (set via ADMIN_EMAIL env variable)
+   Password: (set via ADMIN_PASSWORD env variable)
    ```
 
 2. **Go to Landing CMS:**
@@ -239,8 +239,8 @@ nano .env
 
 **Check admin login:**
 ```
-Email: !Mahadev007!@gmail.com
-Password: [Check .env ADMIN_PASSWORD]
+Email: (set via ADMIN_EMAIL env variable)
+Password: (set via ADMIN_PASSWORD env variable)
 ```
 
 **Verify admin role:**
@@ -273,7 +273,7 @@ sqlite3 morphed-tech.db "SELECT email, role FROM users WHERE role='admin';"
    - Embedded amount: ₹7,777
 
 3. **UPI Details:**
-   - UPI ID: 7038376253@ybl
+   - UPI ID: (set via UPI_ID env variable)
    - Amount: ₹7,777
 
 ---
@@ -307,7 +307,7 @@ grep COURSE_PRICE .env
 **5. Test QR Code:**
 - Scan with phone
 - Verify amount shows ₹7,777
-- Verify UPI ID: 7038376253@ybl
+- Verify UPI ID matches your configured UPI_ID env variable
 
 ---
 

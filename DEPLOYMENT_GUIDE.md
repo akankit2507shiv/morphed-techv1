@@ -25,12 +25,14 @@
    ```
    PORT=10000
    NODE_ENV=production
-   JWT_SECRET=morphed_tech_production_jwt_secret_key_2024_secure
-   ADMIN_EMAIL=!Mahadev007!@gmail.com
-   ADMIN_PASSWORD=!Mahakal007!@
-   UPI_ID=morphedtech@paytm
+   JWT_SECRET=<generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))">
+   ADMIN_EMAIL=<your-admin-email>
+   ADMIN_PASSWORD=<your-secure-password>
+   UPI_ID=<your-upi-id>
    UPI_NAME=Morphed Tech
-   COURSE_PRICE=1111
+   COURSE_PRICE=7777
+   TELEGRAM_BOT_TOKEN=<your-telegram-bot-token>
+   TELEGRAM_CHAT_ID=<your-telegram-chat-id>
    ```
 
 5. **Deploy**

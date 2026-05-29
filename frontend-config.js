@@ -8,9 +8,9 @@ window.APP_CONFIG = {
     ? 'http://localhost:5000/api'
     : `${window.location.origin}/api`,
   
-  // Payment Configuration (loaded from backend)
+  // Payment Configuration (loaded from backend at runtime)
   PAYMENT: {
-    UPI_ID: '7038376253@ybl',
+    UPI_ID: '', // Loaded from /api/enrollment/create — never hardcode here
     UPI_NAME: 'Morphed Tech',
   },
   

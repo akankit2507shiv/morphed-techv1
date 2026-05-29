@@ -43,7 +43,7 @@ const config = {
 
   // ==================== PAYMENT CONFIGURATION ====================
   payment: {
-    UPI_ID: process.env.UPI_ID || '7038376253@ybl',
+    UPI_ID: process.env.UPI_ID || 'YOUR_UPI_ID',
     UPI_NAME: process.env.UPI_NAME || 'Morphed Tech',
     COURSE_PRICE: parseInt(process.env.COURSE_PRICE || '7777'),
     REGULAR_PRICE: parseInt(process.env.REGULAR_PRICE || '11111'),

@@ -1,381 +1,239 @@
-# 🚀 MORPHED TECH - Data Engineering Learning Platform
+# Morphed Tech — Data Engineering Learning Platform
 
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)]()
-[![Node.js](https://img.shields.io/badge/Node.js-v25.8.2-green)]()
-[![License](https://img.shields.io/badge/License-Proprietary-blue)]()
-
-**Transform your career: ₹5 LPA → ₹25+ LPA** through complete data engineering mastery.
-
-> A comprehensive full-stack learning management system for aspiring data engineers with interactive courses, real-world projects, admin dashboard, and integrated payment system.
+A full-stack LMS for aspiring data engineers. Covers SQL, Python, Git, AWS, Databricks, PySpark, and real-world projects with an integrated payment system and admin dashboard.
 
 ---
 
-## 📖 Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-technology-stack)
-- [Quick Start](#-quick-start)
-- [API Documentation](#-api-documentation)
-- [Deployment](#-deployment)
-- [Documentation](#-documentation)
-- [Security](#-security)
-- [Support](#-support)
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Node.js + Express.js |
+| Database | SQLite (dev) / PostgreSQL (prod) |
+| Auth | JWT + bcryptjs |
+| Frontend | HTML5 + CSS3 + Vanilla JS |
+| Payments | UPI + QR Code |
+| Notifications | Telegram Bot API |
+| Deployment | Render (backend) + Vercel (frontend) |
 
 ---
 
-## ✨ Features
+## Quick Start
 
-### 🎓 Student Features
-- **7 Complete Courses**: SQL, Python, Git, AWS, Databricks, PySpark, Projects
-- **1000+ Hours** of content and tutorials
-- **Real-World Projects**: Capstone projects for portfolio building
-- **Interview Preparation**: Resume builder + 100+ interview questions
-- **Progress Tracking**: Track learning per module
-- **Certificates**: Auto-issued on course completion
-- **Multilingual**: 7 languages supported
-- **Lifetime Access**: Pay once, access forever
-
-### 👨‍💼 Admin Features
-- **Student Management**: View, edit, manage students
-- **Payment Monitoring**: Track all transactions
-- **Course Access Control**: Grant/revoke module access
-- **Analytics Dashboard**: Revenue, enrollments, insights
-- **Certificate Management**: Issue certificates
-- **Landing Page CMS**: Update content dynamically
-- **Telegram Notifications**: Real-time alerts
-
-### 💳 Payment System
-- **UPI Gateway**: Direct Indian payment method
-- **QR Code Generation**: Instant QR for payments
-- **Razorpay Ready**: Can add Razorpay anytime
-- **Automatic Verification**: Instant payment confirmation
-- **Telegram Notifications**: Admin notified of payments
-- **Receipt Generation**: Digital receipts
-
-### 🌐 Multilingual Support
-- English, Hindi, Tamil, Telugu, Kannada, Marathi, Gujarati
-- Audio content in multiple languages
-- Localized UI interface
-
----
-
-## 🏗️ Technology Stack
-
-### Backend
-```
-Runtime:      Node.js v25.8.2
-Framework:    Express.js 4.18.2
-Database:     SQLite (dev) / PostgreSQL (prod)
-Auth:         JWT + bcryptjs (10 rounds)
-Payment:      UPI + Razorpay ready
-Notifications: Telegram Bot API
-API Rate:     100 req/15 min
-```
-
-### Frontend
-```
-Technology:   HTML5 + CSS3 + Vanilla JavaScript
-Design:       Premium UI System + Dopamine UI
-Responsive:   Mobile (✓) Tablet (✓) Desktop (✓)
-Performance:  < 2 sec load time, 95+ Lighthouse score
-Languages:    7 languages supported
-```
-
-### Deployment
-```
-Backend:      Render.com (render.yaml configured)
-Frontend:     Vercel (vercel.json configured)
-Auto-Deploy:  GitHub → Auto-deploy on push
-Database:     SQLite local / PostgreSQL cloud
-```
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
 ```bash
-Node.js >= 14.0.0
-npm >= 6.0.0
-Git
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your values
+
+# 3. Start server
+npm start
+# → http://localhost:5000
 ```
 
-### Installation
+### Key URLs
 
-1. **Clone Repository**
-   ```bash
-   git clone https://github.com/akankit2507shiv/MorphedTech.git
-   cd MorphedTech
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Start Development Server**
-   ```bash
-   npm start
-   # Server running on http://localhost:5000
-   ```
-
-5. **Open in Browser**
-   ```
-   Landing Page:    http://localhost:5000
-   Student Login:   http://localhost:5000/student-login.html
-   Admin Login:     http://localhost:5000/admin-login.html
-   ```
+| Page | URL |
+|------|-----|
+| Landing | `http://localhost:5000` |
+| Student Login | `http://localhost:5000/student-login.html` |
+| Admin Login | `http://localhost:5000/admin-login.html` |
+| Student Dashboard | `http://localhost:5000/student-dashboard.html` |
+| Admin Dashboard | `http://localhost:5000/admin-dashboard.html` |
 
 ---
 
-## 📚 API Documentation
-
-### Authentication Endpoints
-```
-POST   /auth/register           Register new student
-POST   /auth/login              Student login
-POST   /auth/admin-login        Admin authentication
-POST   /auth/logout             Logout user
-GET    /auth/verify             Verify JWT token
-```
-
-### Course & Syllabus
-```
-GET    /api/syllabus/all        Get all courses
-GET    /api/syllabus/:course    Get course details
-GET    /api/syllabus/:course/:module   Get module
-GET    /api/progress/:user_id   Get user progress
-```
-
-### Payment Management
-```
-POST   /api/payment/generate-qr Generate payment QR
-POST   /api/payment/verify      Verify payment
-GET    /api/payment/status      Check payment status
-GET    /api/enrollment/receipt  Get payment receipt
-```
-
-### Admin Endpoints
-```
-GET    /api/admin/users         List all students
-GET    /api/admin/enrollments   View enrollments
-POST   /api/admin/certificates  Issue certificate
-GET    /api/admin/analytics     View analytics dashboard
-PUT    /api/admin/syllabus/:userId  Update access
-```
-
----
-
-## 📊 Project Structure
+## Project Structure
 
 ```
-MorphedTech/
-├── server.js                           # Backend core
-├── config.js                           # Configuration
-├── security.js                         # Security utilities
-├── telegram-helper.js                  # Telegram bot
-├── package.json                        # Dependencies
+morphed-tech/
+├── server.js                    # Express backend — all API routes
+├── config.js                    # Centralized configuration
+├── security.js                  # Frontend security layer (JWT guard, watermark)
+├── telegram-helper.js           # Telegram payment notifications
+├── frontend-config.js           # Frontend API config
+├── package.json
 │
-├── index-landing.html                  # Landing page
-├── student-login.html                  # Auth page
-├── student-dashboard.html              # Student portal
-├── admin-dashboard.html                # Admin panel
+├── Frontend Pages
+│   ├── index.html               # Entry point (redirects to landing)
+│   ├── index-landing.html       # Public landing page
+│   ├── student-login.html       # Student auth
+│   ├── student-dashboard.html   # Student portal
+│   ├── admin-login.html         # Admin auth
+│   ├── admin-dashboard.html     # Admin panel
+│   ├── admin-landing-cms.html   # Landing page CMS
+│   ├── admin-access-control.html
+│   ├── admin-diagnostic.html
+│   ├── admin-guide.html
+│   ├── payment.html             # Payment flow
+│   ├── resume-model-15-25lpa.html
+│   └── interview-complete-example.html
 │
-├── *-content.js                        # Course content (7 modules)
-├── *-syllabus.html                     # Course outlines
-├── *-topic.html                        # Topic pages
+├── Course Pages (per module)
+│   ├── sql-module.html / sql-topic.html / sql-free-topics.html
+│   ├── python-syllabus.html / python-topic.html / python-free-topics.html
+│   ├── git-syllabus.html / git-topic.html
+│   ├── aws-syllabus.html / aws-topic.html
+│   ├── databricks-syllabus.html / databricks-topic.html
+│   ├── pyspark-syllabus.html / pyspark-topic.html
+│   └── projects-syllabus.html / project-detail.html
 │
-├── *.css                               # Styling files
-├── *.js                                # Utility scripts
+├── Content JS (loaded by course pages)
+│   ├── sql-content.js
+│   ├── python-content.js
+│   ├── git-content.js
+│   ├── aws-content.js
+│   ├── databricks-content.js
+│   ├── pyspark-content.js
+│   └── projects-content.js
 │
-├── .env.example                        # Environment template
-├── render.yaml                         # Render deployment
-├── vercel.json                         # Vercel deployment
+├── Styling
+│   ├── premium-design-system.css
+│   ├── dopamine-ui.css
+│   ├── premium-ui-enhancements.css
+│   └── dashboard-animations.css
 │
-└── Documentation/                      # 30+ guides
-    ├── PRODUCTION_READY_OVERVIEW.md
+├── Content (JSON)
+│   └── content/
+│       ├── sql/                 # SQL topic JSON files
+│       ├── git/                 # Git topic JSON files
+│       └── aws/                 # AWS topic JSON files
+│
+├── Backend Security Module
+│   └── backend-security/
+│       ├── server.js
+│       ├── routes/auth.js
+│       ├── routes/video.js
+│       ├── middleware/auth.js
+│       ├── middleware/rateLimit.js
+│       ├── middleware/sessionManager.js
+│       ├── config/database.js
+│       ├── utils/jwtUtils.js
+│       ├── utils/emailService.js
+│       └── utils/s3Utils.js
+│
+├── Deployment
+│   ├── render.yaml              # Render.com config
+│   ├── vercel.json              # Vercel config
+│   ├── deploy.sh                # Deploy helper
+│   └── deploy-production.sh
+│
+└── Docs
+    ├── ARCHITECTURE.md
     ├── DEPLOYMENT_GUIDE.md
     ├── PAYMENT_GATEWAY_ANALYSIS.md
-    └── ... more guides
+    ├── PRICING_CONFIGURATION.md
+    ├── TELEGRAM_SETUP_GUIDE.md
+    ├── TELEGRAM_FEATURES.md
+    ├── RENDER_DEPLOYMENT_GUIDE.md
+    └── RENDER_TELEGRAM_SETUP.md
 ```
 
 ---
 
-## 🌐 Deployment
+## Environment Variables
 
-### Deploy to Render.com (Backend)
+Copy `.env.example` to `.env` and fill in:
 
-1. Connect GitHub repository
-2. Create Web Service
-3. Add environment variables from `.env.production`
-4. Set start command: `npm start`
-5. Deploy
+```env
+PORT=5000
+JWT_SECRET=<64-byte hex secret>
+ADMIN_EMAIL=admin@morphedtech.com
+ADMIN_PASSWORD=<secure password>
+FRONTEND_URL=http://localhost:5000
+UPI_ID=yourname@upi
+UPI_NAME=Your Name
+COURSE_PRICE=7777
+TELEGRAM_BOT_TOKEN=<optional>
+TELEGRAM_CHAT_ID=<optional>
+```
 
-### Deploy to Vercel (Frontend)
+> **Never commit `.env` to Git.** It is in `.gitignore`.
 
-1. Go to https://vercel.com
-2. Import GitHub repository
-3. Select `MorphedTech` repo
+---
+
+## API Routes
+
+### Auth
+```
+POST  /api/auth/register
+POST  /api/auth/login
+GET   /api/auth/me
+POST  /api/auth/onboarding
+```
+
+### Enrollment & Payment
+```
+GET   /api/enrollment/status
+POST  /api/enrollment/create
+POST  /api/enrollment/confirm-payment
+GET   /api/enrollment/receipt/:id
+GET   /api/enrollment/certificate
+```
+
+### Syllabus & Access
+```
+GET   /api/syllabus/access
+GET   /api/subtopic/access
+GET   /api/feature/access
+```
+
+### Admin
+```
+GET   /api/admin/students
+PUT   /api/admin/students/:id
+DELETE /api/admin/students/:id
+PUT   /api/admin/students/:id/password
+GET   /api/admin/stats
+PUT   /api/admin/enrollments/:id
+POST  /api/admin/enrollments/create
+GET   /api/admin/syllabus/:userId
+PUT   /api/admin/syllabus/:userId
+PUT   /api/admin/access/:userId
+GET   /api/admin/subtopic/:userId (via /access/:userId)
+PUT   /api/admin/subtopic/:userId
+GET   /api/admin/feature/:userId
+PUT   /api/admin/feature/:userId
+GET   /api/admin/receipt/:id
+GET   /api/landing/sections
+POST  /api/landing/sections
+GET   /api/landing/pricing
+PUT   /api/landing/pricing
+POST  /api/telegram/test
+GET   /api/security/logs
+POST  /api/security/log
+```
+
+---
+
+## Deployment
+
+### Render.com (Backend)
+1. Connect GitHub repo
+2. Create Web Service → `npm start`
+3. Add env vars from `.env.example`
 4. Deploy
-5. Get live URL
 
-### Auto-Deployment Setup
-```bash
-# Push to main branch
-git push origin main
-
-# Automatic deployment to:
-# - Backend: Render.com
-# - Frontend: Vercel
-# Done! ✅
-```
+### Vercel (Frontend)
+1. Import GitHub repo on vercel.com
+2. Deploy — static files served automatically
 
 ---
 
-## 🔐 Security Features
+## Security
 
-✅ **JWT Authentication** - Secure token-based auth  
-✅ **Password Hashing** - bcryptjs (10 rounds)  
-✅ **CORS Protection** - Configured origins  
-✅ **Rate Limiting** - 100 req/15 min on auth endpoints  
-✅ **Input Validation** - All inputs sanitized  
-✅ **SQL Injection Protection** - Parameterized queries  
-✅ **XSS Protection** - Content Security Policy  
-✅ **Admin Role Control** - Role-based access  
-✅ **Secure Payments** - UPI verification  
-✅ **Environment Secrets** - .gitignore protection  
-
-**Security Score: 96/100** ✅
+- JWT authentication with 7-day expiry
+- bcryptjs password hashing (10 rounds)
+- Rate limiting on auth endpoints (100 req / 15 min)
+- CORS restricted to configured origin
+- Parameterized SQL queries (no injection)
+- Frontend: DevTools detection, watermarking, session fingerprinting
+- Role-based access control (admin / student)
 
 ---
 
-## 🔑 Default Credentials
+## License
 
-**⚠️ Change immediately after first login**
-
-```
-Email:    morphextechnologies@gmail.com
-Password: MorphedTech@2024!Secure
-```
-
----
-
-## 🎓 Courses Included
-
-### SQL Mastery (15 Topics)
-- Fundamentals to Advanced
-- Query Optimization
-- Real-world cases
-
-### Python for Data Engineering (14 Topics)
-- Pandas & NumPy
-- ETL Pipelines
-- Data Validation
-
-### Git & Version Control
-- Branching Strategies
-- Collaboration
-- GitHub Integration
-
-### AWS Essentials
-- EC2, S3, Lambda
-- CloudFormation
-- Cost Optimization
-
-### Databricks Analytics
-- Apache Spark
-- Data Warehousing
-- ML Pipelines
-
-### PySpark Mastery
-- Distributed Computing
-- Performance Tuning
-- Real Datasets
-
-### Real-World Projects
-- Capstone projects
-- Portfolio building
-- Interview prep
-
----
-
-## 💾 Database Schema
-
-**Key Tables:**
-- `users` - Student/Admin accounts
-- `enrollments` - Course enrollments & payments
-- `syllabus_access` - Module access control
-- `progress` - Learning progress tracking
-- `certificates` - Issued certificates
-- `qr_codes` - Payment QR codes
-- `payments` - Payment records
-- Plus 5+ more tables
-
----
-
-## 📚 Documentation
-
-- **[PRODUCTION_READY_OVERVIEW.md](./PRODUCTION_READY_OVERVIEW.md)** - Complete architecture
-- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Deployment steps
-- **[LIVE_STATUS_REPORT.md](./LIVE_STATUS_REPORT.md)** - Current status
-- **[PAYMENT_GATEWAY_ANALYSIS.md](./PAYMENT_GATEWAY_ANALYSIS.md)** - Payment guide
-- **[GITHUB_REPOSITORY_GUIDE.md](./GITHUB_REPOSITORY_GUIDE.md)** - Repo structure
-- **30+ other comprehensive guides**
-
----
-
-## 🚀 Production Checklist
-
-- [x] Code organized and tested
-- [x] Security verified (96/100)
-- [x] Performance optimized
-- [x] Database schema ready
-- [x] Authentication system
-- [x] Payment integration
-- [x] Admin dashboard
-- [x] Documentation complete
-- [x] Deployment configs ready
-- [x] Error handling
-- [x] Logging configured
-- [ ] Deploy to production
-- [ ] Change admin password
-- [ ] Setup monitoring
-
----
-
-## 📞 Support & Contact
-
-- **Email**: morphextechnologies@gmail.com
-- **GitHub**: [@akankit2507shiv](https://github.com/akankit2507shiv)
-- **Issues**: GitHub Issues
-- **Discussions**: GitHub Discussions
-
----
-
-## 📄 License
-
-Proprietary - All rights reserved
-
----
-
-## 🎉 Status
-
-**✅ PRODUCTION READY**
-
-- Version: 1.0.0
-- Last Updated: May 29, 2026
-- Commit: 7d6851d
-- Status: Ready for deployment
-- Security: Verified ✅
-- Testing: Passed ✅
-
----
-
-**Built with ❤️ for aspiring data engineers**
-
-🚀 **Ready to transform careers from ₹5 LPA to ₹25+ LPA!**
+Proprietary — All rights reserved © Morphed Tech
