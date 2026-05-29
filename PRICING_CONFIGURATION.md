@@ -338,12 +338,12 @@ grep COURSE_PRICE .env
 - Duration: 3 days
 
 **Payment Details:**
-- UPI ID: 7038376253@ybl
+- UPI ID: (set via UPI_ID env variable)
 - UPI Name: Morphed Tech
 - Amount: ₹7,777
 
 **Admin Access:**
-- Email: !Mahadev007!@gmail.com
+- Email: (set via ADMIN_EMAIL env variable)
 - URL: http://localhost:5000/admin-login.html
 - CMS: http://localhost:5000/admin-landing-cms.html
 

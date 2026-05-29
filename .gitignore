@@ -1,32 +1,53 @@
 # Dependencies
 node_modules/
 
-# Build files
+# Environment variables (NEVER commit)
+.env
+.env.*
+!.env.example
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Logs & runtime
+*.log
+*.pid
+logs/
+
+# Build output
 dist/
 build/
 .next/
-
-# Environment files
-.env
-.env.local
-
-# Logs
-*.log
-
-# Cache
 .cache/
 .turbo/
 
 # OS files
 .DS_Store
 Thumbs.db
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.backup
+*.bak
 
 # Python
 __pycache__/
 *.pyc
 
-# VS Code
-.vscode-test/
+# Uploads (keep folder, ignore contents)
+uploads/*
+!uploads/.gitkeep
 
 # Coverage
 coverage/
+.nyc_output/
