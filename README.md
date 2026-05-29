@@ -119,7 +119,7 @@ railway up
 
 # Set environment variables (see .env.example)
 railway variables set JWT_SECRET="your-secret"
-railway variables set ADMIN_EMAIL="admin@morphedtech.com"
+railway variables set ADMIN_EMAIL="morphextechnologies@gmail.com"
 # ... (set all variables)
 
 # Get public URL
@@ -149,7 +149,7 @@ Required environment variables (see `.env.example`):
 ```env
 PORT=5000
 JWT_SECRET=your_64_byte_secret
-ADMIN_EMAIL=admin@morphedtech.com
+ADMIN_EMAIL=morphextechnologies@gmail.com
 ADMIN_PASSWORD=your_secure_password
 FRONTEND_URL=http://localhost:5000
 UPI_ID=your_upi_id@bank
@@ -164,7 +164,7 @@ COURSE_PRICE=7777
 **⚠️ CHANGE IMMEDIATELY AFTER FIRST LOGIN**
 
 ```
-Email: admin@morphedtech.com
+Email: morphextechnologies@gmail.com
 Password: MorphedTech@2024!Secure
 ```
 
@@ -260,7 +260,7 @@ Proprietary - All rights reserved
 ## 📞 Support
 
 **Admin Contact:**
-- Email: admin@morphedtech.com
+- Email: morphextechnologies@gmail.com
 - Platform: MORPHED TECH
 
 ---

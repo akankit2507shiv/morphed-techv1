@@ -23,6 +23,7 @@
     .topic-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(255,61,129,0.4); border-color: rgba(255,61,129,0.4); }
     .topic-card.done { border-color: rgba(184,255,60,0.4); }
   </style>
+  <script src="security.js"></script>
 </head>
 <body class="text-white">
 
@@ -190,18 +191,7 @@
       window.location.href = `sql-topic.html?topic=${id}`;
     }
 
-    if (user.role === 'admin') {
-      render();
-    } else {
-      fetch(`${API}/enrollment/status`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json())
-        .then(d => {
-          if (!d.paid) { alert('🔒 Please complete payment to access content'); window.location.href = 'student-dashboard.html'; }
-          else if (d.enrollment && d.enrollment.content_access_granted === 0) { alert('🚫 Access denied. Contact admin.'); window.location.href = 'student-dashboard.html'; }
-          else render();
-        })
-        .catch(() => { alert('Auth failed'); window.location.href = 'student-login.html'; });
-    }
+    render();
 
     function goBackToSyllabus() {
       window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';

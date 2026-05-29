@@ -13,6 +13,7 @@
     .card-hover { transition:all 0.3s ease; }
     .card-hover:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 20px 40px rgba(255,61,129,0.4); }
   </style>
+  <script src="security.js"></script>
 </head>
 <body class="text-white">
 
@@ -144,16 +145,7 @@
       const hist = JSON.parse(localStorage.getItem('searchHistory') || '[]');
       hist.unshift({ type:'pyspark', title: pysparkContent[id].title, url:`pyspark-topic.html?topic=${id}`, time: new Date().toISOString() });
       localStorage.setItem('searchHistory', JSON.stringify(hist.slice(0,50)));
-
-      if (user.role === 'admin') { window.location.href = `pyspark-topic.html?topic=${id}`; return; }
-      fetch(`${API}/enrollment/status`, { headers:{ Authorization:`Bearer ${token}` } })
-        .then(r => r.json())
-        .then(d => {
-          if (!d.paid) { alert('🔒 Please complete payment to access content!'); window.location.href='student-dashboard.html'; }
-          else if (d.enrollment && d.enrollment.content_access_granted === 0) { alert('🚫 Access denied. Contact admin.'); }
-          else window.location.href = `pyspark-topic.html?topic=${id}`;
-        })
-        .catch(() => { alert('Auth failed'); window.location.href='student-login.html'; });
+      window.location.href = `pyspark-topic.html?topic=${id}`;
     }
 
     render();

@@ -50,27 +50,15 @@
       <!-- Login Card -->
       <div class="panel panel-lg">
 
-        <!-- Admin/Student Switch -->
-        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 2rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 0.75rem;">
-          <span id="studentLabel" class="text-muted" style="font-size: 0.9rem; font-weight: 600; color: var(--cyan);">Student Login</span>
-          <label class="toggle" style="cursor: pointer;">
-            <input type="checkbox" id="loginModeSwitch" onchange="toggleLoginMode()">
-            <span class="slider"></span>
-          </label>
-          <span id="adminLabel" class="text-muted" style="font-size: 0.9rem; font-weight: 600;">Admin Login</span>
-        </div>
 
-        <!-- Student Tabs (visible by default) -->
-        <div id="studentTabs" class="tabs" style="margin-bottom: 32px;">
+
+        <!-- Student Tabs -->
+        <div class="tabs" style="margin-bottom: 32px;">
           <button id="tabLogin" onclick="switchTab('login')" class="tab active">Sign In</button>
           <button id="tabSignup" onclick="switchTab('signup')" class="tab">Sign Up</button>
         </div>
 
-        <!-- Admin Title (hidden by default) -->
-        <div id="adminTitle" style="display: none; text-align: center; margin-bottom: 2rem;">
-          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--pink); margin-bottom: 0.5rem;">🔐 Admin Portal</h2>
-          <p class="text-muted" style="font-size: 0.9rem;">Secure Access Only</p>
-        </div>
+
 
         <!-- Form Container -->
         <div class="form-wrap">
@@ -112,20 +100,7 @@
             </form>
           </div>
 
-          <!-- Admin Login Form (hidden by default) -->
-          <div id="adminPanel" class="form-panel hidden-panel">
-            <form id="adminLoginForm" style="display: flex; flex-direction: column; gap: 20px;">
-              <div>
-                <label class="label">Admin ID</label>
-                <input type="text" id="adminEmail" required placeholder="Enter admin ID" class="input">
-              </div>
-              <div>
-                <label class="label">Admin Password</label>
-                <input type="password" id="adminPassword" required placeholder="••••••••" class="input">
-              </div>
-              <button type="submit" id="adminBtn" class="btn btn-primary" style="margin-top: 8px; width: 100%; background: linear-gradient(135deg, #ff3d81, #7c3cff); box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">🔐 Admin Login</button>
-            </form>
-          </div>
+
         </div>
 
         <!-- Message Box -->
@@ -135,6 +110,9 @@
       <!-- Footer Text -->
       <div class="text-muted" style="text-align: center; margin-top: 32px; font-size: 13px;">
         <p>Secure • Fast • Professional</p>
+        <p style="margin-top: 12px;">
+          <a href="admin-login.html" style="color: var(--cyan); text-decoration: none; font-weight: 600;">🔐 Admin Login</a>
+        </p>
       </div>
     </div>
   </div>
@@ -142,38 +120,7 @@
   <script>
     const API = window.location.origin + '/api';
 
-    // Toggle between Student and Admin login
-    function toggleLoginMode() {
-      const isAdmin = document.getElementById('loginModeSwitch').checked;
-      const studentTabs = document.getElementById('studentTabs');
-      const adminTitle = document.getElementById('adminTitle');
-      const loginPanel = document.getElementById('loginPanel');
-      const signupPanel = document.getElementById('signupPanel');
-      const adminPanel = document.getElementById('adminPanel');
-      const studentLabel = document.getElementById('studentLabel');
-      const adminLabel = document.getElementById('adminLabel');
-      
-      if (isAdmin) {
-        // Show admin login
-        studentTabs.style.display = 'none';
-        adminTitle.style.display = 'block';
-        loginPanel.className = 'form-panel hidden-panel';
-        signupPanel.className = 'form-panel hidden-panel';
-        adminPanel.className = 'form-panel active-panel';
-        studentLabel.style.color = 'var(--text-muted)';
-        adminLabel.style.color = 'var(--cyan)';
-      } else {
-        // Show student login
-        studentTabs.style.display = 'flex';
-        adminTitle.style.display = 'none';
-        loginPanel.className = 'form-panel active-panel';
-        signupPanel.className = 'form-panel hidden-panel';
-        adminPanel.className = 'form-panel hidden-panel';
-        studentLabel.style.color = 'var(--cyan)';
-        adminLabel.style.color = 'var(--text-muted)';
-      }
-      hideMsg();
-    }
+
 
     // Check URL parameter to auto-open signup tab
     const urlParams = new URLSearchParams(window.location.search);
@@ -230,9 +177,17 @@
           localStorage.setItem('token', d.token);
           localStorage.setItem('user', JSON.stringify(d.user));
           showMsg('✅ Login successful! Redirecting...', true);
-          setTimeout(() => {
-            window.location.href = d.user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard-new.html';
-          }, 800);
+          // Register session with server for tracking
+          fetch(window.location.origin + '/api/security/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + d.token },
+            body: JSON.stringify({
+              device_type: /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+              user_agent: navigator.userAgent.substring(0, 200),
+              device_fp: btoa([navigator.userAgent, screen.width + 'x' + screen.height, navigator.language].join('|')).substring(0, 50)
+            })
+          }).catch(() => {});
+          setTimeout(() => { window.location.href = 'student-dashboard.html#resume'; }, 800);
         } else {
           showMsg(d.error || 'Login failed', false);
           setLoading('loginBtn', false);
@@ -263,7 +218,7 @@
           localStorage.setItem('token', d.token);
           localStorage.setItem('user', JSON.stringify(d.user));
           showMsg('✅ Account created! Redirecting...', true);
-          setTimeout(() => window.location.href = 'student-dashboard-new.html', 800);
+          setTimeout(() => window.location.href = 'student-dashboard.html#resume', 800);
         } else {
           showMsg(d.error || 'Registration failed', false);
           setLoading('signupBtn', false);
@@ -274,39 +229,7 @@
       }
     });
 
-    // Admin Login
-    document.getElementById('adminLoginForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      setLoading('adminBtn', true);
-      try {
-        const r = await fetch(`${API}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: document.getElementById('adminEmail').value,
-            password: document.getElementById('adminPassword').value
-          })
-        });
-        const d = await r.json();
-        if (r.ok) {
-          if (d.user.role !== 'admin') {
-            showMsg('❌ Access denied. Admin credentials required.', false);
-            setLoading('adminBtn', false);
-            return;
-          }
-          localStorage.setItem('token', d.token);
-          localStorage.setItem('user', JSON.stringify(d.user));
-          showMsg('✅ Admin login successful! Redirecting...', true);
-          setTimeout(() => window.location.href = 'admin-dashboard.html', 800);
-        } else {
-          showMsg(d.error || 'Invalid admin credentials', false);
-          setLoading('adminBtn', false);
-        }
-      } catch {
-        showMsg('Server error. Is the server running?', false);
-        setLoading('adminBtn', false);
-      }
-    });
+
   </script>
 </body>
 </html>

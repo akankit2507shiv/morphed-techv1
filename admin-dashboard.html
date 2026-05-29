@@ -95,6 +95,7 @@
       <button onclick="showTab('access')" id="tab-access" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🔐 Module Access</button>
       <button onclick="showTab('features')" id="tab-features" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📝 Resume & Interview</button>
       <button onclick="showTab('syllabus')" id="tab-syllabus" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📚 Syllabus & Content</button>
+      <button onclick="showTab('security')" id="tab-security" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🛡️ Security Alerts <span id="secAlertBadge" class="hidden ml-1 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">0</span></button>
       <button onclick="openNewPage('admin-landing-cms.html')" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🎨 Landing Page CMS</button>
     </div>
 
@@ -175,6 +176,7 @@
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">🎤 Interview Tab 4</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">🎤 Interview Tab 5</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">Grant All</th>
+                <th class="text-center py-3 px-4 text-gray-400 text-sm">Revoke All</th>
               </tr>
             </thead>
             <tbody id="featuresBody">
@@ -203,7 +205,7 @@
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">☁️ AWS</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">🧱 Databricks</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">📦 Git</th>
-                <th class="text-center py-3 px-4 text-gray-400 text-sm">🏗️ Projects</th>
+                <th class="text-center py-3 px-4 text-gray-400 text-sm">🏗️ Real Projects</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">Grant All</th>
                 <th class="text-center py-3 px-4 text-gray-400 text-sm">Revoke All</th>
               </tr>
@@ -322,6 +324,91 @@
       </div>
     </div>
 
+    <!-- SECURITY ALERTS TAB -->
+    <div id="content-security" class="hidden">
+      <!-- Stats Row -->
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <div class="card p-4 text-center">
+          <p class="text-gray-400 text-xs mb-1">Total Alerts (24h)</p>
+          <p id="sec-total" class="text-2xl font-bold text-white">—</p>
+        </div>
+        <div class="card p-4 text-center border-red-500/30">
+          <p class="text-gray-400 text-xs mb-1">🔴 High</p>
+          <p id="sec-high" class="text-2xl font-bold text-red-400">—</p>
+        </div>
+        <div class="card p-4 text-center border-yellow-500/30">
+          <p class="text-gray-400 text-xs mb-1">🟡 Medium</p>
+          <p id="sec-medium" class="text-2xl font-bold text-yellow-400">—</p>
+        </div>
+        <div class="card p-4 text-center border-green-500/30">
+          <p class="text-gray-400 text-xs mb-1">🟢 Low</p>
+          <p id="sec-low" class="text-2xl font-bold text-green-400">—</p>
+        </div>
+        <div class="card p-4 text-center border-primary/30">
+          <p class="text-gray-400 text-xs mb-1">🚫 Blocked Users</p>
+          <p id="sec-blocked" class="text-2xl font-bold text-primary">—</p>
+        </div>
+      </div>
+
+      <!-- Filter Row -->
+      <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <h2 class="text-xl font-bold text-white flex-1">Security Event Log</h2>
+        <select id="secSeverityFilter" onchange="loadSecurityLogs()" class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none">
+          <option value="">All Severities</option>
+          <option value="HIGH">🔴 High</option>
+          <option value="MEDIUM">🟡 Medium</option>
+          <option value="LOW">🟢 Low</option>
+        </select>
+        <button onclick="loadSecurityLogs()" class="px-4 py-2 bg-accent/20 hover:bg-accent/30 text-accent rounded-lg text-sm transition">🔄 Refresh</button>
+        <button onclick="clearSecurityLogs()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-sm transition">🗑️ Clear Logs</button>
+      </div>
+
+      <!-- Active Sessions -->
+      <div class="card p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-white">📱 Active Sessions</h3>
+          <button onclick="loadActiveSessions()" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-gray-300 rounded text-xs transition">🔄 Refresh</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="border-b border-white/10">
+              <tr>
+                <th class="text-left py-2 px-3 text-gray-400">Student</th>
+                <th class="text-left py-2 px-3 text-gray-400">Device</th>
+                <th class="text-left py-2 px-3 text-gray-400">Last Active</th>
+                <th class="text-left py-2 px-3 text-gray-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sessionsBody">
+              <tr><td colspan="4" class="text-center py-4 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Event Log Table -->
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="border-b border-white/10">
+              <tr>
+                <th class="text-left py-3 px-4 text-gray-400">Time</th>
+                <th class="text-left py-3 px-4 text-gray-400">User</th>
+                <th class="text-left py-3 px-4 text-gray-400">Event</th>
+                <th class="text-left py-3 px-4 text-gray-400">Detail</th>
+                <th class="text-left py-3 px-4 text-gray-400">Device</th>
+                <th class="text-left py-3 px-4 text-gray-400">Severity</th>
+                <th class="text-left py-3 px-4 text-gray-400">Action</th>
+              </tr>
+            </thead>
+            <tbody id="securityLogsBody">
+              <tr><td colspan="7" class="text-center py-8 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Edit Payment Modal -->
@@ -373,7 +460,7 @@
       { key: 'aws_access',        label: 'AWS' },
       { key: 'databricks_access', label: 'Databricks' },
       { key: 'git_access',        label: 'Git' },
-      { key: 'projects_access',   label: 'Projects' }
+      { key: 'projects_access',   label: 'Real Projects' }
     ];
 
     function logout() {
@@ -389,7 +476,7 @@
 
     async function showTab(name) {
       console.log('📂 Switching to tab:', name);
-      ['students','payments','access','features','syllabus'].forEach(t => {
+      ['students','payments','access','features','syllabus','security'].forEach(t => {
         const content = document.getElementById('content-' + t);
         if (content) content.classList.add('hidden');
         const btn = document.getElementById('tab-' + t);
@@ -416,6 +503,7 @@
       if (name === 'payments') renderPayments();
       if (name === 'access') await renderAccess();
       if (name === 'features') await renderFeatures();
+      if (name === 'security') { loadSecurityStats(); loadSecurityLogs(); loadActiveSessions(); }
     }
 
     // ── STATS ──────────────────────────────────────────────────────
@@ -694,15 +782,22 @@
 
     async function toggleModule(userId, moduleKey, value) {
       try {
-        await fetch(`${API}/admin/access/${userId}`, {
+        // Build full access object with current state + this change
+        const current = accessData[userId] || {};
+        const body = {};
+        MODULES.forEach(m => body[m.key] = current[m.key] ? 1 : 0);
+        body[moduleKey] = value ? 1 : 0;
+
+        const r = await fetch(`${API}/admin/syllabus/${userId}`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ module: moduleKey, value: value ? 1 : 0 })
+          body: JSON.stringify(body)
         });
+        if (!r.ok) throw new Error('Server error');
         if (!accessData[userId]) accessData[userId] = {};
         accessData[userId][moduleKey] = value ? 1 : 0;
-        showToast(`${value ? '✅ Granted' : '🚫 Revoked'} ${moduleKey.replace('_access','').toUpperCase()}`);
-      } catch(e) { alert('Failed to update'); }
+        showToast(`${value ? '✅ Granted' : '🚫 Revoked'} ${moduleKey.replace('_access','').toUpperCase()} for ${allStudents.find(s=>s.id===userId)?.name || userId}`);
+      } catch(e) { showToast('❌ Failed to update access'); }
     }
 
     async function grantAll(userId) {
@@ -816,6 +911,9 @@
             <td class="py-4 px-4 text-center">
               <button onclick="grantAllFeatures(${s.id})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold">Grant All</button>
             </td>
+            <td class="py-4 px-4 text-center">
+              <button onclick="revokeAllFeatures(${s.id})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold">Revoke All</button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -845,7 +943,6 @@
         { feature_type: 'interview', tab_number: 4 },
         { feature_type: 'interview', tab_number: 5 }
       ];
-      
       for (const f of features) {
         await fetch(`${API}/admin/feature/${userId}`, {
           method: 'PUT',
@@ -853,9 +950,30 @@
           body: JSON.stringify({ ...f, access_granted: 1 })
         });
       }
-      
       renderFeatures();
       showToast('✅ All Resume & Interview tabs granted');
+    }
+
+    async function revokeAllFeatures(userId) {
+      if (!confirm('Revoke ALL Resume & Interview tab access for this student?')) return;
+      const features = [
+        { feature_type: 'resume', tab_number: 3 },
+        { feature_type: 'resume', tab_number: 4 },
+        { feature_type: 'resume', tab_number: 5 },
+        { feature_type: 'resume', tab_number: 6 },
+        { feature_type: 'interview', tab_number: 3 },
+        { feature_type: 'interview', tab_number: 4 },
+        { feature_type: 'interview', tab_number: 5 }
+      ];
+      for (const f of features) {
+        await fetch(`${API}/admin/feature/${userId}`, {
+          method: 'PUT',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...f, access_granted: 0 })
+        });
+      }
+      renderFeatures();
+      showToast('🚫 All Resume & Interview tabs revoked');
     }
 
     // ── TOAST ──────────────────────────────────────────────────────
@@ -867,12 +985,130 @@
       setTimeout(() => t.remove(), 2500);
     }
 
+    // ── SECURITY TAB ───────────────────────────────────────────────
+    async function loadSecurityStats() {
+      try {
+        const r = await fetch(`${API}/admin/security/stats`, { headers: { Authorization: `Bearer ${token}` } });
+        const d = await r.json();
+        document.getElementById('sec-total').textContent = d.total || 0;
+        document.getElementById('sec-high').textContent = d.high || 0;
+        document.getElementById('sec-medium').textContent = d.medium || 0;
+        document.getElementById('sec-low').textContent = d.low || 0;
+        document.getElementById('sec-blocked').textContent = d.blocked_users || 0;
+        // Update badge
+        const highCount = d.high || 0;
+        const badge = document.getElementById('secAlertBadge');
+        if (highCount > 0) {
+          badge.textContent = highCount;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      } catch(e) {}
+    }
+
+    async function loadSecurityLogs() {
+      const severity = document.getElementById('secSeverityFilter')?.value || '';
+      const tbody = document.getElementById('securityLogsBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">Loading...</td></tr>';
+      try {
+        const url = `${API}/admin/security/logs?limit=100${severity ? '&severity=' + severity : ''}`;
+        const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+        const logs = await r.json();
+        if (!logs.length) {
+          tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">✅ No security events found</td></tr>';
+          return;
+        }
+        const severityConfig = {
+          HIGH:   { color: 'text-red-400',    bg: 'bg-red-500/20',    border: 'border-red-500/40',    icon: '🔴' },
+          MEDIUM: { color: 'text-yellow-400', bg: 'bg-yellow-500/20', border: 'border-yellow-500/40', icon: '🟡' },
+          LOW:    { color: 'text-green-400',  bg: 'bg-green-500/20',  border: 'border-green-500/40',  icon: '🟢' }
+        };
+        tbody.innerHTML = logs.map(log => {
+          const sc = severityConfig[log.severity] || severityConfig.LOW;
+          const time = new Date(log.timestamp).toLocaleString();
+          return `
+            <tr class="border-b border-white/5 hover:bg-white/5 transition">
+              <td class="py-3 px-4 text-gray-400 text-xs whitespace-nowrap">${time}</td>
+              <td class="py-3 px-4">
+                <p class="text-white text-sm font-medium">${log.user_name || '—'}</p>
+                <p class="text-gray-500 text-xs">${log.user_email}</p>
+              </td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 ${sc.bg} ${sc.color} rounded text-xs font-mono font-bold">${log.event_type}</span>
+              </td>
+              <td class="py-3 px-4 text-gray-300 text-xs max-w-xs truncate">${log.detail || '—'}</td>
+              <td class="py-3 px-4 text-gray-400 text-xs">${log.device_type || '—'}</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-1 ${sc.bg} border ${sc.border} ${sc.color} rounded-full text-xs font-bold">${sc.icon} ${log.severity}</span>
+              </td>
+              <td class="py-3 px-4">
+                ${log.user_id ? `<button onclick="blockUser(${log.user_id}, '${log.user_email}')" class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Block</button>` : '—'}
+              </td>
+            </tr>`;
+        }).join('');
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-400">Failed to load security logs</td></tr>';
+      }
+    }
+
+    async function loadActiveSessions() {
+      const tbody = document.getElementById('sessionsBody');
+      try {
+        const r = await fetch(`${API}/admin/security/sessions`, { headers: { Authorization: `Bearer ${token}` } });
+        const sessions = await r.json();
+        if (!sessions.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">No active sessions</td></tr>';
+          return;
+        }
+        tbody.innerHTML = sessions.map(s => `
+          <tr class="border-b border-white/5 hover:bg-white/5 transition">
+            <td class="py-3 px-3">
+              <p class="text-white text-sm font-medium">${s.name}</p>
+              <p class="text-gray-500 text-xs">${s.email}</p>
+            </td>
+            <td class="py-3 px-3 text-gray-300 text-xs">${s.device_type || 'Desktop'}</td>
+            <td class="py-3 px-3 text-gray-400 text-xs">${new Date(s.last_active).toLocaleString()}</td>
+            <td class="py-3 px-3">
+              <button onclick="blockUser(${s.user_id}, '${s.email}')" class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Force Logout</button>
+            </td>
+          </tr>`).join('');
+      } catch(e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-400">Failed to load sessions</td></tr>';
+      }
+    }
+
+    async function blockUser(userId, email) {
+      if (!confirm(`Block user ${email}? This will force logout and prevent access.`)) return;
+      const reason = prompt('Reason for blocking:', 'Suspicious activity') || 'Blocked by admin';
+      try {
+        const r = await fetch(`${API}/admin/security/block/${userId}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason })
+        });
+        if (r.ok) {
+          showToast(`🚫 ${email} blocked successfully`);
+          loadSecurityLogs();
+          loadActiveSessions();
+          loadSecurityStats();
+        }
+      } catch(e) { showToast('❌ Failed to block user'); }
+    }
+
+    async function clearSecurityLogs() {
+      if (!confirm('Clear all security logs? This cannot be undone.')) return;
+      showToast('✅ Logs cleared (UI only — DB logs preserved)');
+      document.getElementById('securityLogsBody').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">✅ Logs cleared from view</td></tr>';
+    }
+
     // ── INIT ───────────────────────────────────────────────────────
     async function init() {
       console.log('🎬 Initializing admin dashboard...');
       try {
         await loadStudents();
         loadStats();
+        loadSecurityStats();
         console.log('✅ Dashboard initialized successfully');
       } catch (e) {
         console.error('❌ Dashboard initialization error:', e);

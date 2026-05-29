@@ -16,15 +16,14 @@
     .tab-btn.active { border-bottom-color: #ff3d81; color: #00d4ff; font-weight: 600; }
     .tab-btn:hover { background: rgba(255,61,129,0.1); }
   </style>
+  <script src="security.js"></script>
 </head>
 <body class="text-white">
 
   <header class="bg-dark/60 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <a href="admin-dashboard.html" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-secondary rounded-lg text-sm font-medium transition">
-          ← Admin Dashboard
-        </a>
+        <span id="adminBackBtn"></span>
         <a href="projects-syllabus.html" class="text-gray-400 hover:text-white transition">← Back to Projects</a>
         <h1 id="projectTitle" class="text-2xl font-extrabold gradient-text"></h1>
       </div>
@@ -78,6 +77,8 @@
     const token = localStorage.getItem('token');
     // Temporarily bypass login check for testing
     // if (!token) window.location.href = 'student-login.html';
+    const _u = JSON.parse(localStorage.getItem('user') || '{}');
+    if (_u.role === 'admin') { document.getElementById('adminBackBtn').innerHTML = '<a href="admin-dashboard.html" class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-secondary rounded-lg text-sm font-medium transition">← Admin Dashboard</a>'; }
 
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = urlParams.get('project') || 'project-1'; // Default to project-1 if no parameter

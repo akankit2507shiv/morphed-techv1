@@ -1,0 +1,411 @@
+/* ==================== DASHBOARD ANIMATIONS ==================== */
+/* Positive Energy & Engaging Animations for Student Dashboard */
+
+/* Floating Animation for Icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Pulse Glow Animation */
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(255, 61, 129, 0.3), 0 0 40px rgba(124, 60, 255, 0.2);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(255, 61, 129, 0.6), 0 0 60px rgba(124, 60, 255, 0.4);
+  }
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+/* Bounce In Animation */
+@keyframes bounceIn {
+  0% { 
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+/* Slide Up Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gradient Shift Animation */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Rotate Glow Animation */
+@keyframes rotateGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Scale Pulse Animation */
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Sparkle Animation */
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ==================== APPLY ANIMATIONS ==================== */
+
+/* Floating Icons */
+.glass-card:hover .text-5xl,
+.glass-card:hover .text-2xl {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Welcome Section - Bounce In */
+.text-4xl.font-black {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Free Content Cards - Slide Up with Delay */
+.glass-card:nth-child(1) {
+  animation: slideUp 0.6s ease-out 0.1s backwards;
+}
+
+.glass-card:nth-child(2) {
+  animation: slideUp 0.6s ease-out 0.2s backwards;
+}
+
+/* Mindset Hero Section - Pulse Glow */
+.gradient-text.glow-text {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Primary Action Cards - Hover Scale with Glow */
+.glass-card.cursor-pointer {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.glass-card.cursor-pointer:hover {
+  transform: scale(1.08) translateY(-5px);
+  box-shadow: 0 20px 60px rgba(255, 61, 129, 0.4), 0 0 40px rgba(124, 60, 255, 0.3);
+}
+
+/* Course Cards - Shimmer Effect on Hover */
+.glass-card:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Progress Bars - Animated Fill */
+.h-3.bg-gradient-to-r {
+  position: relative;
+  overflow: hidden;
+}
+
+.h-3.bg-gradient-to-r::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Buttons - Gradient Shift */
+button.bg-gradient-to-r {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+  transition: all 0.3s ease;
+}
+
+button.bg-gradient-to-r:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 61, 129, 0.5);
+}
+
+/* Stats Cards - Scale Pulse */
+.grid-cols-3 > div {
+  animation: scalePulse 2s ease-in-out infinite;
+}
+
+.grid-cols-3 > div:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.grid-cols-3 > div:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.grid-cols-3 > div:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+/* Streak Fire Icon - Pulse */
+#streakDays {
+  animation: scalePulse 1.5s ease-in-out infinite;
+  color: #ff3d81;
+}
+
+/* Tab Navigation - Active Tab Glow */
+.tab-nav button.active {
+  animation: pulseGlow 2s ease-in-out infinite;
+  position: relative;
+}
+
+.tab-nav button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #ff3d81, #7c3cff, #00d4ff);
+  animation: shimmer 2s infinite;
+}
+
+/* Locked Cards - Shake on Hover */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.locked-card:hover {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Enrollment Status - Bounce */
+#enrollmentStatus > div {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Gradient Text - Animated Gradient */
+.gradient-text {
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease infinite;
+}
+
+/* Glass Card - Hover Lift */
+.glass-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.glass-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 61, 129, 0.2);
+}
+
+/* Sparkle Effect on Important Elements */
+.text-4xl.font-black::before,
+.text-3xl.font-black::before {
+  content: '✨';
+  position: absolute;
+  left: -40px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Progress Ring Animation */
+@keyframes drawCircle {
+  from {
+    stroke-dashoffset: 251;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.progress-ring {
+  animation: drawCircle 2s ease-out forwards;
+}
+
+/* Rotating Border Glow */
+@keyframes rotateBorder {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #ff3d81, #7c3cff, #00d4ff, #ff3d81);
+  background-size: 300% 300%;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s;
+  animation: gradientShift 3s ease infinite;
+}
+
+.glass-card:hover::after {
+  opacity: 0.3;
+}
+
+/* Smooth Page Load Animation */
+body {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scroll Reveal Animation */
+@keyframes scrollReveal {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply scroll reveal to sections */
+main > div {
+  animation: scrollReveal 0.8s ease-out backwards;
+}
+
+main > div:nth-child(1) { animation-delay: 0.1s; }
+main > div:nth-child(2) { animation-delay: 0.2s; }
+main > div:nth-child(3) { animation-delay: 0.3s; }
+main > div:nth-child(4) { animation-delay: 0.4s; }
+main > div:nth-child(5) { animation-delay: 0.5s; }
+
+/* Success Checkmark Animation */
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.text-green-300:contains('✅') {
+  animation: checkmark 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Hover Glow for Links */
+a {
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  text-shadow: 0 0 10px rgba(255, 61, 129, 0.5);
+}
+
+/* Motivational Quote - Typing Effect */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.text-xl.font-bold.gradient-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 3s steps(40) 1s backwards;
+}
+
+/* Energy Particles Background */
+@keyframes particles {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px);
+    opacity: 0;
+  }
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 61, 129, 0.3), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(124, 60, 255, 0.3), transparent),
+    radial-gradient(2px 2px at 80% 10%, rgba(0, 212, 255, 0.3), transparent);
+  animation: particles 20s linear infinite;
+}
+
+/* Smooth Transitions for All Interactive Elements */
+* {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -139,7 +139,48 @@ function initDatabase() {
     )
   `);
 
-  // Landing page sections table
+  // Security logs table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS security_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      user_email TEXT,
+      event_type TEXT NOT NULL,
+      detail TEXT,
+      severity TEXT DEFAULT 'LOW',
+      page TEXT,
+      user_agent TEXT,
+      device_type TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Active sessions table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS active_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      session_token TEXT NOT NULL,
+      device_fp TEXT,
+      device_type TEXT,
+      user_agent TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id)
+    )
+  `);
+
+  // Blocked users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS blocked_users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL UNIQUE,
+      reason TEXT,
+      blocked_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Landing sections table
   db.run(`
     CREATE TABLE IF NOT EXISTS landing_sections (
       id INTEGER PRIMARY KEY,
@@ -975,6 +1016,124 @@ app.get('/api/test-telegram', async (req, res) => {
   const { sendTestNotification } = require('./telegram-helper');
   const result = await sendTestNotification();
   res.json(result);
+});
+
+// ==================== SECURITY ROUTES ====================
+
+// Log security event (open — called from frontend)
+app.post('/api/security/log', (req, res) => {
+  const { event_type, detail, severity, user_id, user_email, page, user_agent, device_type } = req.body;
+  if (!event_type) return res.status(400).json({ error: 'event_type required' });
+
+  db.run(
+    `INSERT INTO security_logs (user_id, user_email, event_type, detail, severity, page, user_agent, device_type)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [user_id || null, user_email || 'anonymous', event_type, detail || '', severity || 'LOW', page || '', (user_agent || '').substring(0, 200), device_type || 'Desktop'],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Log failed' });
+      res.json({ ok: true });
+    }
+  );
+});
+
+// Get security logs (admin only)
+app.get('/api/admin/security/logs', authenticateToken, authenticateAdmin, (req, res) => {
+  const limit = parseInt(req.query.limit) || 100;
+  const severity = req.query.severity;
+  const whereClause = severity ? `WHERE severity = '${severity}'` : '';
+
+  db.all(
+    `SELECT sl.*, u.name as user_name FROM security_logs sl
+     LEFT JOIN users u ON sl.user_id = u.id
+     ${whereClause}
+     ORDER BY sl.timestamp DESC LIMIT ?`,
+    [limit],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Server error' });
+      res.json(rows || []);
+    }
+  );
+});
+
+// Get security summary stats (admin only)
+app.get('/api/admin/security/stats', authenticateToken, authenticateAdmin, (req, res) => {
+  db.get(`SELECT
+    COUNT(*) as total,
+    SUM(CASE WHEN severity='HIGH' THEN 1 ELSE 0 END) as high,
+    SUM(CASE WHEN severity='MEDIUM' THEN 1 ELSE 0 END) as medium,
+    SUM(CASE WHEN severity='LOW' THEN 1 ELSE 0 END) as low,
+    COUNT(DISTINCT user_email) as affected_users
+    FROM security_logs WHERE timestamp > datetime('now', '-24 hours')`, [],
+    (err, stats) => {
+      if (err) return res.status(500).json({ error: 'Server error' });
+      db.get('SELECT COUNT(*) as blocked FROM blocked_users', [], (err2, blocked) => {
+        res.json({ ...stats, blocked_users: blocked?.blocked || 0 });
+      });
+    }
+  );
+});
+
+// Force logout / block user (admin only)
+app.post('/api/admin/security/block/:userId', authenticateToken, authenticateAdmin, (req, res) => {
+  const { reason } = req.body;
+  db.run(
+    `INSERT OR REPLACE INTO blocked_users (user_id, reason) VALUES (?, ?)`,
+    [req.params.userId, reason || 'Blocked by admin'],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Block failed' });
+      // Invalidate session
+      db.run('DELETE FROM active_sessions WHERE user_id = ?', [req.params.userId]);
+      res.json({ message: 'User blocked and session invalidated' });
+    }
+  );
+});
+
+// Unblock user (admin only)
+app.post('/api/admin/security/unblock/:userId', authenticateToken, authenticateAdmin, (req, res) => {
+  db.run('DELETE FROM blocked_users WHERE user_id = ?', [req.params.userId], (err) => {
+    if (err) return res.status(500).json({ error: 'Unblock failed' });
+    res.json({ message: 'User unblocked' });
+  });
+});
+
+// Check if user is blocked (called on login)
+app.get('/api/security/check/:userId', authenticateToken, (req, res) => {
+  db.get('SELECT * FROM blocked_users WHERE user_id = ?', [req.params.userId], (err, row) => {
+    res.json({ blocked: !!row, reason: row?.reason || null });
+  });
+});
+
+// Update session (upsert on login)
+app.post('/api/security/session', authenticateToken, (req, res) => {
+  const { device_fp, device_type, user_agent } = req.body;
+  db.run(
+    `INSERT INTO active_sessions (user_id, session_token, device_fp, device_type, user_agent, last_active)
+     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(user_id) DO UPDATE SET
+       session_token = excluded.session_token,
+       device_fp = excluded.device_fp,
+       device_type = excluded.device_type,
+       user_agent = excluded.user_agent,
+       last_active = CURRENT_TIMESTAMP`,
+    [req.user.id, req.headers.authorization?.split(' ')[1] || '', device_fp || '', device_type || 'Desktop', (user_agent || '').substring(0, 200)],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Session update failed' });
+      res.json({ ok: true });
+    }
+  );
+});
+
+// Get active sessions (admin only)
+app.get('/api/admin/security/sessions', authenticateToken, authenticateAdmin, (req, res) => {
+  db.all(
+    `SELECT s.*, u.name, u.email FROM active_sessions s
+     JOIN users u ON s.user_id = u.id
+     ORDER BY s.last_active DESC`,
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Server error' });
+      res.json(rows || []);
+    }
+  );
 });
 
 // Start server

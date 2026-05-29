@@ -13,6 +13,7 @@
     .card-hover { transition:all 0.3s ease; }
     .card-hover:hover { transform:translateY(-8px) scale(1.02); box-shadow:0 20px 40px rgba(255,61,129,0.4); }
   </style>
+  <script src="security.js"></script>
 </head>
 <body class="text-white">
 
@@ -73,6 +74,17 @@
 
     const progress = JSON.parse(localStorage.getItem('userProgress') || '{}');
 
+    // Map subtopic group keys to project IDs
+    const GROUP_TO_PROJECT = {
+      'group-1-1': 'project-1',
+      'group-1-2': 'project-2',
+      'group-1-3': 'project-3',
+      'group-2-1': 'project-4',
+      'group-2-2': 'project-5',
+      'group-2-3': 'project-6',
+      'group-2-4': 'project-7'
+    };
+
     const colors = [
       'from-pink-500 to-violet-600',
       'from-cyan-400 to-blue-500',
@@ -92,16 +104,28 @@
       'Beginner to Advanced': 'bg-gradient-to-r from-amber-400 to-pink-500 text-white font-semibold'
     };
 
-    function render() {
+    function render(allowedProjectIds) {
       const projectIds = Object.keys(projectsContent);
-      const readyCount = projectIds.filter(id => projectsContent[id].ready === true).length;
-      const doneCount = projectIds.filter(id => progress[id]).length;
+      const allowedSet = new Set(allowedProjectIds);
+      const visibleIds = projectIds.filter(id => allowedSet.has(id));
+      const readyCount = visibleIds.filter(id => projectsContent[id].ready === true).length;
+      const doneCount = visibleIds.filter(id => progress[id]).length;
 
-      document.getElementById('projectCount').textContent = `📚 ${projectIds.length} Projects`;
-      document.getElementById('progressLabel').textContent = readyCount ? `${doneCount} / ${readyCount} completed` : 'Coming Soon';
-      document.getElementById('progressBar').style.width = readyCount ? Math.round((doneCount/readyCount)*100)+'%' : '0%';
+      document.getElementById('projectCount').textContent = `📚 ${visibleIds.length} Projects`;
+      document.getElementById('progressLabel').textContent = readyCount ? `${doneCount} / ${readyCount} completed` : '';
+      document.getElementById('progressBar').style.width = readyCount ? Math.round((doneCount / readyCount) * 100) + '%' : '0%';
 
-      document.getElementById('projectsGrid').innerHTML = projectIds.map((id, i) => {
+      if (visibleIds.length === 0) {
+        document.getElementById('projectsGrid').innerHTML = `
+          <div class="col-span-3 text-center py-16">
+            <div class="text-6xl mb-4">🔒</div>
+            <h3 class="text-2xl font-bold text-white mb-2">No Projects Unlocked Yet</h3>
+            <p class="text-gray-400">Contact admin to get access to projects.</p>
+          </div>`;
+        return;
+      }
+
+      document.getElementById('projectsGrid').innerHTML = visibleIds.map((id, i) => {
         const t = projectsContent[id];
         const isReady = t.ready === true;
         const isDone = !!progress[id];
@@ -140,29 +164,53 @@
 
     function openProject(id) {
       const hist = JSON.parse(localStorage.getItem('searchHistory') || '[]');
-      hist.unshift({ type:'projects', title: projectsContent[id].title, url:`project-detail.html?project=${id}`, time: new Date().toISOString() });
-      localStorage.setItem('searchHistory', JSON.stringify(hist.slice(0,50)));
-
-      if (user.role === 'admin') { window.location.href = `project-detail.html?project=${id}`; return; }
-      fetch(`${API}/enrollment/status`, { headers:{ Authorization:`Bearer ${token}` } })
-        .then(r => r.json())
-        .then(d => {
-          if (!d.paid) { alert('🔒 Please complete payment to access content!'); window.location.href='student-dashboard.html'; }
-          else if (d.enrollment && d.enrollment.content_access_granted === 0) { alert('🚫 Access denied. Contact admin.'); }
-          else window.location.href = `project-detail.html?project=${id}`;
-        })
-        .catch(() => { alert('Auth failed'); window.location.href='student-login.html'; });
+      hist.unshift({ type: 'projects', title: projectsContent[id].title, url: `project-detail.html?project=${id}`, time: new Date().toISOString() });
+      localStorage.setItem('searchHistory', JSON.stringify(hist.slice(0, 50)));
+      window.location.href = `project-detail.html?project=${id}`;
     }
 
-    render();
+    async function init() {
+      try {
+        // Admin sees all projects
+        if (user.role === 'admin') {
+          render(Object.keys(projectsContent));
+          return;
+        }
+
+        // Check syllabus_access.projects_access — set by admin Module Access tab
+        const r = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` } });
+        const access = await r.json();
+
+        if (access.projects_access) {
+          // Full access granted — show all projects
+          render(Object.keys(projectsContent));
+        } else {
+          // Check subtopic_access for per-project grants (admin-access-control page)
+          const r2 = await fetch(`${API}/subtopic/access`, { headers: { Authorization: `Bearer ${token}` } });
+          const subtopics = await r2.json();
+
+          if (subtopics.all_access) {
+            render(Object.keys(projectsContent));
+            return;
+          }
+
+          const allowedIds = (subtopics || [])
+            .filter(s => s.module === 'projects' && s.access_granted === 1)
+            .map(s => GROUP_TO_PROJECT[s.group_name])
+            .filter(Boolean);
+
+          render(allowedIds);
+        }
+      } catch (e) {
+        console.error('Failed to load access:', e);
+        render([]);
+      }
+    }
+
+    init();
 
     function goBackToSyllabus() {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      if (user.role === 'admin') {
-        window.location.href = 'admin-dashboard.html';
-      } else {
-        window.location.href = 'student-dashboard.html';
-      }
+      window.location.href = 'student-dashboard.html';
     }
   </script>
 </body>
