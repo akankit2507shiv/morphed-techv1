@@ -219,9 +219,9 @@
         <!-- Message Box -->
         <div id="message" style="display: none; margin-top: 24px;"></div>
 
-<!-- Student Link -->
+<!-- Back Link -->
         <div style="margin-top: 32px; text-align: center; padding-top: 24px; border-top: 1px solid var(--border);">
-          <a href="student-login.html" class="link" style="font-size: 14px;">← Student Login</a>
+          <span style="color: var(--muted); font-size: 14px;">Authorized Personnel Only</span>
         </div>
       </div>
 
@@ -261,7 +261,15 @@
 
         if (response.ok) {
           if (data.user.role !== 'admin') {
-            showMessage('Access denied. Admin credentials required.', 'error');
+            showMessage('⚠️ Unauthorized Access — This incident has been logged.', 'error');
+            // Log unauthorized admin access attempt
+            fetch(`${API_URL}/security/admin-access-attempt`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ route: '/secure-admin', user_email: email })
+            }).catch(() => {});
+            // Redirect non-admin users away after delay
+            setTimeout(() => { window.location.href = 'student-login.html'; }, 2000);
             return;
           }
 

@@ -39,7 +39,7 @@ npm start
 |------|-----|
 | Landing | `http://localhost:5000` |
 | Student Login | `http://localhost:5000/student-login.html` |
-| Admin Login | `http://localhost:5000/admin-login.html` |
+| Admin Login | `http://localhost:5000/secure-admin` (hidden route) |
 | Student Dashboard | `http://localhost:5000/student-dashboard.html` |
 | Admin Dashboard | `http://localhost:5000/admin-dashboard.html` |
 

@@ -164,7 +164,7 @@ https://morphed-tech-backend.onrender.com
 
 **Admin Portal:**
 ```
-https://morphed-tech.vercel.app/admin-login.html
+https://morphed-tech.vercel.app/secure-admin
 ```
 
 **Student Portal:**
@@ -231,7 +231,7 @@ Users can:
 - Access courses (when admin grants access)
 
 Admin can:
-- Login at /admin-login.html
+- Login at /secure-admin (hidden route — do not share publicly)
 - Manage students
 - Control course access
 - Track payments

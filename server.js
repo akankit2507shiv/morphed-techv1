@@ -27,6 +27,22 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Serve static files (after admin route protection below)
+// Note: Express routes defined before static middleware take priority
+
+// ==================== ADMIN ACCESS SECURITY ====================
+// Block direct access to admin-login.html — redirect to student login
+app.get('/admin-login.html', (req, res) => {
+  res.redirect('/student-login.html');
+});
+
+// Hidden admin portal route — only accessible via direct URL
+app.get('/secure-admin', (req, res) => {
+  res.sendFile(__dirname + '/admin-login.html');
+});
+
+// Serve static files (after admin route protection)
 app.use(express.static('.'));
 
 // Serve learning data
@@ -1020,6 +1036,20 @@ app.get('/api/test-telegram', async (req, res) => {
 
 // ==================== SECURITY ROUTES ====================
 
+// Log unauthorized admin access attempts (open — no auth required to log the attempt)
+app.post('/api/security/admin-access-attempt', (req, res) => {
+  const { route, user_email } = req.body;
+  db.run(
+    `INSERT INTO security_logs (user_email, event_type, detail, severity, page, user_agent, device_type)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [user_email || 'anonymous', 'UNAUTHORIZED_ADMIN_ACCESS', `Attempted access to admin route: ${route || '/secure-admin'}`, 'HIGH', route || '/secure-admin', (req.headers['user-agent'] || '').substring(0, 200), /Mobi|Android/i.test(req.headers['user-agent'] || '') ? 'Mobile' : 'Desktop'],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Log failed' });
+      res.json({ ok: true });
+    }
+  );
+});
+
 // Log security event (open — called from frontend)
 app.post('/api/security/log', (req, res) => {
   const { event_type, detail, severity, user_id, user_email, page, user_agent, device_type } = req.body;
@@ -1139,6 +1169,6 @@ app.get('/api/admin/security/sessions', authenticateToken, authenticateAdmin, (r
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 Admin Portal: http://localhost:${PORT}/admin-login.html`);
+  console.log(`🔒 Admin Portal: http://localhost:${PORT}/secure-admin (HIDDEN - do not share)`);
   console.log(`👨‍🎓 Student Portal: http://localhost:${PORT}/student-login.html`);
 });

@@ -85,10 +85,16 @@
     },
 
     requireAdmin: function () {
-      if (!this.requireLogin('admin-login.html')) return false;
+      if (!this.requireLogin('secure-admin')) return false;
       const user = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) { return {}; } })();
       if (user.role !== 'admin') {
         logEvent('UNAUTHORIZED_ADMIN_ACCESS', window.location.pathname, 'HIGH');
+        // Log the attempt to the server
+        fetch(`${API}/security/admin-access-attempt`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ route: window.location.pathname, user_email: user.email || 'anonymous' })
+        }).catch(() => {});
         window.location.href = 'student-login.html';
         return false;
       }

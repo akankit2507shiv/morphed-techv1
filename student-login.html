@@ -110,9 +110,7 @@
       <!-- Footer Text -->
       <div class="text-muted" style="text-align: center; margin-top: 32px; font-size: 13px;">
         <p>Secure • Fast • Professional</p>
-        <p style="margin-top: 12px;">
-          <a href="admin-login.html" style="color: var(--cyan); text-decoration: none; font-weight: 600;">🔐 Admin Login</a>
-        </p>
+        <p style="margin-top: 8px;"><a href="mailto:support@morphedtechai.com" style="color: var(--cyan); text-decoration: none; font-weight: 500;">📧 support@morphedtechai.com</a></p>
       </div>
     </div>
   </div>
@@ -156,8 +154,6 @@
         btn.textContent = loading ? 'Please wait...' : 'Sign In';
       } else if (btnId === 'signupBtn') {
         btn.textContent = loading ? 'Please wait...' : 'Create Account';
-      } else if (btnId === 'adminBtn') {
-        btn.textContent = loading ? 'Please wait...' : '🔐 Admin Login';
       }
       btn.style.opacity = loading ? '0.6' : '1';
     }

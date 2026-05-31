@@ -12,13 +12,13 @@
       console.log('Auth check:', { hasToken: !!token, userRole: user.role });
       if (!token || user.role !== 'admin') {
         console.warn('Not authenticated as admin, redirecting...');
-        window.location.href = 'admin-login.html';
+        window.location.href = 'secure-admin';
       } else {
         console.log('✅ Admin authenticated successfully');
       }
     } catch (e) {
       console.error('Auth check error:', e);
-      window.location.href = 'admin-login.html';
+      window.location.href = 'secure-admin';
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -449,7 +449,7 @@
     console.log('User:', user);
     if (!token || user.role !== 'admin') {
       console.error('❌ Auth failed in main script');
-      window.location.href = 'admin-login.html';
+      window.location.href = 'secure-admin';
     }
 
     let allStudents = [];

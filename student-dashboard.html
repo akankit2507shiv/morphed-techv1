@@ -1096,7 +1096,7 @@
             `;
           }
           // No access — show locked card with reason
-          const reason = enrollmentData.paid ? 'Contact admin to unlock' : 'Complete payment first';
+          const reason = enrollmentData.paid ? 'Contact support@morphedtechai.com to unlock' : 'Complete payment first';
           return `
             <div class="glass-card p-6 relative" style="opacity:0.55;filter:blur(1px) grayscale(0.4);pointer-events:none;">
               <div class="absolute top-4 right-4 text-3xl">🔒</div>
@@ -1322,7 +1322,7 @@ function showUpgradeModal(type, tabNum) {
         <div class="text-6xl mb-4">🔒</div>
         <h3 class="text-2xl font-black gradient-text mb-3">Premium Content</h3>
         <p class="text-xl text-white mb-2">${tabNames[type][tabNum]}</p>
-        <p class="text-gray-400 mb-6">This tab is locked. Contact admin to unlock premium content.</p>
+        <p class="text-gray-400 mb-6">This tab is locked. Contact <a href="mailto:support@morphedtechai.com" style="color:#00d4ff;text-decoration:none;font-weight:600;">support@morphedtechai.com</a> to unlock premium content.</p>
         <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6">
           <p class="text-yellow-300 text-sm font-semibold mb-2">✨ What You'll Get:</p>
           <ul class="text-left text-gray-300 text-sm space-y-1">
@@ -1390,7 +1390,7 @@ function renderMyAccess(subtopicAccess, featureAccess) {
     container.innerHTML = `
       <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6 text-center">
         <p class="text-yellow-300 text-lg font-bold mb-2">🔒 No Additional Access Granted Yet</p>
-        <p class="text-gray-400 text-sm mb-4">You have access to free content. Admin will grant additional access as you progress.</p>
+        <p class="text-gray-400 text-sm mb-4">You have access to free content. Contact <a href="mailto:support@morphedtechai.com" style="color:#00d4ff;text-decoration:none;font-weight:600;">support@morphedtechai.com</a> for additional access as you progress.</p>
         <div class="mt-4 space-y-3">
           <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
             <p class="text-white font-bold mb-2">🗄️ SQL: First 3 topics (FREE)</p>
