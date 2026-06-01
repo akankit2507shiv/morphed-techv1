@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MORPHED TECH - Logo Samples</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #050816; font-family: 'Inter', system-ui, sans-serif; color: white; padding: 40px; }
+    h1 { text-align: center; font-size: 14px; letter-spacing: 4px; color: #94A3B8; margin-bottom: 60px; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; max-width: 900px; margin: 0 auto; }
+    .card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 40px; text-align: center; }
+    .card h3 { font-size: 12px; letter-spacing: 3px; color: #64748B; margin-bottom: 24px; text-transform: uppercase; }
+    .card svg { display: block; margin: 0 auto; }
+    .label { margin-top: 16px; font-size: 11px; color: #475569; }
+  </style>
+</head>
+<body>
+  <h1>Morphed Tech — Logo Samples (Pick Your Favorite)</h1>
+  <div class="grid">
+
+    <!-- SAMPLE 1: Original Enhanced - Bolder strokes + gradient fill -->
+    <div class="card">
+      <h3>Sample 1 — Bold Gradient Fill</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s1Grad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C3AED"/>
+            <stop offset="50%" stop-color="#EC4899"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+          <filter id="s1Glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#s1Glow)">
+          <path d="M15 95 L40 30 L65 62 L90 30 L115 95" stroke="url(#s1Grad)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M65 62 L105 20" stroke="url(#s1Grad)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M105 20 L93 24 M105 20 L101 32" stroke="url(#s1Grad)" stroke-width="7" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <p class="label">Bolder strokes, 3-color gradient (purple → pink → cyan), stronger glow</p>
+    </div>
+
+    <!-- SAMPLE 2: Filled M with arrow -->
+    <div class="card">
+      <h3>Sample 2 — Filled Shape + Arrow</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s2Grad" x1="0" y1="120" x2="120" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#7C3AED"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+          <linearGradient id="s2Arrow" x1="0" y1="0" x2="100%" y2="0">
+            <stop offset="0%" stop-color="#F59E0B"/>
+            <stop offset="100%" stop-color="#EF4444"/>
+          </linearGradient>
+          <filter id="s2Glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#s2Glow)">
+          <!-- Filled M shape -->
+          <path d="M15 95 L15 30 L40 30 L60 58 L80 30 L105 30 L105 95 L85 95 L85 55 L65 80 L55 80 L35 55 L35 95 Z" fill="url(#s2Grad)" opacity="0.9"/>
+          <!-- Growth arrow -->
+          <path d="M60 50 L100 15" stroke="url(#s2Arrow)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M100 15 L88 18 M100 15 L96 27" stroke="url(#s2Arrow)" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <p class="label">Solid filled M, orange-red growth arrow, professional SaaS feel</p>
+    </div>
+
+    <!-- SAMPLE 3: Geometric M with Trishul accent -->
+    <div class="card">
+      <h3>Sample 3 — Geometric + Gold Accent</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s3Main" x1="0" y1="0" x2="120" y2="120">
+            <stop offset="0%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+          <linearGradient id="s3Gold" x1="0" y1="0" x2="0" y2="100%">
+            <stop offset="0%" stop-color="#F5D76E"/>
+            <stop offset="100%" stop-color="#D4AF37"/>
+          </linearGradient>
+          <filter id="s3Glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#s3Glow)">
+          <!-- M strokes -->
+          <path d="M18 92 L18 28 L38 28 L60 56 L82 28 L102 28 L102 92" stroke="url(#s3Main)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Gold trishul-inspired center -->
+          <path d="M60 56 L60 92" stroke="url(#s3Gold)" stroke-width="6" stroke-linecap="round"/>
+          <path d="M50 42 L60 28 L70 42" stroke="url(#s3Gold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Diamond tip -->
+          <circle cx="60" cy="22" r="4" fill="url(#s3Gold)"/>
+        </g>
+      </svg>
+      <p class="label">Clean M + gold trishul center, premium EdTech branding</p>
+    </div>
+
+    <!-- SAMPLE 4: Modern M with upward energy lines -->
+    <div class="card">
+      <h3>Sample 4 — Energy Lines + Glow</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s4Grad" x1="0" y1="0" x2="120" y2="120">
+            <stop offset="0%" stop-color="#EC4899"/>
+            <stop offset="40%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+          <filter id="s4Glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#s4Glow)">
+          <!-- M path -->
+          <path d="M15 95 L40 25 L60 55 L80 25 L105 95" stroke="url(#s4Grad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Energy lines shooting up -->
+          <path d="M60 55 L60 12" stroke="url(#s4Grad)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M48 60 L42 18" stroke="url(#s4Grad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <path d="M72 60 L78 18" stroke="url(#s4Grad)" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <!-- Spark at top -->
+          <circle cx="60" cy="10" r="3.5" fill="#06B6D4"/>
+          <circle cx="60" cy="10" r="6" fill="#06B6D4" opacity="0.3"/>
+        </g>
+      </svg>
+      <p class="label">Dynamic energy lines, spark effect, growth/transformation feel</p>
+    </div>
+
+    <!-- SAMPLE 5: Minimal premium with rounded bg -->
+    <div class="card">
+      <h3>Sample 5 — App Icon Style</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s5Bg" x1="0" y1="0" x2="120" y2="120">
+            <stop offset="0%" stop-color="#1E1B4B"/>
+            <stop offset="100%" stop-color="#0F172A"/>
+          </linearGradient>
+          <linearGradient id="s5Stroke" x1="0" y1="0" x2="120" y2="120">
+            <stop offset="0%" stop-color="#A78BFA"/>
+            <stop offset="50%" stop-color="#EC4899"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+          <filter id="s5Glow" x="-15%" y="-15%" width="130%" height="130%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Rounded bg -->
+        <rect x="5" y="5" width="110" height="110" rx="28" fill="url(#s5Bg)" stroke="rgba(124,58,237,0.3)" stroke-width="1"/>
+        <g filter="url(#s5Glow)">
+          <path d="M28 88 L48 32 L60 52 L72 32 L92 88" stroke="url(#s5Stroke)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M60 52 L95 22" stroke="url(#s5Stroke)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M95 22 L84 25 M95 22 L91 33" stroke="url(#s5Stroke)" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <p class="label">Dark bg container, 3-color stroke, arrow — ready for app icon</p>
+    </div>
+
+    <!-- SAMPLE 6: Ultra minimal -->
+    <div class="card">
+      <h3>Sample 6 — Ultra Minimal</h3>
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="s6Grad" x1="20" y1="90" x2="100" y2="20">
+            <stop offset="0%" stop-color="#7C3AED"/>
+            <stop offset="100%" stop-color="#06B6D4"/>
+          </linearGradient>
+        </defs>
+        <!-- Clean M only, no glow, no extras -->
+        <path d="M20 90 L20 30 L45 30 L60 55 L75 30 L100 30 L100 90" stroke="url(#s6Grad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Single upward arrow from center -->
+        <path d="M60 55 L60 18" stroke="#06B6D4" stroke-width="4" stroke-linecap="round"/>
+        <path d="M54 26 L60 16 L66 26" stroke="#06B6D4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <p class="label">Clean, no glow, minimal — works at any size</p>
+    </div>
+
+  </div>
+</body>
+</html>

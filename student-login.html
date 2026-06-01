@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Morphed Tech | Data Engineering Platform</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="dopamine-ui.css">
   <style>
@@ -21,6 +22,14 @@
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
     input:checked + .slider { background: linear-gradient(135deg, #ff3d81, #7c3cff); border-color: transparent; }
     input:checked + .slider:before { transform: translateX(24px); }
+
+    /* Field validation hints */
+    .field-hint { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 4px; transition: color 0.3s; }
+    .input:focus ~ .field-hint { color: rgba(255,255,255,0.55); }
+    .input:invalid:not(:placeholder-shown) { border-color: #ff3d81; }
+    .input:valid:not(:placeholder-shown) { border-color: rgba(0, 212, 255, 0.4); }
+    .input:invalid:not(:placeholder-shown) ~ .field-hint { color: #ff3d81; }
+    .input:valid:not(:placeholder-shown) ~ .field-hint { color: #00d4ff; }
   </style>
 </head>
 <body>
@@ -31,16 +40,24 @@
       <!-- Logo Section -->
       <div style="text-align: center; margin-bottom: 48px;">
         <div class="logo-glow" style="display: inline-block; margin-bottom: 20px;">
-          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="72" height="72" rx="18" fill="url(#logo-gradient)"/>
-            <path d="M22 50V22L36 32L50 22V50L36 40L22 50Z" fill="white"/>
+          <svg width="72" height="72" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="logo-gradient" x1="0" y1="0" x2="72" y2="72">
-                <stop offset="0%" stop-color="#ff3d81"/>
-                <stop offset="50%" stop-color="#7c3cff"/>
-                <stop offset="100%" stop-color="#00d4ff"/>
+              <linearGradient id="logo-gradient" x1="0" y1="120" x2="120" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#7C3AED"/>
+                <stop offset="100%" stop-color="#06B6D4"/>
+              </linearGradient>
+              <linearGradient id="logo-gold" x1="0" y1="0" x2="0" y2="100%">
+                <stop offset="0%" stop-color="#FDE68A"/>
+                <stop offset="100%" stop-color="#D4AF37"/>
               </linearGradient>
             </defs>
+            <path d="M18 92 L38 30 L60 58 L82 30 L102 92" stroke="url(#logo-gradient)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M60 58 L60 18" stroke="url(#logo-gold)" stroke-width="5" stroke-linecap="round"/>
+            <path d="M48 28 L60 12 L72 28" stroke="url(#logo-gold)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M60 12 L60 6" stroke="url(#logo-gold)" stroke-width="4" stroke-linecap="round"/>
+            <path d="M48 28 L45 23" stroke="url(#logo-gold)" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M72 28 L75 23" stroke="url(#logo-gold)" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="60" cy="4" r="3" fill="url(#logo-gold)"/>
           </svg>
         </div>
         <h1 class="gradient-text" style="font-size: 48px; font-weight: 900; margin-bottom: 12px; letter-spacing: -1.5px;">MORPHED TECH</h1>
@@ -82,19 +99,34 @@
             <form id="signupForm" style="display: flex; flex-direction: column; gap: 20px;">
               <div>
                 <label class="label">Full Name</label>
-                <input type="text" id="signupName" required placeholder="Your full name" class="input">
+                <input type="text" id="signupName" required placeholder="Your full name" class="input" minlength="3" maxlength="50" pattern="[A-Za-z\s]{3,50}" title="Name must be 3-50 characters, letters only">
+                <span class="field-hint">Min 3 characters, letters only</span>
               </div>
               <div>
                 <label class="label">Email Address</label>
-                <input type="email" id="signupEmail" required placeholder="you@example.com" class="input">
+                <input type="email" id="signupEmail" required placeholder="you@example.com" class="input" maxlength="100" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="Enter a valid email address">
+                <span class="field-hint">Valid email required</span>
               </div>
               <div>
                 <label class="label">Phone Number</label>
-                <input type="tel" id="signupPhone" required placeholder="+91 XXXXX XXXXX" class="input">
+                <input type="tel" id="signupPhone" required placeholder="+91 9876543210" class="input" minlength="10" maxlength="15" pattern="[\+]?[0-9\s\-]{10,15}" title="Enter a valid 10-digit phone number">
+                <span class="field-hint">10-digit mobile number</span>
               </div>
               <div>
                 <label class="label">Password</label>
-                <input type="password" id="signupPassword" required placeholder="Minimum 6 characters" minlength="6" class="input">
+                <input type="password" id="signupPassword" required placeholder="Min 8 chars, 1 uppercase, 1 number" minlength="8" maxlength="64" class="input" title="Minimum 8 characters with at least 1 uppercase letter and 1 number">
+                <span class="field-hint">Min 8 chars, 1 uppercase, 1 number</span>
+              </div>
+              <div>
+                <label class="label">Confirm Password</label>
+                <input type="password" id="signupConfirmPassword" required placeholder="Re-enter your password" class="input">
+                <span class="field-hint">Must match password above</span>
+              </div>
+              <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <input type="checkbox" id="signupTerms" required style="margin-top: 4px; width: 18px; height: 18px; accent-color: #7c3cff; cursor: pointer;">
+                <label for="signupTerms" style="font-size: 13px; color: rgba(255,255,255,0.6); cursor: pointer; line-height: 1.4;">
+                  I agree to the <a href="#" onclick="showTerms(event)" style="color: #00d4ff; text-decoration: none; font-weight: 600;">Terms & Conditions</a> and <a href="#" onclick="showPrivacy(event)" style="color: #00d4ff; text-decoration: none; font-weight: 600;">Privacy Policy</a>
+                </label>
               </div>
               <button type="submit" id="signupBtn" class="btn btn-primary" style="margin-top: 8px; width: 100%;">Create Account</button>
             </form>
@@ -197,17 +229,43 @@
     // Student Signup
     document.getElementById('signupForm').addEventListener('submit', async e => {
       e.preventDefault();
+
+      // Client-side validation
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const phone = document.getElementById('signupPhone').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const confirmPassword = document.getElementById('signupConfirmPassword').value;
+      const terms = document.getElementById('signupTerms').checked;
+
+      // Name validation
+      if (name.length < 3) { showMsg('Name must be at least 3 characters', false); return; }
+      if (!/^[A-Za-z\s]+$/.test(name)) { showMsg('Name should contain only letters', false); return; }
+
+      // Email validation
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { showMsg('Please enter a valid email address', false); return; }
+
+      // Phone validation
+      const phoneClean = phone.replace(/[\s\-\+]/g, '');
+      if (phoneClean.length < 10 || !/^\d{10,13}$/.test(phoneClean)) { showMsg('Please enter a valid 10-digit phone number', false); return; }
+
+      // Password strength validation
+      if (password.length < 8) { showMsg('Password must be at least 8 characters', false); return; }
+      if (!/[A-Z]/.test(password)) { showMsg('Password must contain at least 1 uppercase letter', false); return; }
+      if (!/[0-9]/.test(password)) { showMsg('Password must contain at least 1 number', false); return; }
+
+      // Confirm password
+      if (password !== confirmPassword) { showMsg('Passwords do not match', false); return; }
+
+      // Terms checkbox
+      if (!terms) { showMsg('Please accept Terms & Conditions', false); return; }
+
       setLoading('signupBtn', true);
       try {
         const r = await fetch(`${API}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: document.getElementById('signupName').value,
-            email: document.getElementById('signupEmail').value,
-            phone: document.getElementById('signupPhone').value,
-            password: document.getElementById('signupPassword').value
-          })
+          body: JSON.stringify({ name, email, phone, password })
         });
         const d = await r.json();
         if (r.ok) {
@@ -224,6 +282,48 @@
         setLoading('signupBtn', false);
       }
     });
+
+    // Terms & Privacy modals
+    function showTerms(e) {
+      e.preventDefault();
+      showModal('Terms & Conditions', `
+        <p><strong>1. Account Usage:</strong> Your account is personal and non-transferable. You are responsible for maintaining the confidentiality of your login credentials.</p>
+        <p><strong>2. Content Access:</strong> Course content is for personal learning only. Sharing, copying, or distributing content is strictly prohibited.</p>
+        <p><strong>3. Payment:</strong> All payments are non-refundable once course access is granted. Payment confirmation may take up to 24 hours.</p>
+        <p><strong>4. Code of Conduct:</strong> Users must not attempt to hack, reverse-engineer, or misuse the platform. Violations will result in permanent account suspension.</p>
+        <p><strong>5. Intellectual Property:</strong> All course materials, videos, and content are owned by Morphed Tech. Unauthorized reproduction is prohibited.</p>
+        <p><strong>6. Account Termination:</strong> We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
+        <p><strong>7. Modifications:</strong> We may update these terms at any time. Continued use of the platform constitutes acceptance of updated terms.</p>
+      `);
+    }
+
+    function showPrivacy(e) {
+      e.preventDefault();
+      showModal('Privacy Policy', `
+        <p><strong>1. Data Collection:</strong> We collect your name, email, phone number, and payment details for account management and course delivery.</p>
+        <p><strong>2. Data Usage:</strong> Your data is used solely for providing platform services, sending course updates, and processing payments.</p>
+        <p><strong>3. Data Security:</strong> We use industry-standard encryption (JWT, bcrypt) to protect your personal information.</p>
+        <p><strong>4. No Third-Party Sharing:</strong> We do not sell or share your personal data with third parties for marketing purposes.</p>
+        <p><strong>5. Session Tracking:</strong> We track login sessions and device information for security purposes (fraud prevention).</p>
+        <p><strong>6. Cookies:</strong> We use localStorage for session management. No third-party tracking cookies are used.</p>
+        <p><strong>7. Data Deletion:</strong> You may request account deletion by contacting support@morphedtechai.com. All personal data will be removed within 30 days.</p>
+        <p><strong>8. Contact:</strong> For privacy concerns, email us at support@morphedtechai.com</p>
+      `);
+    }
+
+    function showModal(title, content) {
+      const existing = document.getElementById('modal-overlay');
+      if (existing) existing.remove();
+      const div = document.createElement('div');
+      div.id = 'modal-overlay';
+      div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+      div.innerHTML = `<div style="background:linear-gradient(135deg,#0b1020,#1a0a2e);border:1px solid rgba(124,60,255,0.3);border-radius:16px;padding:32px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;color:white;font-family:Inter,sans-serif;">
+        <h3 style="font-size:20px;font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,#ff3d81,#7c3cff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${title}</h3>
+        <div style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.7);">${content}</div>
+        <button onclick="document.getElementById('modal-overlay').remove()" style="margin-top:20px;width:100%;padding:12px;background:linear-gradient(135deg,#ff3d81,#7c3cff);color:white;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;">Close</button>
+      </div>`;
+      document.body.appendChild(div);
+    }
 
 
   </script>

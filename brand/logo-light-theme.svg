@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" fill="none">
+  <!-- MORPHED TECH - Light Theme Version -->
+  <defs>
+    <linearGradient id="ltGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B8860B"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+    <linearGradient id="ltIndigo" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#312E81"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- M Icon Mark -->
+  <g transform="translate(10, 10)">
+    <path d="M8 72 L8 16 L28 16 L40 38 L52 16 L72 16 L72 72" 
+          stroke="url(#ltIndigo)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M40 38 L40 72" stroke="url(#ltIndigo)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M33 44 L40 34 L47 44" stroke="url(#ltGold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M40 28 L43 32 L40 36 L37 32 Z" fill="url(#ltGold)" opacity="0.9"/>
+  </g>
+  
+  <!-- Wordmark -->
+  <text x="100" y="58" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="2" fill="#1E1B4B">MORPHED</text>
+  <text x="310" y="58" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="300" letter-spacing="2" fill="url(#ltGold)">TECH</text>
+  
+  <text x="100" y="78" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="400" letter-spacing="4" fill="#64748B" opacity="0.8">DATA ENGINEERING MASTERY</text>
+</svg>

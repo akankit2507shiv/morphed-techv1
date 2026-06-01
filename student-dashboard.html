@@ -7,6 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>My Dashboard - Morphed Tech v2.0</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1059,13 +1060,13 @@
         await loadFeatureAccess();
         
         // Get enrollment status
-        const r = await fetch(`${API}/enrollment/status`, { headers: { Authorization: `Bearer ${token}` } });
+        const r = await fetch(`${API}/enrollment/status`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
         const enrollmentData = await r.json();
 
         // Get syllabus access (always fetch, regardless of payment status)
         let syllabusAccess = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
         try {
-          const sr = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` } });
+          const sr = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
           syllabusAccess = await sr.json();
         } catch(e) { console.error('Failed to load syllabus access:', e); }
 
@@ -1252,7 +1253,7 @@ function _activateInterviewTab(tabNum) {
 // Check feature access from API — returns Promise
 async function loadFeatureAccess() {
   try {
-    const r = await fetch(`${API}/feature/access`, { headers: { Authorization: `Bearer ${token}` } });
+    const r = await fetch(`${API}/feature/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
     const data = await r.json();
     if (data.all_access) {
       window.featureAccess = 'all';
