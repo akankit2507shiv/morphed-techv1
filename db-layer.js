@@ -10,11 +10,24 @@ require('dotenv').config();
 const USE_MONGODB = !!process.env.MONGODB_URI;
 
 let mongo, sqlite3, sqliteDb;
+let mongoose; // for ObjectId conversion
 
 if (USE_MONGODB) {
   mongo = require('./database-mongo');
+  mongoose = require('mongoose');
 } else {
   sqlite3 = require('sqlite3').verbose();
+}
+
+// Helper: convert string ID to MongoDB ObjectId (safe)
+function toObjectId(id) {
+  if (!USE_MONGODB) return id;
+  try {
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      return new mongoose.Types.ObjectId(id);
+    }
+  } catch(e) {}
+  return id;
 }
 
 // Helper: promisify sqlite3 callbacks
@@ -198,7 +211,7 @@ const users = {
 const enrollments = {
   async findByUserId(userId) {
     if (USE_MONGODB) {
-      const e = await mongo.Enrollment.findOne({ user_id: userId }).sort({ enrolled_at: -1 }).lean();
+      const e = await mongo.Enrollment.findOne({ user_id: toObjectId(userId) }).sort({ enrolled_at: -1 }).lean();
       if (e) { e.id = e._id.toString(); e.user_id = e.user_id.toString(); }
       return e;
     }
@@ -206,7 +219,7 @@ const enrollments = {
   },
   async create(userId, amount, method) {
     if (USE_MONGODB) {
-      const e = await mongo.Enrollment.create({ user_id: userId, payment_amount: amount, payment_method: method, payment_status: 'pending' });
+      const e = await mongo.Enrollment.create({ user_id: toObjectId(userId), payment_amount: amount, payment_method: method, payment_status: 'pending' });
       return { id: e._id.toString() };
     }
     const r = await sqlRun('INSERT INTO enrollments (user_id, payment_amount, payment_method, payment_status) VALUES (?, ?, ?, ?)', [userId, amount, method, 'pending']);
@@ -214,7 +227,7 @@ const enrollments = {
   },
   async confirmPayment(enrollmentId, userId, transactionId) {
     if (USE_MONGODB) {
-      const r = await mongo.Enrollment.findOneAndUpdate({ _id: enrollmentId, user_id: userId }, { payment_status: 'completed', transaction_id: transactionId, payment_date: new Date() });
+      const r = await mongo.Enrollment.findOneAndUpdate({ _id: toObjectId(enrollmentId), user_id: toObjectId(userId) }, { payment_status: 'completed', transaction_id: transactionId, payment_date: new Date() });
       return { changes: r ? 1 : 0 };
     }
     return sqlRun(`UPDATE enrollments SET payment_status = 'completed', transaction_id = ?, payment_date = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?`, [transactionId, enrollmentId, userId]);
@@ -228,7 +241,7 @@ const enrollments = {
   },
   async adminCreate(data) {
     if (USE_MONGODB) {
-      const e = await mongo.Enrollment.create({ user_id: data.user_id, payment_amount: data.payment_amount, payment_method: data.payment_method || 'UPI', payment_status: data.payment_status || 'completed', transaction_id: data.transaction_id, payment_date: new Date() });
+      const e = await mongo.Enrollment.create({ user_id: toObjectId(data.user_id), payment_amount: data.payment_amount, payment_method: data.payment_method || 'UPI', payment_status: data.payment_status || 'completed', transaction_id: data.transaction_id, payment_date: new Date() });
       return { id: e._id.toString() };
     }
     const r = await sqlRun(`INSERT INTO enrollments (user_id, payment_amount, payment_method, payment_status, transaction_id, payment_date) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`, [data.user_id, data.payment_amount, data.payment_method || 'UPI', data.payment_status || 'completed', data.transaction_id]);
@@ -236,7 +249,7 @@ const enrollments = {
   },
   async getReceipt(enrollmentId, userId) {
     if (USE_MONGODB) {
-      const e = await mongo.Enrollment.findOne({ _id: enrollmentId, user_id: userId }).lean();
+      const e = await mongo.Enrollment.findOne({ _id: toObjectId(enrollmentId), user_id: toObjectId(userId) }).lean();
       if (!e) return null;
       const u = await mongo.User.findById(userId).lean();
       return { ...e, id: e._id.toString(), name: u?.name, email: u?.email, phone: u?.phone };
@@ -254,7 +267,7 @@ const enrollments = {
   },
   async getCertificate(userId) {
     if (USE_MONGODB) {
-      const e = await mongo.Enrollment.findOne({ user_id: userId, payment_status: 'completed' }).sort({ enrolled_at: -1 }).lean();
+      const e = await mongo.Enrollment.findOne({ user_id: toObjectId(userId), payment_status: 'completed' }).sort({ enrolled_at: -1 }).lean();
       if (!e) return null;
       const u = await mongo.User.findById(userId).lean();
       return { ...e, id: e._id.toString(), name: u?.name };
@@ -276,7 +289,7 @@ const enrollments = {
 const syllabusAccess = {
   async get(userId) {
     if (USE_MONGODB) {
-      const s = await mongo.SyllabusAccess.findOne({ user_id: userId }).lean();
+      const s = await mongo.SyllabusAccess.findOne({ user_id: toObjectId(userId) }).lean();
       return s || { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
     }
     const row = await sqlGet('SELECT * FROM syllabus_access WHERE user_id = ?', [userId]);
@@ -284,14 +297,14 @@ const syllabusAccess = {
   },
   async update(userId, data) {
     if (USE_MONGODB) {
-      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: userId }, { ...data, user_id: userId }, { upsert: true });
+      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: toObjectId(userId) }, { sql_access: data.sql_access ? 1 : 0, python_access: data.python_access ? 1 : 0, pyspark_access: data.pyspark_access ? 1 : 0, databricks_access: data.databricks_access ? 1 : 0, aws_access: data.aws_access ? 1 : 0, git_access: data.git_access ? 1 : 0, projects_access: data.projects_access ? 1 : 0, user_id: toObjectId(userId) }, { upsert: true, new: true });
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO syllabus_access (user_id, sql_access, python_access, pyspark_access, databricks_access, aws_access, git_access, projects_access) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET sql_access = excluded.sql_access, python_access = excluded.python_access, pyspark_access = excluded.pyspark_access, databricks_access = excluded.databricks_access, aws_access = excluded.aws_access, git_access = excluded.git_access, projects_access = excluded.projects_access`, [userId, data.sql_access ? 1 : 0, data.python_access ? 1 : 0, data.pyspark_access ? 1 : 0, data.databricks_access ? 1 : 0, data.aws_access ? 1 : 0, data.git_access ? 1 : 0, data.projects_access ? 1 : 0]);
   },
   async updateSingle(userId, module, value) {
     if (USE_MONGODB) {
-      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: userId }, { [module]: value ? 1 : 0, user_id: userId }, { upsert: true });
+      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: toObjectId(userId) }, { [module]: value ? 1 : 0, user_id: toObjectId(userId) }, { upsert: true, new: true });
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO syllabus_access (user_id, ${module}) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET ${module} = excluded.${module}`, [userId, value ? 1 : 0]);
@@ -302,13 +315,13 @@ const syllabusAccess = {
 const subtopicAccess = {
   async getByUser(userId) {
     if (USE_MONGODB) {
-      return mongo.SubtopicAccess.find({ user_id: userId }).lean();
+      return mongo.SubtopicAccess.find({ user_id: toObjectId(userId) }).lean();
     }
     return sqlAll('SELECT * FROM subtopic_access WHERE user_id = ?', [userId]);
   },
   async update(userId, module, group_name, access_granted) {
     if (USE_MONGODB) {
-      await mongo.SubtopicAccess.findOneAndUpdate({ user_id: userId, module, group_name }, { access_granted: access_granted ? 1 : 0, user_id: userId, module, group_name }, { upsert: true });
+      await mongo.SubtopicAccess.findOneAndUpdate({ user_id: toObjectId(userId), module, group_name }, { access_granted: access_granted ? 1 : 0, user_id: toObjectId(userId), module, group_name }, { upsert: true, new: true });
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO subtopic_access (user_id, module, group_name, access_granted) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, module, group_name) DO UPDATE SET access_granted = excluded.access_granted`, [userId, module, group_name, access_granted ? 1 : 0]);
@@ -319,19 +332,19 @@ const subtopicAccess = {
 const featureAccess = {
   async getByUser(userId) {
     if (USE_MONGODB) {
-      return mongo.FeatureAccess.find({ user_id: userId }).lean();
+      return mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).lean();
     }
     return sqlAll('SELECT * FROM feature_access WHERE user_id = ?', [userId]);
   },
   async getByUserFormatted(userId) {
     if (USE_MONGODB) {
-      return mongo.FeatureAccess.find({ user_id: userId }).select('feature_type tab_number access_granted').lean();
+      return mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).select('feature_type tab_number access_granted').lean();
     }
     return sqlAll('SELECT feature_type, tab_number, access_granted FROM feature_access WHERE user_id = ?', [userId]);
   },
   async update(userId, feature_type, tab_number, access_granted) {
     if (USE_MONGODB) {
-      await mongo.FeatureAccess.findOneAndUpdate({ user_id: userId, feature_type, tab_number }, { access_granted: access_granted ? 1 : 0, user_id: userId, feature_type, tab_number }, { upsert: true });
+      await mongo.FeatureAccess.findOneAndUpdate({ user_id: toObjectId(userId), feature_type, tab_number }, { access_granted: access_granted ? 1 : 0, user_id: toObjectId(userId), feature_type, tab_number }, { upsert: true, new: true });
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO feature_access (user_id, feature_type, tab_number, access_granted) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, feature_type, tab_number) DO UPDATE SET access_granted = excluded.access_granted`, [userId, feature_type, tab_number, access_granted ? 1 : 0]);
@@ -388,7 +401,7 @@ const securityLogs = {
 const sessions = {
   async upsert(userId, data) {
     if (USE_MONGODB) {
-      await mongo.ActiveSession.findOneAndUpdate({ user_id: userId }, { ...data, user_id: userId, last_active: new Date() }, { upsert: true });
+      await mongo.ActiveSession.findOneAndUpdate({ user_id: toObjectId(userId) }, { ...data, user_id: toObjectId(userId), last_active: new Date() }, { upsert: true });
       return { ok: true };
     }
     return sqlRun(`INSERT INTO active_sessions (user_id, session_token, device_fp, device_type, user_agent, last_active) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP) ON CONFLICT(user_id) DO UPDATE SET session_token = excluded.session_token, device_fp = excluded.device_fp, device_type = excluded.device_type, user_agent = excluded.user_agent, last_active = CURRENT_TIMESTAMP`, [userId, data.session_token || '', data.device_fp || '', data.device_type || 'Desktop', (data.user_agent || '').substring(0, 200)]);
@@ -406,7 +419,7 @@ const sessions = {
   },
   async deleteByUser(userId) {
     if (USE_MONGODB) {
-      await mongo.ActiveSession.deleteOne({ user_id: userId });
+      await mongo.ActiveSession.deleteOne({ user_id: toObjectId(userId) });
     } else {
       await sqlRun('DELETE FROM active_sessions WHERE user_id = ?', [userId]);
     }
@@ -417,7 +430,7 @@ const sessions = {
 const blockedUsers = {
   async block(userId, reason) {
     if (USE_MONGODB) {
-      await mongo.BlockedUser.findOneAndUpdate({ user_id: userId }, { user_id: userId, reason: reason || 'Blocked by admin' }, { upsert: true });
+      await mongo.BlockedUser.findOneAndUpdate({ user_id: toObjectId(userId) }, { user_id: toObjectId(userId), reason: reason || 'Blocked by admin' }, { upsert: true });
       await sessions.deleteByUser(userId);
       return { ok: true };
     }
@@ -427,14 +440,14 @@ const blockedUsers = {
   },
   async unblock(userId) {
     if (USE_MONGODB) {
-      await mongo.BlockedUser.deleteOne({ user_id: userId });
+      await mongo.BlockedUser.deleteOne({ user_id: toObjectId(userId) });
     } else {
       await sqlRun('DELETE FROM blocked_users WHERE user_id = ?', [userId]);
     }
   },
   async check(userId) {
     if (USE_MONGODB) {
-      const b = await mongo.BlockedUser.findOne({ user_id: userId }).lean();
+      const b = await mongo.BlockedUser.findOne({ user_id: toObjectId(userId) }).lean();
       return { blocked: !!b, reason: b?.reason || null };
     }
     const row = await sqlGet('SELECT * FROM blocked_users WHERE user_id = ?', [userId]);
