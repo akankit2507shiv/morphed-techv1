@@ -268,7 +268,30 @@ app.get('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, asy
 
 app.put('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
   try {
+    // Get current access for audit comparison
+    const oldAccess = await DB.syllabusAccess.get(req.params.userId);
     await DB.syllabusAccess.update(req.params.userId, req.body);
+
+    // Audit log — track each module change
+    const modules = ['sql_access', 'python_access', 'pyspark_access', 'databricks_access', 'aws_access', 'git_access', 'projects_access'];
+    const student = await DB.users.findById(req.params.userId);
+    for (const mod of modules) {
+      const oldVal = oldAccess[mod] || 0;
+      const newVal = req.body[mod] ? 1 : 0;
+      if (oldVal !== newVal) {
+        DB.moduleAccessAudit.log({
+          student_id: req.params.userId,
+          student_email: student?.email || '',
+          module_name: mod.replace('_access', ''),
+          old_value: oldVal,
+          new_value: newVal,
+          action: newVal ? 'GRANT' : 'REVOKE',
+          admin_id: req.user.id,
+          admin_email: req.user.email
+        }).catch(e => console.error('Audit log error:', e));
+      }
+    }
+
     res.json({ message: 'Syllabus access updated' });
   } catch (error) { res.status(500).json({ error: 'Update failed' }); }
 });
@@ -434,6 +457,20 @@ app.post('/api/security/session', authenticateToken, async (req, res) => {
 app.get('/api/admin/security/sessions', authenticateToken, authenticateAdmin, async (req, res) => {
   try { res.json(await DB.sessions.getAll()); }
   catch (error) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// ==================== MODULE ACCESS AUDIT ROUTES ====================
+app.get('/api/admin/module-audit', authenticateToken, authenticateAdmin, async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 100;
+    res.json(await DB.moduleAccessAudit.getRecent(limit));
+  } catch (error) { res.status(500).json({ error: 'Server error' }); }
+});
+
+app.get('/api/admin/module-audit/:studentId', authenticateToken, authenticateAdmin, async (req, res) => {
+  try {
+    res.json(await DB.moduleAccessAudit.getByStudent(req.params.studentId));
+  } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 
 // ==================== START SERVER ====================

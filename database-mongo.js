@@ -133,6 +133,19 @@ const landingPricingSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
+// Module Access Audit Log
+const moduleAccessAuditSchema = new mongoose.Schema({
+  student_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  student_email: { type: String, default: '' },
+  module_name: { type: String, required: true },
+  old_value: { type: Number, default: 0 },
+  new_value: { type: Number, required: true },
+  action: { type: String, enum: ['GRANT', 'REVOKE'], required: true },
+  admin_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  admin_email: { type: String, default: '' },
+  action_time: { type: Date, default: Date.now }
+});
+
 // ==================== MODELS ====================
 const User = mongoose.model('User', userSchema);
 const Enrollment = mongoose.model('Enrollment', enrollmentSchema);
@@ -144,6 +157,7 @@ const ActiveSession = mongoose.model('ActiveSession', activeSessionSchema);
 const BlockedUser = mongoose.model('BlockedUser', blockedUserSchema);
 const LandingSection = mongoose.model('LandingSection', landingSectionSchema);
 const LandingPricing = mongoose.model('LandingPricing', landingPricingSchema);
+const ModuleAccessAudit = mongoose.model('ModuleAccessAudit', moduleAccessAuditSchema);
 
 module.exports = {
   connectMongoDB,
@@ -156,5 +170,6 @@ module.exports = {
   ActiveSession,
   BlockedUser,
   LandingSection,
-  LandingPricing
+  LandingPricing,
+  ModuleAccessAudit
 };

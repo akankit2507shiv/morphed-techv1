@@ -100,7 +100,8 @@ async function initSQLiteTables() {
     `CREATE TABLE IF NOT EXISTS active_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, session_token TEXT NOT NULL, device_fp TEXT, device_type TEXT, user_agent TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, last_active DATETIME DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id))`,
     `CREATE TABLE IF NOT EXISTS blocked_users (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, reason TEXT, blocked_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS landing_sections (id INTEGER PRIMARY KEY, name TEXT NOT NULL, type TEXT NOT NULL, display_order INTEGER DEFAULT 1, title TEXT, subtitle TEXT, content TEXT, visible INTEGER DEFAULT 1, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS landing_pricing (id INTEGER PRIMARY KEY AUTOINCREMENT, regular_price INTEGER NOT NULL, offer_price INTEGER NOT NULL, offer_days INTEGER DEFAULT 3, limited_seats INTEGER DEFAULT 100, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`
+    `CREATE TABLE IF NOT EXISTS landing_pricing (id INTEGER PRIMARY KEY AUTOINCREMENT, regular_price INTEGER NOT NULL, offer_price INTEGER NOT NULL, offer_days INTEGER DEFAULT 3, limited_seats INTEGER DEFAULT 100, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS module_access_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, student_id INTEGER, student_email TEXT, module_name TEXT NOT NULL, old_value INTEGER DEFAULT 0, new_value INTEGER NOT NULL, action TEXT NOT NULL, admin_id INTEGER, admin_email TEXT, action_time DATETIME DEFAULT CURRENT_TIMESTAMP)`
   ];
   for (const sql of tables) {
     await sqlRun(sql);
@@ -516,6 +517,38 @@ const stats = {
   }
 };
 
+// ==================== MODULE ACCESS AUDIT ====================
+const moduleAccessAudit = {
+  async log({ student_id, student_email, module_name, old_value, new_value, action, admin_id, admin_email }) {
+    if (USE_MONGODB) {
+      await mongo.ModuleAccessAudit.create({
+        student_id: toObjectId(student_id),
+        student_email,
+        module_name,
+        old_value: old_value || 0,
+        new_value,
+        action,
+        admin_id: admin_id ? toObjectId(admin_id) : null,
+        admin_email
+      });
+    } else {
+      await sqlRun(`INSERT INTO module_access_audit (student_id, student_email, module_name, old_value, new_value, action, admin_id, admin_email, action_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`, [student_id, student_email || '', module_name, old_value || 0, new_value, action, admin_id || null, admin_email || '']);
+    }
+  },
+  async getByStudent(studentId, limit = 50) {
+    if (USE_MONGODB) {
+      return mongo.ModuleAccessAudit.find({ student_id: toObjectId(studentId) }).sort({ action_time: -1 }).limit(limit).lean();
+    }
+    return sqlAll('SELECT * FROM module_access_audit WHERE student_id = ? ORDER BY action_time DESC LIMIT ?', [studentId, limit]);
+  },
+  async getRecent(limit = 100) {
+    if (USE_MONGODB) {
+      return mongo.ModuleAccessAudit.find().sort({ action_time: -1 }).limit(limit).lean();
+    }
+    return sqlAll('SELECT * FROM module_access_audit ORDER BY action_time DESC LIMIT ?', [limit]);
+  }
+};
+
 // ==================== EXPORT ====================
 module.exports = {
   init,
@@ -529,5 +562,6 @@ module.exports = {
   blockedUsers,
   landing,
   stats,
+  moduleAccessAudit,
   USE_MONGODB
 };
