@@ -1,38 +1,30 @@
 /**
  * Telegram Bot Helper for Payment Notifications
- * Sends instant notifications to Morphed Tech Telegram group
+ * Uses axios directly (no vulnerable dependencies)
  */
 
-const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
 
-// Initialize bot (only if token is provided)
-let bot = null;
-if (process.env.TELEGRAM_BOT_TOKEN) {
-  bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: false });
-}
+const TELEGRAM_API = process.env.TELEGRAM_BOT_TOKEN 
+  ? `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`
+  : null;
 
 /**
  * Send payment notification to Telegram group
  */
 async function sendPaymentNotification(paymentData) {
-  if (!bot || !process.env.TELEGRAM_CHAT_ID) {
+  if (!TELEGRAM_API || !process.env.TELEGRAM_CHAT_ID) {
     console.log('⚠️ Telegram not configured - skipping notification');
     return;
   }
 
   try {
-    const {
-      studentName,
-      studentEmail,
-      amount,
-      transactionId,
-      phone
-    } = paymentData;
+    const { studentName, studentEmail, amount, transactionId, phone } = paymentData;
 
     const message = `
 🔥 *NEW PAYMENT RECEIVED*
 
-💰 *Amount:* ₹${amount.toLocaleString('en-IN')}
+💰 *Amount:* ₹${amount?.toLocaleString('en-IN') || amount}
 ✅ *Status:* SUCCESS ✅
 
 👤 *Student:* ${studentName}
@@ -45,7 +37,9 @@ async function sendPaymentNotification(paymentData) {
 🎓 *MORPHED TECH - Data Engineering*
     `.trim();
 
-    await bot.sendMessage(process.env.TELEGRAM_CHAT_ID, message, {
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: message,
       parse_mode: 'Markdown'
     });
 
@@ -59,7 +53,7 @@ async function sendPaymentNotification(paymentData) {
  * Send test notification
  */
 async function sendTestNotification() {
-  if (!bot || !process.env.TELEGRAM_CHAT_ID) {
+  if (!TELEGRAM_API || !process.env.TELEGRAM_CHAT_ID) {
     return { success: false, error: 'Telegram not configured' };
   }
 
@@ -74,7 +68,9 @@ async function sendTestNotification() {
 🎓 *MORPHED TECH*
     `.trim();
 
-    await bot.sendMessage(process.env.TELEGRAM_CHAT_ID, message, {
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: message,
       parse_mode: 'Markdown'
     });
 
