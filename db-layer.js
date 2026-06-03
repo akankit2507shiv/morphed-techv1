@@ -19,6 +19,47 @@ if (USE_MONGODB) {
   sqlite3 = require('sqlite3').verbose();
 }
 
+// Helper: normalize syllabus access document to API shape
+function formatSyllabusAccess(row) {
+  const defaults = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+  if (!row) return defaults;
+  return {
+    sql_access: row.sql_access ? 1 : 0,
+    python_access: row.python_access ? 1 : 0,
+    pyspark_access: row.pyspark_access ? 1 : 0,
+    databricks_access: row.databricks_access ? 1 : 0,
+    aws_access: row.aws_access ? 1 : 0,
+    git_access: row.git_access ? 1 : 0,
+    projects_access: row.projects_access ? 1 : 0
+  };
+}
+
+// Helper: format student for admin API (never expose password hash)
+function formatStudentRecord(s, enrollment) {
+  return {
+    id: s._id ? s._id.toString() : String(s.id),
+    name: s.name,
+    email: s.email,
+    phone: s.phone || '',
+    role: s.role,
+    target_role: s.target_role || '',
+    experience_level: s.experience_level || '',
+    learning_pace: s.learning_pace || '',
+    onboarding_completed: !!s.onboarding_completed,
+    created_at: s.created_at,
+    enrollment_id: enrollment?._id?.toString() || enrollment?.id?.toString() || null,
+    payment_status: enrollment?.payment_status || null,
+    payment_amount: enrollment?.payment_amount ?? null,
+    transaction_id: enrollment?.transaction_id || null,
+    enrolled_at: enrollment?.enrolled_at || null,
+    payment_date: enrollment?.payment_date || null,
+    payment_method: enrollment?.payment_method || null,
+    course_completed: !!enrollment?.course_completed,
+    certificate_issued: !!enrollment?.certificate_issued,
+    content_access_granted: enrollment?.content_access_granted ?? true
+  };
+}
+
 // Helper: convert string ID to MongoDB ObjectId (safe)
 function toObjectId(id) {
   if (!USE_MONGODB) return id;
@@ -173,11 +214,10 @@ const users = {
   async getAllStudents() {
     if (USE_MONGODB) {
       const students = await mongo.User.find({ role: 'student' }).sort({ created_at: -1 }).lean();
-      // Join with enrollments
       const result = [];
       for (const s of students) {
         const e = await mongo.Enrollment.findOne({ user_id: s._id }).sort({ enrolled_at: -1 }).lean();
-        result.push({ ...s, id: s._id.toString(), enrollment_id: e?._id?.toString() || null, payment_status: e?.payment_status || null, payment_amount: e?.payment_amount || null, transaction_id: e?.transaction_id || null, enrolled_at: e?.enrolled_at || null, payment_date: e?.payment_date || null, payment_method: e?.payment_method || null, course_completed: e?.course_completed || false, certificate_issued: e?.certificate_issued || false, content_access_granted: e?.content_access_granted ?? true });
+        result.push(formatStudentRecord(s, e));
       }
       return result;
     }
@@ -185,15 +225,20 @@ const users = {
   },
   async update(id, { name, email, phone }) {
     if (USE_MONGODB) {
-      const r = await mongo.User.findOneAndUpdate({ _id: id, role: 'student' }, { name, email, phone });
+      const r = await mongo.User.findOneAndUpdate({ _id: toObjectId(id), role: 'student' }, { name, email, phone });
       return { changes: r ? 1 : 0 };
     }
     return sqlRun('UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ? AND role = "student"', [name, email, phone, id]);
   },
   async delete(id) {
     if (USE_MONGODB) {
-      await mongo.Enrollment.deleteMany({ user_id: id });
-      const r = await mongo.User.findOneAndDelete({ _id: id, role: 'student' });
+      const oid = toObjectId(id);
+      await mongo.Enrollment.deleteMany({ user_id: oid });
+      await mongo.SyllabusAccess.deleteMany({ user_id: oid });
+      await mongo.SubtopicAccess.deleteMany({ user_id: oid });
+      await mongo.FeatureAccess.deleteMany({ user_id: oid });
+      await mongo.ActiveSession.deleteMany({ user_id: oid });
+      const r = await mongo.User.findOneAndDelete({ _id: oid, role: 'student' });
       return { changes: r ? 1 : 0 };
     }
     await sqlRun('DELETE FROM enrollments WHERE user_id = ?', [id]);
@@ -201,7 +246,7 @@ const users = {
   },
   async updatePassword(id, hashedPassword) {
     if (USE_MONGODB) {
-      const r = await mongo.User.findOneAndUpdate({ _id: id, role: 'student' }, { password: hashedPassword });
+      const r = await mongo.User.findOneAndUpdate({ _id: toObjectId(id), role: 'student' }, { password: hashedPassword });
       return { changes: r ? 1 : 0 };
     }
     return sqlRun('UPDATE users SET password = ? WHERE id = ? AND role = "student"', [hashedPassword, id]);
@@ -291,10 +336,10 @@ const syllabusAccess = {
   async get(userId) {
     if (USE_MONGODB) {
       const s = await mongo.SyllabusAccess.findOne({ user_id: toObjectId(userId) }).lean();
-      return s || { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+      return formatSyllabusAccess(s);
     }
     const row = await sqlGet('SELECT * FROM syllabus_access WHERE user_id = ?', [userId]);
-    return row || { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+    return formatSyllabusAccess(row);
   },
   async update(userId, data) {
     if (USE_MONGODB) {

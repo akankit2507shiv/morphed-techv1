@@ -84,7 +84,18 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await DB.users.create({ name: name.trim(), email: email.trim().toLowerCase(), password: hashedPassword, phone: phone || '' });
 
-    const token = jwt.sign({ id: user.id, email, role: 'student' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Grant free starter access (SQL + Python syllabus) on registration
+    await DB.syllabusAccess.update(user.id, {
+      sql_access: 1,
+      python_access: 1,
+      pyspark_access: 0,
+      databricks_access: 0,
+      aws_access: 0,
+      git_access: 0,
+      projects_access: 0
+    });
+
+    const token = jwt.sign({ id: user.id, email: email.trim().toLowerCase(), role: 'student' }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({ message: 'Registration successful', token, user: { id: user.id, name: name.trim(), email, role: 'student' } });
   } catch (error) {
     console.error('Register error:', error);

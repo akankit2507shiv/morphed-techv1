@@ -29,3 +29,7 @@ services:
         value: YOUR_TELEGRAM_BOT_TOKEN
       - key: TELEGRAM_CHAT_ID
         value: YOUR_TELEGRAM_CHAT_ID
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        value: https://morphedtechai.com
