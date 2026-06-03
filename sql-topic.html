@@ -409,15 +409,30 @@
   <!-- Premium Multilingual & Audio System -->
   <script src="premium-language-audio.js"></script>
   <script>
-    const FREE_TOPICS = ['joins', 'case-statements', 'aggregations'];
+    const FREE_TOPICS = ['sql-joins', 'sql-aggregation'];
     const params = new URLSearchParams(window.location.search);
-    const topicId = params.get('topic') || 'joins';
+    const topicId = params.get('topic') || 'sql-joins';
     const topic = sqlContent[topicId];
     const isFree = FREE_TOPICS.includes(topicId);
     const token = localStorage.getItem('token');
-    if (!isFree && !token) { window.location.href = 'student-login.html'; }
+    const API = window.location.origin + '/api';
+    if (!token) { window.location.href = 'student-login.html'; }
+
+    async function checkPaidAccess() {
+      if (isFree) return true;
+      try {
+        const r = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const access = await r.json();
+        if (access.sql_access) return true;
+      } catch (e) {}
+      document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-400"><div class="text-6xl mb-4">🔒</div><p class="text-2xl font-bold text-white mb-2">Premium Topic</p><p class="text-gray-400 mb-6">This topic unlocks when admin grants SQL syllabus access.</p><a href="student-dashboard.html" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg">← Back to Dashboard</a></div>';
+      return false;
+    }
 
     const TOPICS = ['joins','window-functions','cte','subqueries','aggregations','ranking-functions','data-cleaning','deduplication','scd','query-optimization','incremental-load','data-validation','handling-nulls','set-operations','case-statements'];
+
+    (async function initTopicPage() {
+      if (!(await checkPaidAccess())) return;
 
     if (!topic) {
       document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-400"><div class="text-6xl mb-4">😕</div><p class="text-xl">Topic not found</p><a href="sql-module.html" class="text-primary mt-4 inline-block">← Back</a></div>';
@@ -609,6 +624,7 @@
       hist.unshift({ type: 'sql', title: topic.title, url: `sql-topic.html?topic=${topicId}`, time: new Date().toISOString() });
       localStorage.setItem('searchHistory', JSON.stringify(hist.slice(0, 50)));
     }
+    })();
 
     // Tab switch
     function switchTab(name, btn) {

@@ -220,9 +220,28 @@
   <script src="https://skulpt.org/js/skulpt-stdlib.js"></script>
   <script src="python-content.js?v=2"></script>
   <script>
+    const FREE_TOPICS = ['collections'];
+    const API = window.location.origin + '/api';
     const params = new URLSearchParams(window.location.search);
     const topicId = params.get('topic') || 'python-basics';
     const topic = pythonContent[topicId];
+    const isFree = FREE_TOPICS.includes(topicId);
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'student-login.html'; }
+
+    async function checkPaidAccess() {
+      if (isFree) return true;
+      try {
+        const r = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const access = await r.json();
+        if (access.python_access) return true;
+      } catch (e) {}
+      document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-400"><div class="text-6xl mb-4">🔒</div><p class="text-2xl font-bold text-white mb-2">Premium Topic</p><p class="text-gray-400 mb-6">This topic unlocks when admin grants Python syllabus access.</p><a href="student-dashboard.html" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg">← Back to Dashboard</a></div>';
+      return false;
+    }
+
+    (async function initTopicPage() {
+      if (!(await checkPaidAccess())) return;
 
     if (!topic || topic.ready === false) {
       document.querySelector('main').innerHTML = '<div class="text-center py-20 text-gray-400"><div class="text-6xl mb-4">🔒</div><p class="text-2xl font-bold text-white mb-2">Coming Soon</p><p class="text-gray-400 mb-6">This topic is being prepared. Check back soon!</p><a href="python-syllabus.html" class="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white font-semibold rounded-lg">← Back to Python</a></div>';
@@ -379,6 +398,7 @@
       // 9. Revision
       document.getElementById('revisionContent').textContent = topic.revision || '';
     }
+    })();
 
     // Tab switch
     function switchTab(name, btn) {

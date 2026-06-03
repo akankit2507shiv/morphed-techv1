@@ -87,6 +87,18 @@
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) window.location.href = 'student-login.html';
 
+    async function requireModuleAccess() {
+      if (user.role === 'admin') return true;
+      try {
+        const r = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const access = await r.json();
+        if (access.python_access) return true;
+      } catch (e) {}
+      alert('Python syllabus is locked. Start with the free topics on your dashboard, or contact admin for full access.');
+      window.location.href = 'student-dashboard.html';
+      return false;
+    }
+
     const progress = JSON.parse(localStorage.getItem('userProgress') || '{}');
 
     const colors = [
@@ -176,7 +188,7 @@
       window.location.href = `python-topic.html?topic=${id}`;
     }
 
-    render();
+    requireModuleAccess().then(ok => { if (ok) render(); });
 
     function goBackToSyllabus() {
       const user = JSON.parse(localStorage.getItem('user') || '{}');

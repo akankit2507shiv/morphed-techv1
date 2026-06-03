@@ -73,6 +73,18 @@
 
     if (!token) { alert('Please login first'); window.location.href = 'student-login.html'; }
 
+    async function requireModuleAccess() {
+      if (user.role === 'admin') return true;
+      try {
+        const r = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const access = await r.json();
+        if (access.sql_access) return true;
+      } catch (e) {}
+      alert('SQL syllabus is locked. Start with the free topics on your dashboard, or contact admin for full access.');
+      window.location.href = 'student-dashboard.html';
+      return false;
+    }
+
     // Set student name
     document.getElementById('studentName').textContent = user.name || 'Student';
 
@@ -192,7 +204,7 @@
       window.location.href = `sql-topic.html?topic=${id}`;
     }
 
-    render();
+    requireModuleAccess().then(ok => { if (ok) render(); });
 
     function goBackToSyllabus() {
       window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';
