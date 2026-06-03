@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - Morphed Tech</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>Admin Dashboard - Morphed Tech v2.1</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <script>
     // IMMEDIATE AUTH CHECK - Before page loads
@@ -190,9 +192,12 @@
 
     <!-- ACCESS CONTROL TAB -->
     <div id="content-access" class="hidden">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-white">Module Access Control</h2>
-        <p class="text-gray-400 text-sm">Toggle to grant or revoke per module per student</p>
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-white">Module Access Control</h2>
+          <p class="text-gray-400 text-sm">Toggle to grant or revoke per module per student</p>
+        </div>
+        <button type="button" id="refreshAccessBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition">🔄 Refresh from DB</button>
       </div>
       <div class="card overflow-hidden">
         <div class="overflow-x-auto">
@@ -504,7 +509,13 @@
       }
       
       if (name === 'payments') renderPayments();
-      if (name === 'access') await renderAccess();
+      if (name === 'access') {
+        if (accessDataLoaded && allStudents.length && Object.keys(accessData).length >= allStudents.length) {
+          paintAccessTable();
+        } else {
+          await renderAccess(false);
+        }
+      }
       if (name === 'features') await renderFeatures();
       if (name === 'security') { loadSecurityStats(); loadSecurityLogs(); loadActiveSessions(); }
     }
@@ -530,6 +541,8 @@
           throw new Error(`HTTP ${r.status}: ${r.statusText}`);
         }
         allStudents = await r.json();
+        accessData = {};
+        accessDataLoaded = false;
         console.log(`✅ Loaded ${allStudents.length} students`);
         renderStudents(allStudents);
       } catch(e) {
@@ -727,103 +740,134 @@
     }
 
     // ── ACCESS CONTROL ─────────────────────────────────────────────
-    let accessData = {}; // userId -> { sql_access, python_access, ... }
+    let accessData = {};
+    let accessDataLoaded = false;
 
-    async function renderAccess() {
+    function emptyAccess() {
+      return { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+    }
+
+    function normalizeAccess(raw) {
+      const out = emptyAccess();
+      if (!raw || raw.error) return out;
+      MODULES.forEach(m => { out[m.key] = raw[m.key] ? 1 : 0; });
+      return out;
+    }
+
+    function isAccessOn(record, key) {
+      const v = record?.[key];
+      return v === 1 || v === true || v === '1';
+    }
+
+    function paintAccessTable() {
       const tbody = document.getElementById('accessBody');
-      
-      // Show loading
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-400">Loading access data...</td></tr>';
-      
-      if (!allStudents.length) { 
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-12">
-          <div class="text-gray-400">
-            <p class="text-lg mb-2">🔐 No students to manage access</p>
-            <p class="text-sm">Module access controls will appear here once students register</p>
-          </div>
-        </td></tr>`; 
-        return; 
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">🔐 No students to manage access</p></div></td></tr>`;
+        return;
       }
-
-      // Load all access data
-      await Promise.all(allStudents.map(async s => {
-        try {
-          const r = await fetch(`${API}/admin/syllabus/${s.id}`, { headers: { Authorization: `Bearer ${token}` } });
-          accessData[String(s.id)] = await r.json();
-        } catch(e) {
-          accessData[String(s.id)] = {};
-        }
-      }));
-
       tbody.innerHTML = allStudents.map(s => {
-        const a = accessData[String(s.id)] || {};
+        const sid = String(s.id);
+        const a = accessData[sid] || emptyAccess();
         const toggles = MODULES.map(m => `
           <td class="py-4 px-4 text-center">
             <label class="toggle">
-              <input type="checkbox" ${a[m.key] ? 'checked' : ''} onchange="toggleModule(${jsId(s.id)}, '${m.key}', this.checked)">
+              <input type="checkbox" class="module-access-toggle"
+                data-user-id="${sid}" data-module="${m.key}"
+                ${isAccessOn(a, m.key) ? 'checked' : ''}>
               <span class="slider"></span>
             </label>
           </td>
         `).join('');
         return `
-          <tr class="border-b border-white/5 hover:bg-white/5 transition" id="row-${s.id}">
+          <tr class="border-b border-white/5 hover:bg-white/5 transition" id="row-${sid}">
             <td class="py-4 px-4 sticky left-0 bg-transparent">
               <p class="text-white font-medium text-sm">${s.name}</p>
               <p class="text-gray-500 text-xs">${s.email}</p>
             </td>
             ${toggles}
             <td class="py-4 px-4 text-center">
-              <button onclick="grantAll(${jsId(s.id)})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold">Grant All</button>
+              <button type="button" class="access-grant-all px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Grant All</button>
             </td>
             <td class="py-4 px-4 text-center">
-              <button onclick="revokeAll(${jsId(s.id)})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold">Revoke All</button>
+              <button type="button" class="access-revoke-all px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Revoke All</button>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    async function toggleModule(userId, moduleKey, value) {
-      userId = String(userId);
-      try {
-        // Build full access object with current state + this change
-        const current = accessData[userId] || {};
-        const body = {};
-        MODULES.forEach(m => body[m.key] = current[m.key] ? 1 : 0);
-        body[moduleKey] = value ? 1 : 0;
+    async function loadAccessData(force = false) {
+      if (!allStudents.length) return;
+      if (accessDataLoaded && !force && Object.keys(accessData).length >= allStudents.length) return;
 
-        const r = await fetch(`${API}/admin/syllabus/${userId}`, {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        if (!r.ok) throw new Error('Server error');
-        if (!accessData[userId]) accessData[userId] = {};
-        accessData[userId][moduleKey] = value ? 1 : 0;
-        showToast(`${value ? '✅ Granted' : '🚫 Revoked'} ${moduleKey.replace('_access','').toUpperCase()} for ${allStudents.find(s => String(s.id) === userId)?.name || userId}`);
-      } catch(e) {
-        // Revert checkbox on failure
-        const row = document.getElementById(`row-${userId}`);
-        if (row) {
-          const idx = MODULES.findIndex(m => m.key === moduleKey);
-          const checkbox = row.querySelectorAll('input[type="checkbox"]')[idx];
-          if (checkbox) checkbox.checked = !value;
+      await Promise.all(allStudents.map(async s => {
+        const sid = String(s.id);
+        try {
+          const r = await fetch(`${API}/admin/syllabus/${encodeURIComponent(sid)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: 'no-store'
+          });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          accessData[sid] = normalizeAccess(await r.json());
+        } catch (e) {
+          console.error('Access load failed for', sid, e);
+          if (!accessData[sid]) accessData[sid] = emptyAccess();
         }
-        showToast('❌ Failed to update access');
+      }));
+      accessDataLoaded = true;
+    }
+
+    async function setModuleAccess(userId, moduleKey, value) {
+      userId = String(userId);
+      const r = await fetch(`${API}/admin/access/${encodeURIComponent(userId)}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: moduleKey, value: value ? 1 : 0 })
+      });
+      const payload = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(payload.error || `Save failed (${r.status})`);
+
+      if (!accessData[userId]) accessData[userId] = emptyAccess();
+      accessData[userId][moduleKey] = value ? 1 : 0;
+      accessDataLoaded = true;
+
+      const studentName = allStudents.find(s => String(s.id) === userId)?.name || 'Student';
+      showToast(`${value ? '✅ Saved & granted' : '✅ Saved & revoked'} ${moduleKey.replace('_access', '').toUpperCase()} for ${studentName}`);
+    }
+
+    async function renderAccess(forceReload = false) {
+      const tbody = document.getElementById('accessBody');
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-gray-400">Loading access data...</td></tr>';
+
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">🔐 No students to manage access</p><p class="text-sm">Students will appear here once they register</p></div></td></tr>`;
+        return;
       }
+
+      if (forceReload) {
+        accessData = {};
+        accessDataLoaded = false;
+      }
+      await loadAccessData(forceReload);
+      paintAccessTable();
     }
 
     async function grantAll(userId) {
       userId = String(userId);
       const body = {};
       MODULES.forEach(m => body[m.key] = 1);
-      await fetch(`${API}/admin/syllabus/${userId}`, {
+      const r = await fetch(`${API}/admin/syllabus/${encodeURIComponent(userId)}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      accessData[userId] = body;
-      renderAccess();
+      if (!r.ok) {
+        showToast('❌ Failed to grant all modules');
+        return;
+      }
+      accessData[userId] = normalizeAccess(body);
+      accessDataLoaded = true;
+      paintAccessTable();
       showToast('✅ All modules granted');
     }
 
@@ -832,15 +876,52 @@
       if (!confirm('Revoke ALL module access for this student?')) return;
       const body = {};
       MODULES.forEach(m => body[m.key] = 0);
-      await fetch(`${API}/admin/syllabus/${userId}`, {
+      const r = await fetch(`${API}/admin/syllabus/${encodeURIComponent(userId)}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      accessData[userId] = body;
-      renderAccess();
+      if (!r.ok) {
+        showToast('❌ Failed to revoke all modules');
+        return;
+      }
+      accessData[userId] = normalizeAccess(body);
+      accessDataLoaded = true;
+      paintAccessTable();
       showToast('🚫 All modules revoked');
     }
+
+    document.getElementById('refreshAccessBtn').addEventListener('click', () => renderAccess(true));
+
+    // Event delegation — survives re-render, no broken inline MongoDB IDs
+    document.getElementById('content-access').addEventListener('change', async (e) => {
+      const cb = e.target;
+      if (!cb.classList.contains('module-access-toggle')) return;
+      const userId = cb.dataset.userId;
+      const moduleKey = cb.dataset.module;
+      const value = cb.checked;
+      cb.disabled = true;
+      try {
+        await setModuleAccess(userId, moduleKey, value);
+      } catch (err) {
+        cb.checked = !value;
+        showToast('❌ ' + err.message);
+      } finally {
+        cb.disabled = false;
+      }
+    });
+
+    document.getElementById('content-access').addEventListener('click', async (e) => {
+      const grantBtn = e.target.closest('.access-grant-all');
+      if (grantBtn) {
+        await grantAll(grantBtn.dataset.userId);
+        return;
+      }
+      const revokeBtn = e.target.closest('.access-revoke-all');
+      if (revokeBtn) {
+        await revokeAll(revokeBtn.dataset.userId);
+      }
+    });
 
     // ── FEATURES (Resume & Interview) ─────────────────────────────
     let featureAccessData = {}; // userId -> [{ feature_type, tab_number, access_granted }]

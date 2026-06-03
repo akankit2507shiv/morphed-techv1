@@ -235,9 +235,12 @@ app.put('/api/admin/access/:userId', authenticateToken, authenticateAdmin, async
     const { module, value } = req.body;
     const allowed = ['sql_access','python_access','pyspark_access','databricks_access','aws_access','git_access','projects_access'];
     if (!allowed.includes(module)) return res.status(400).json({ error: 'Invalid module' });
-    await DB.syllabusAccess.updateSingle(req.params.userId, module, value);
-    res.json({ message: 'Access updated' });
-  } catch (error) { res.status(500).json({ error: 'Update failed' }); }
+    await DB.syllabusAccess.updateSingle(req.params.userId, module, !!value);
+    res.json({ message: 'Access updated', module, value: value ? 1 : 0 });
+  } catch (error) {
+    console.error('Admin access update error:', error);
+    res.status(500).json({ error: 'Update failed' });
+  }
 });
 
 app.get('/api/admin/stats', authenticateToken, authenticateAdmin, async (req, res) => {
@@ -263,8 +266,10 @@ app.get('/api/syllabus/access', authenticateToken, async (req, res) => {
 });
 
 app.get('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
-  try { res.json(await DB.syllabusAccess.get(req.params.userId)); }
-  catch (error) { res.status(500).json({ error: 'Server error' }); }
+  try {
+    res.set('Cache-Control', 'no-store');
+    res.json(await DB.syllabusAccess.get(req.params.userId));
+  } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 
 app.put('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
@@ -294,7 +299,10 @@ app.put('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, asy
     }
 
     res.json({ message: 'Syllabus access updated' });
-  } catch (error) { res.status(500).json({ error: 'Update failed' }); }
+  } catch (error) {
+    console.error('Admin syllabus update error:', error);
+    res.status(500).json({ error: 'Update failed' });
+  }
 });
 
 // ==================== SUB-TOPIC ACCESS ROUTES ====================

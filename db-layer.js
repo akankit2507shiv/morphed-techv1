@@ -342,15 +342,33 @@ const syllabusAccess = {
     return formatSyllabusAccess(row);
   },
   async update(userId, data) {
+    const existing = await this.get(userId);
+    const merged = {
+      sql_access: data.sql_access !== undefined ? (data.sql_access ? 1 : 0) : existing.sql_access,
+      python_access: data.python_access !== undefined ? (data.python_access ? 1 : 0) : existing.python_access,
+      pyspark_access: data.pyspark_access !== undefined ? (data.pyspark_access ? 1 : 0) : existing.pyspark_access,
+      databricks_access: data.databricks_access !== undefined ? (data.databricks_access ? 1 : 0) : existing.databricks_access,
+      aws_access: data.aws_access !== undefined ? (data.aws_access ? 1 : 0) : existing.aws_access,
+      git_access: data.git_access !== undefined ? (data.git_access ? 1 : 0) : existing.git_access,
+      projects_access: data.projects_access !== undefined ? (data.projects_access ? 1 : 0) : existing.projects_access
+    };
     if (USE_MONGODB) {
-      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: toObjectId(userId) }, { sql_access: data.sql_access ? 1 : 0, python_access: data.python_access ? 1 : 0, pyspark_access: data.pyspark_access ? 1 : 0, databricks_access: data.databricks_access ? 1 : 0, aws_access: data.aws_access ? 1 : 0, git_access: data.git_access ? 1 : 0, projects_access: data.projects_access ? 1 : 0, user_id: toObjectId(userId) }, { upsert: true, new: true });
+      await mongo.SyllabusAccess.findOneAndUpdate(
+        { user_id: toObjectId(userId) },
+        { $set: { ...merged, user_id: toObjectId(userId) } },
+        { upsert: true, new: true }
+      );
       return { changes: 1 };
     }
-    return sqlRun(`INSERT INTO syllabus_access (user_id, sql_access, python_access, pyspark_access, databricks_access, aws_access, git_access, projects_access) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET sql_access = excluded.sql_access, python_access = excluded.python_access, pyspark_access = excluded.pyspark_access, databricks_access = excluded.databricks_access, aws_access = excluded.aws_access, git_access = excluded.git_access, projects_access = excluded.projects_access`, [userId, data.sql_access ? 1 : 0, data.python_access ? 1 : 0, data.pyspark_access ? 1 : 0, data.databricks_access ? 1 : 0, data.aws_access ? 1 : 0, data.git_access ? 1 : 0, data.projects_access ? 1 : 0]);
+    return sqlRun(`INSERT INTO syllabus_access (user_id, sql_access, python_access, pyspark_access, databricks_access, aws_access, git_access, projects_access) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET sql_access = excluded.sql_access, python_access = excluded.python_access, pyspark_access = excluded.pyspark_access, databricks_access = excluded.databricks_access, aws_access = excluded.aws_access, git_access = excluded.git_access, projects_access = excluded.projects_access`, [userId, merged.sql_access, merged.python_access, merged.pyspark_access, merged.databricks_access, merged.aws_access, merged.git_access, merged.projects_access]);
   },
   async updateSingle(userId, module, value) {
     if (USE_MONGODB) {
-      await mongo.SyllabusAccess.findOneAndUpdate({ user_id: toObjectId(userId) }, { [module]: value ? 1 : 0, user_id: toObjectId(userId) }, { upsert: true, new: true });
+      await mongo.SyllabusAccess.findOneAndUpdate(
+        { user_id: toObjectId(userId) },
+        { $set: { [module]: value ? 1 : 0, user_id: toObjectId(userId) } },
+        { upsert: true, new: true }
+      );
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO syllabus_access (user_id, ${module}) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET ${module} = excluded.${module}`, [userId, value ? 1 : 0]);
