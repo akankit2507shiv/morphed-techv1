@@ -34,6 +34,15 @@ function formatSyllabusAccess(row) {
   };
 }
 
+function formatFeatureAccessList(rows) {
+  if (!Array.isArray(rows)) return [];
+  return rows.map(r => ({
+    feature_type: r.feature_type,
+    tab_number: Number(r.tab_number),
+    access_granted: r.access_granted ? 1 : 0
+  }));
+}
+
 // Helper: format student for admin API (never expose password hash)
 function formatStudentRecord(s, enrollment) {
   return {
@@ -396,22 +405,30 @@ const subtopicAccess = {
 const featureAccess = {
   async getByUser(userId) {
     if (USE_MONGODB) {
-      return mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).lean();
+      const rows = await mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).lean();
+      return formatFeatureAccessList(rows);
     }
-    return sqlAll('SELECT * FROM feature_access WHERE user_id = ?', [userId]);
+    return formatFeatureAccessList(await sqlAll('SELECT * FROM feature_access WHERE user_id = ?', [userId]));
   },
   async getByUserFormatted(userId) {
     if (USE_MONGODB) {
-      return mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).select('feature_type tab_number access_granted').lean();
+      const rows = await mongo.FeatureAccess.find({ user_id: toObjectId(userId) }).select('feature_type tab_number access_granted').lean();
+      return formatFeatureAccessList(rows);
     }
-    return sqlAll('SELECT feature_type, tab_number, access_granted FROM feature_access WHERE user_id = ?', [userId]);
+    return formatFeatureAccessList(await sqlAll('SELECT feature_type, tab_number, access_granted FROM feature_access WHERE user_id = ?', [userId]));
   },
   async update(userId, feature_type, tab_number, access_granted) {
+    const tabNum = Number(tab_number);
+    const granted = access_granted ? 1 : 0;
     if (USE_MONGODB) {
-      await mongo.FeatureAccess.findOneAndUpdate({ user_id: toObjectId(userId), feature_type, tab_number }, { access_granted: access_granted ? 1 : 0, user_id: toObjectId(userId), feature_type, tab_number }, { upsert: true, new: true });
+      await mongo.FeatureAccess.findOneAndUpdate(
+        { user_id: toObjectId(userId), feature_type, tab_number: tabNum },
+        { $set: { access_granted: granted, user_id: toObjectId(userId), feature_type, tab_number: tabNum } },
+        { upsert: true, new: true }
+      );
       return { changes: 1 };
     }
-    return sqlRun(`INSERT INTO feature_access (user_id, feature_type, tab_number, access_granted) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, feature_type, tab_number) DO UPDATE SET access_granted = excluded.access_granted`, [userId, feature_type, tab_number, access_granted ? 1 : 0]);
+    return sqlRun(`INSERT INTO feature_access (user_id, feature_type, tab_number, access_granted) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, feature_type, tab_number) DO UPDATE SET access_granted = excluded.access_granted`, [userId, feature_type, tabNum, granted]);
   }
 };
 

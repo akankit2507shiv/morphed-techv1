@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
-  <title>Admin Dashboard - Morphed Tech v2.1</title>
+  <title>Admin Dashboard - Morphed Tech v2.2</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <script>
     // IMMEDIATE AUTH CHECK - Before page loads
@@ -161,9 +161,12 @@
 
     <!-- FEATURES TAB (Resume & Interview) -->
     <div id="content-features" class="hidden">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-white">Resume & Interview Tab Access</h2>
-        <p class="text-gray-400 text-sm">First 2 tabs are always free. Control access to remaining tabs.</p>
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-white">Resume & Interview Tab Access</h2>
+          <p class="text-gray-400 text-sm">First 2 tabs are always free. Control access to remaining tabs.</p>
+        </div>
+        <button type="button" id="refreshFeaturesBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition">🔄 Refresh from DB</button>
       </div>
       <div class="card overflow-hidden">
         <div class="overflow-x-auto">
@@ -470,6 +473,15 @@
       { key: 'git_access',        label: 'Git' },
       { key: 'projects_access',   label: 'Real Projects' }
     ];
+    const FEATURE_TOGGLES = [
+      { feature_type: 'resume', tab_number: 3, label: 'Resume Tab 3' },
+      { feature_type: 'resume', tab_number: 4, label: 'Resume Tab 4' },
+      { feature_type: 'resume', tab_number: 5, label: 'Resume Tab 5' },
+      { feature_type: 'resume', tab_number: 6, label: 'Resume Tab 6' },
+      { feature_type: 'interview', tab_number: 3, label: 'Interview Tab 3' },
+      { feature_type: 'interview', tab_number: 4, label: 'Interview Tab 4' },
+      { feature_type: 'interview', tab_number: 5, label: 'Interview Tab 5' }
+    ];
 
     function logout() {
       localStorage.removeItem('token');
@@ -516,7 +528,13 @@
           await renderAccess(false);
         }
       }
-      if (name === 'features') await renderFeatures();
+      if (name === 'features') {
+        if (featureDataLoaded && allStudents.length && Object.keys(featureAccessData).length >= allStudents.length) {
+          paintFeaturesTable();
+        } else {
+          await renderFeatures(false);
+        }
+      }
       if (name === 'security') { loadSecurityStats(); loadSecurityLogs(); loadActiveSessions(); }
     }
 
@@ -543,6 +561,8 @@
         allStudents = await r.json();
         accessData = {};
         accessDataLoaded = false;
+        featureAccessData = {};
+        featureDataLoaded = false;
         console.log(`✅ Loaded ${allStudents.length} students`);
         renderStudents(allStudents);
       } catch(e) {
@@ -924,154 +944,200 @@
     });
 
     // ── FEATURES (Resume & Interview) ─────────────────────────────
-    let featureAccessData = {}; // userId -> [{ feature_type, tab_number, access_granted }]
+    let featureAccessData = {};
+    let featureDataLoaded = false;
 
-    async function renderFeatures() {
-      const tbody = document.getElementById('featuresBody');
-      
-      // Show loading
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400">Loading feature access data...</td></tr>';
-      
-      if (!allStudents.length) { 
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-12">
-          <div class="text-gray-400">
-            <p class="text-lg mb-2">📝 No students to manage feature access</p>
-            <p class="text-sm">Resume & Interview tab controls will appear here once students register</p>
-          </div>
-        </td></tr>`; 
-        return; 
-      }
-
-      // Load all feature access data
-      await Promise.all(allStudents.map(async s => {
-        try {
-          const r = await fetch(`${API}/admin/feature/${s.id}`, { headers: { Authorization: `Bearer ${token}` } });
-          featureAccessData[s.id] = await r.json();
-        } catch(e) {
-          featureAccessData[s.id] = [];
-        }
+    function normalizeFeatureList(raw) {
+      if (!Array.isArray(raw)) return [];
+      return raw.map(f => ({
+        feature_type: f.feature_type,
+        tab_number: Number(f.tab_number),
+        access_granted: f.access_granted ? 1 : 0
       }));
+    }
 
+    function hasFeatureToggleAccess(records, featureType, tabNumber) {
+      return (records || []).some(f =>
+        f.feature_type === featureType &&
+        Number(f.tab_number) === tabNumber &&
+        (f.access_granted === 1 || f.access_granted === true || f.access_granted === '1')
+      );
+    }
+
+    function upsertFeatureRecord(userId, featureType, tabNumber, granted) {
+      if (!featureAccessData[userId]) featureAccessData[userId] = [];
+      featureAccessData[userId] = featureAccessData[userId].filter(
+        f => !(f.feature_type === featureType && Number(f.tab_number) === tabNumber)
+      );
+      if (granted) {
+        featureAccessData[userId].push({ feature_type: featureType, tab_number: tabNumber, access_granted: 1 });
+      }
+    }
+
+    function paintFeaturesTable() {
+      const tbody = document.getElementById('featuresBody');
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">📝 No students to manage feature access</p></div></td></tr>`;
+        return;
+      }
       tbody.innerHTML = allStudents.map(s => {
-        const features = featureAccessData[s.id] || [];
-        const hasAccess = (type, tab) => features.some(f => f.feature_type === type && f.tab_number === tab && f.access_granted === 1);
-        
+        const sid = String(s.id);
+        const features = featureAccessData[sid] || [];
+        const toggles = FEATURE_TOGGLES.map(t => `
+          <td class="py-4 px-4 text-center">
+            <label class="toggle">
+              <input type="checkbox" class="feature-access-toggle"
+                data-user-id="${sid}" data-feature-type="${t.feature_type}" data-tab-number="${t.tab_number}"
+                ${hasFeatureToggleAccess(features, t.feature_type, t.tab_number) ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+          </td>
+        `).join('');
         return `
-          <tr class="border-b border-white/5 hover:bg-white/5 transition">
+          <tr class="border-b border-white/5 hover:bg-white/5 transition" id="feature-row-${sid}">
             <td class="py-4 px-4 sticky left-0 bg-transparent">
               <p class="text-white font-medium text-sm">${s.name}</p>
               <p class="text-gray-500 text-xs">${s.email}</p>
             </td>
+            ${toggles}
             <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('resume', 3) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'resume', 3, this.checked)">
-                <span class="slider"></span>
-              </label>
+              <button type="button" class="feature-grant-all px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Grant All</button>
             </td>
             <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('resume', 4) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'resume', 4, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('resume', 5) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'resume', 5, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('resume', 6) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'resume', 6, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('interview', 3) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'interview', 3, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('interview', 4) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'interview', 4, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <label class="toggle">
-                <input type="checkbox" ${hasAccess('interview', 5) ? 'checked' : ''} onchange="toggleFeature(${jsId(s.id)}, 'interview', 5, this.checked)">
-                <span class="slider"></span>
-              </label>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <button onclick="grantAllFeatures(${jsId(s.id)})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold">Grant All</button>
-            </td>
-            <td class="py-4 px-4 text-center">
-              <button onclick="revokeAllFeatures(${jsId(s.id)})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold">Revoke All</button>
+              <button type="button" class="feature-revoke-all px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Revoke All</button>
             </td>
           </tr>
         `;
       }).join('');
     }
 
-    async function toggleFeature(userId, featureType, tabNumber, value) {
+    async function loadFeatureData(force = false) {
+      if (!allStudents.length) return;
+      if (featureDataLoaded && !force && Object.keys(featureAccessData).length >= allStudents.length) return;
+
+      await Promise.all(allStudents.map(async s => {
+        const sid = String(s.id);
+        try {
+          const r = await fetch(`${API}/admin/feature/${encodeURIComponent(sid)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: 'no-store'
+          });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          featureAccessData[sid] = normalizeFeatureList(await r.json());
+        } catch (e) {
+          console.error('Feature load failed for', sid, e);
+          if (!featureAccessData[sid]) featureAccessData[sid] = [];
+        }
+      }));
+      featureDataLoaded = true;
+    }
+
+    async function setFeatureAccess(userId, featureType, tabNumber, value) {
       userId = String(userId);
-      try {
-        await fetch(`${API}/admin/feature/${userId}`, {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ feature_type: featureType, tab_number: tabNumber, access_granted: value ? 1 : 0 })
-        });
-        showToast(`${value ? '✅ Granted' : '🚫 Revoked'} ${featureType} Tab ${tabNumber}`);
-        // Refresh data
-        const r = await fetch(`${API}/admin/feature/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
-        featureAccessData[userId] = await r.json();
-      } catch(e) { alert('Failed to update'); }
+      const tabNum = Number(tabNumber);
+      const r = await fetch(`${API}/admin/feature/${encodeURIComponent(userId)}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feature_type: featureType, tab_number: tabNum, access_granted: value ? 1 : 0 })
+      });
+      const payload = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(payload.error || `Save failed (${r.status})`);
+
+      upsertFeatureRecord(userId, featureType, tabNum, value);
+      featureDataLoaded = true;
+
+      const studentName = allStudents.find(s => String(s.id) === userId)?.name || 'Student';
+      const label = featureType.charAt(0).toUpperCase() + featureType.slice(1);
+      showToast(`${value ? '✅ Saved & granted' : '✅ Saved & revoked'} ${label} Tab ${tabNum} for ${studentName}`);
+    }
+
+    async function renderFeatures(forceReload = false) {
+      const tbody = document.getElementById('featuresBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400">Loading feature access data...</td></tr>';
+
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">📝 No students to manage feature access</p><p class="text-sm">Resume & Interview tab controls will appear here once students register</p></div></td></tr>`;
+        return;
+      }
+
+      if (forceReload) {
+        featureAccessData = {};
+        featureDataLoaded = false;
+      }
+      await loadFeatureData(forceReload);
+      paintFeaturesTable();
     }
 
     async function grantAllFeatures(userId) {
-      const features = [
-        { feature_type: 'resume', tab_number: 3 },
-        { feature_type: 'resume', tab_number: 4 },
-        { feature_type: 'resume', tab_number: 5 },
-        { feature_type: 'resume', tab_number: 6 },
-        { feature_type: 'interview', tab_number: 3 },
-        { feature_type: 'interview', tab_number: 4 },
-        { feature_type: 'interview', tab_number: 5 }
-      ];
-      for (const f of features) {
-        await fetch(`${API}/admin/feature/${userId}`, {
+      userId = String(userId);
+      for (const t of FEATURE_TOGGLES) {
+        const r = await fetch(`${API}/admin/feature/${encodeURIComponent(userId)}`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...f, access_granted: 1 })
+          body: JSON.stringify({ feature_type: t.feature_type, tab_number: t.tab_number, access_granted: 1 })
         });
+        if (!r.ok) {
+          showToast('❌ Failed to grant all Resume & Interview tabs');
+          return;
+        }
+        upsertFeatureRecord(userId, t.feature_type, t.tab_number, true);
       }
-      renderFeatures();
+      featureDataLoaded = true;
+      paintFeaturesTable();
       showToast('✅ All Resume & Interview tabs granted');
     }
 
     async function revokeAllFeatures(userId) {
+      userId = String(userId);
       if (!confirm('Revoke ALL Resume & Interview tab access for this student?')) return;
-      const features = [
-        { feature_type: 'resume', tab_number: 3 },
-        { feature_type: 'resume', tab_number: 4 },
-        { feature_type: 'resume', tab_number: 5 },
-        { feature_type: 'resume', tab_number: 6 },
-        { feature_type: 'interview', tab_number: 3 },
-        { feature_type: 'interview', tab_number: 4 },
-        { feature_type: 'interview', tab_number: 5 }
-      ];
-      for (const f of features) {
-        await fetch(`${API}/admin/feature/${userId}`, {
+      for (const t of FEATURE_TOGGLES) {
+        const r = await fetch(`${API}/admin/feature/${encodeURIComponent(userId)}`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...f, access_granted: 0 })
+          body: JSON.stringify({ feature_type: t.feature_type, tab_number: t.tab_number, access_granted: 0 })
         });
+        if (!r.ok) {
+          showToast('❌ Failed to revoke all Resume & Interview tabs');
+          return;
+        }
+        upsertFeatureRecord(userId, t.feature_type, t.tab_number, false);
       }
-      renderFeatures();
+      featureDataLoaded = true;
+      paintFeaturesTable();
       showToast('🚫 All Resume & Interview tabs revoked');
     }
+
+    document.getElementById('refreshFeaturesBtn').addEventListener('click', () => renderFeatures(true));
+
+    document.getElementById('content-features').addEventListener('change', async (e) => {
+      const cb = e.target;
+      if (!cb.classList.contains('feature-access-toggle')) return;
+      const userId = cb.dataset.userId;
+      const featureType = cb.dataset.featureType;
+      const tabNumber = cb.dataset.tabNumber;
+      const value = cb.checked;
+      cb.disabled = true;
+      try {
+        await setFeatureAccess(userId, featureType, tabNumber, value);
+      } catch (err) {
+        cb.checked = !value;
+        showToast('❌ ' + err.message);
+      } finally {
+        cb.disabled = false;
+      }
+    });
+
+    document.getElementById('content-features').addEventListener('click', async (e) => {
+      const grantBtn = e.target.closest('.feature-grant-all');
+      if (grantBtn) {
+        await grantAllFeatures(grantBtn.dataset.userId);
+        return;
+      }
+      const revokeBtn = e.target.closest('.feature-revoke-all');
+      if (revokeBtn) {
+        await revokeAllFeatures(revokeBtn.dataset.userId);
+      }
+    });
 
     // ── TOAST ──────────────────────────────────────────────────────
     function showToast(msg) {

@@ -339,16 +339,25 @@ app.put('/api/admin/subtopic/:userId', authenticateToken, authenticateAdmin, asy
 });
 
 app.get('/api/admin/feature/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
-  try { res.json(await DB.featureAccess.getByUserFormatted(req.params.userId)); }
-  catch (error) { res.status(500).json({ error: 'Failed to fetch' }); }
+  try {
+    res.set('Cache-Control', 'no-store');
+    res.json(await DB.featureAccess.getByUserFormatted(req.params.userId));
+  } catch (error) { res.status(500).json({ error: 'Failed to fetch' }); }
 });
 
 app.put('/api/admin/feature/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
   try {
     const { feature_type, tab_number, access_granted } = req.body;
-    await DB.featureAccess.update(req.params.userId, feature_type, tab_number, access_granted);
-    res.json({ message: 'Access updated' });
-  } catch (error) { res.status(500).json({ error: 'Update failed' }); }
+    const allowedTypes = ['resume', 'interview'];
+    if (!allowedTypes.includes(feature_type)) return res.status(400).json({ error: 'Invalid feature type' });
+    const tabNum = Number(tab_number);
+    if (!Number.isInteger(tabNum) || tabNum < 1) return res.status(400).json({ error: 'Invalid tab number' });
+    await DB.featureAccess.update(req.params.userId, feature_type, tabNum, !!access_granted);
+    res.json({ message: 'Access updated', feature_type, tab_number: tabNum, access_granted: access_granted ? 1 : 0 });
+  } catch (error) {
+    console.error('Admin feature update error:', error);
+    res.status(500).json({ error: 'Update failed' });
+  }
 });
 
 // DEPRECATED topic routes

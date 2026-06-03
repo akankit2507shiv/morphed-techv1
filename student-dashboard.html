@@ -1274,8 +1274,11 @@ function hasFeatureAccess(featureType, tabNumber) {
   // Admin gets everything
   if (window.featureAccess === 'all') return true;
   if (!window.featureAccess || window.featureAccess.length === 0) return false;
-  return window.featureAccess.some(
-    f => f.feature_type === featureType && f.tab_number === tabNumber && f.access_granted === 1
+  const tabNum = Number(tabNumber);
+  return window.featureAccess.some(f =>
+    f.feature_type === featureType &&
+    Number(f.tab_number) === tabNum &&
+    (f.access_granted === 1 || f.access_granted === true || f.access_granted === '1')
   );
 }
 
