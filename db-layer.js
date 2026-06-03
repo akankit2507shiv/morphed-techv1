@@ -43,6 +43,23 @@ function formatFeatureAccessList(rows) {
   }));
 }
 
+// Helper: format user for API (never expose password hash)
+function formatUserPublic(u) {
+  if (!u) return null;
+  return {
+    id: u._id ? u._id.toString() : String(u.id),
+    name: u.name,
+    email: u.email,
+    phone: u.phone || '',
+    role: u.role,
+    target_role: u.target_role || '',
+    experience_level: u.experience_level || '',
+    learning_pace: u.learning_pace || '',
+    onboarding_completed: !!u.onboarding_completed,
+    created_at: u.created_at
+  };
+}
+
 // Helper: format student for admin API (never expose password hash)
 function formatStudentRecord(s, enrollment) {
   return {
@@ -199,9 +216,8 @@ const users = {
   },
   async findById(id) {
     if (USE_MONGODB) {
-      const u = await mongo.User.findById(id).lean();
-      if (u) { u.id = u._id.toString(); }
-      return u;
+      const u = await mongo.User.findById(id).select('-password').lean();
+      return formatUserPublic(u);
     }
     return sqlGet('SELECT id, name, email, phone, role, target_role, experience_level, learning_pace, onboarding_completed, created_at FROM users WHERE id = ?', [id]);
   },
@@ -230,7 +246,7 @@ const users = {
       }
       return result;
     }
-    return sqlAll(`SELECT u.*, e.id as enrollment_id, e.payment_status, e.payment_amount, e.transaction_id, e.enrolled_at, e.payment_date, e.payment_method, e.course_completed, e.certificate_issued, e.content_access_granted FROM users u LEFT JOIN enrollments e ON u.id = e.user_id WHERE u.role = 'student' ORDER BY u.created_at DESC`);
+    return sqlAll(`SELECT u.id, u.name, u.email, u.phone, u.role, u.target_role, u.experience_level, u.learning_pace, u.onboarding_completed, u.created_at, e.id as enrollment_id, e.payment_status, e.payment_amount, e.transaction_id, e.enrolled_at, e.payment_date, e.payment_method, e.course_completed, e.certificate_issued, e.content_access_granted FROM users u LEFT JOIN enrollments e ON u.id = e.user_id WHERE u.role = 'student' ORDER BY u.created_at DESC`);
   },
   async update(id, { name, email, phone }) {
     if (USE_MONGODB) {
@@ -442,8 +458,10 @@ const securityLogs = {
     return sqlRun(`INSERT INTO security_logs (user_id, user_email, event_type, detail, severity, page, user_agent, device_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [data.user_id || null, data.user_email || 'anonymous', data.event_type, data.detail || '', data.severity || 'LOW', data.page || '', (data.user_agent || '').substring(0, 200), data.device_type || 'Desktop']);
   },
   async getAll(limit = 100, severity = null) {
+    const allowed = ['LOW', 'MEDIUM', 'HIGH'];
+    const safeSeverity = severity && allowed.includes(severity) ? severity : null;
     if (USE_MONGODB) {
-      const filter = severity ? { severity } : {};
+      const filter = safeSeverity ? { severity: safeSeverity } : {};
       const logs = await mongo.SecurityLog.find(filter).sort({ timestamp: -1 }).limit(limit).lean();
       // Join user names
       for (const log of logs) {
@@ -455,8 +473,9 @@ const securityLogs = {
       }
       return logs;
     }
-    const whereClause = severity ? `WHERE sl.severity = '${severity}'` : '';
-    return sqlAll(`SELECT sl.*, u.name as user_name FROM security_logs sl LEFT JOIN users u ON sl.user_id = u.id ${whereClause} ORDER BY sl.timestamp DESC LIMIT ?`, [limit]);
+    const whereClause = safeSeverity ? 'WHERE sl.severity = ?' : '';
+    const params = safeSeverity ? [safeSeverity, limit] : [limit];
+    return sqlAll(`SELECT sl.*, u.name as user_name FROM security_logs sl LEFT JOIN users u ON sl.user_id = u.id ${whereClause} ORDER BY sl.timestamp DESC LIMIT ?`, params);
   },
   async getStats() {
     if (USE_MONGODB) {
