@@ -44,7 +44,7 @@ function getModel(jsonMode = false) {
   return getClient().getGenerativeModel({ model: modelName, generationConfig });
 }
 
-const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-lite'];
+const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
 
 async function withGeminiFallback(fn) {
   const preferred = process.env.GEMINI_MODEL || 'gemini-2.0-flash';

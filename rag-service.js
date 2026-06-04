@@ -45,8 +45,7 @@ function formatSources(chunks) {
 const FALLBACK_MODELS = [
   'gemini-2.0-flash',
   'gemini-1.5-flash',
-  'gemini-2.5-flash',
-  'gemini-2.0-flash-lite'
+  'gemini-2.5-flash'
 ];
 
 function delay(ms) {
@@ -89,7 +88,11 @@ async function withGeminiFallback(fn) {
 
 function formatGeminiError(err) {
   if (isQuotaError(err)) {
-    return 'Gemini free quota is used up for now. Wait 1–2 minutes and try again, or set GEMINI_MODEL=gemini-2.0-flash in .env and restart the server. Check usage: https://ai.dev/rate-limit';
+    const usedLite = /flash-lite/i.test(process.env.GEMINI_MODEL || '');
+    const hint = usedLite
+      ? ' On Render, change GEMINI_MODEL from gemini-2.0-flash-lite to gemini-2.0-flash and redeploy.'
+      : ' On Render: Environment → GEMINI_MODEL = gemini-2.0-flash. Free quota resets daily.';
+    return 'Gemini free quota exceeded. Wait ~1 minute and retry, or switch model.' + hint + ' Usage: https://ai.dev/rate-limit';
   }
   return err?.message || 'AI request failed';
 }
