@@ -491,6 +491,127 @@ app.get('/api/admin/module-audit/:studentId', authenticateToken, authenticateAdm
   } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 
+// ==================== AI MOCK INTERVIEW (Gemini) ====================
+const mockInterviewAI = require('./mock-interview-service');
+
+const mockInterviewLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Too many mock interview requests. Please wait a minute.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.get('/api/mock-interview/config', authenticateToken, (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    interviewers: mockInterviewAI.INTERVIEWERS,
+    interviewTypes: mockInterviewAI.INTERVIEW_TYPES,
+    maxQuestions: mockInterviewAI.MAX_QUESTIONS,
+    dailyLimit: parseInt(process.env.MOCK_INTERVIEW_DAILY_LIMIT || '3', 10),
+    geminiConfigured: !!process.env.GEMINI_API_KEY
+  });
+});
+
+app.post('/api/mock-interview/start', authenticateToken, mockInterviewLimiter, async (req, res) => {
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(503).json({ error: 'AI mock interview is not configured yet. Admin must add GEMINI_API_KEY.' });
+    }
+    const { interviewer, experience_level, interview_type } = req.body;
+    if (!['rahul', 'priya'].includes(interviewer)) {
+      return res.status(400).json({ error: 'Select interviewer: rahul or priya' });
+    }
+    const dailyLimit = parseInt(process.env.MOCK_INTERVIEW_DAILY_LIMIT || '3', 10);
+    if (req.user.role !== 'admin') {
+      const used = await DB.mockInterviews.countTodayByUser(req.user.id);
+      if (used >= dailyLimit) {
+        return res.status(429).json({ error: `Daily limit reached (${dailyLimit} mock interviews per day). Try again tomorrow.` });
+      }
+    }
+    const exp = experience_level || 'Fresher';
+    const type = interview_type || 'full';
+    const firstQuestion = await mockInterviewAI.generateFirstQuestion(interviewer, exp, type);
+    const session = await DB.mockInterviews.create({
+      userId: req.user.id,
+      interviewer,
+      interviewType: type,
+      experienceLevel: exp,
+      firstQuestion
+    });
+    res.json(session);
+  } catch (error) {
+    console.error('Mock interview start error:', error);
+    res.status(500).json({ error: error.message || 'Failed to start mock interview' });
+  }
+});
+
+app.post('/api/mock-interview/message', authenticateToken, mockInterviewLimiter, async (req, res) => {
+  try {
+    const { sessionId, message } = req.body;
+    if (!sessionId || !message?.trim()) {
+      return res.status(400).json({ error: 'Session ID and message required' });
+    }
+    const session = await DB.mockInterviews.findByIdForUser(sessionId, req.user.id);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    if (session.status === 'completed') {
+      return res.status(400).json({ error: 'Interview already completed' });
+    }
+
+    await DB.mockInterviews.addMessage(sessionId, 'student', message.trim());
+    const updated = await DB.mockInterviews.findById(sessionId);
+    const next = await mockInterviewAI.generateNextQuestion(updated);
+
+    await DB.mockInterviews.addMessage(sessionId, 'interviewer', next.content);
+    const finalSession = await DB.mockInterviews.findById(sessionId);
+    res.json({ message: next.content, done: next.done, session: finalSession });
+  } catch (error) {
+    console.error('Mock interview message error:', error);
+    res.status(500).json({ error: error.message || 'Failed to process answer' });
+  }
+});
+
+app.post('/api/mock-interview/end', authenticateToken, mockInterviewLimiter, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    if (!sessionId) return res.status(400).json({ error: 'Session ID required' });
+    const session = await DB.mockInterviews.findByIdForUser(sessionId, req.user.id);
+    if (!session) return res.status(404).json({ error: 'Session not found' });
+    if (session.status === 'completed' && session.feedback) {
+      return res.json(session);
+    }
+    const studentAnswers = session.messages.filter(m => m.role === 'student').length;
+    if (studentAnswers < 1) {
+      return res.status(400).json({ error: 'Answer at least one question before ending the interview' });
+    }
+    const user = await DB.users.findById(req.user.id);
+    const feedback = await mockInterviewAI.generateFeedback(session, user?.name);
+    const completed = await DB.mockInterviews.complete(sessionId, feedback);
+    res.json(completed);
+  } catch (error) {
+    console.error('Mock interview end error:', error);
+    res.status(500).json({ error: error.message || 'Failed to generate feedback' });
+  }
+});
+
+app.get('/api/mock-interview/history', authenticateToken, async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+    res.json(await DB.mockInterviews.getHistoryByUser(req.user.id));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load history' });
+  }
+});
+
+app.get('/api/admin/mock-interviews', authenticateToken, authenticateAdmin, async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+    res.json(await DB.mockInterviews.getAllAdmin(parseInt(req.query.limit) || 50));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load mock interviews' });
+  }
+});
+
 // ==================== START SERVER ====================
 async function startServer() {
   try {

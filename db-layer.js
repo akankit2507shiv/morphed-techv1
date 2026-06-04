@@ -168,7 +168,8 @@ async function initSQLiteTables() {
     `CREATE TABLE IF NOT EXISTS blocked_users (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, reason TEXT, blocked_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS landing_sections (id INTEGER PRIMARY KEY, name TEXT NOT NULL, type TEXT NOT NULL, display_order INTEGER DEFAULT 1, title TEXT, subtitle TEXT, content TEXT, visible INTEGER DEFAULT 1, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS landing_pricing (id INTEGER PRIMARY KEY AUTOINCREMENT, regular_price INTEGER NOT NULL, offer_price INTEGER NOT NULL, offer_days INTEGER DEFAULT 3, limited_seats INTEGER DEFAULT 100, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS module_access_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, student_id INTEGER, student_email TEXT, module_name TEXT NOT NULL, old_value INTEGER DEFAULT 0, new_value INTEGER NOT NULL, action TEXT NOT NULL, admin_id INTEGER, admin_email TEXT, action_time DATETIME DEFAULT CURRENT_TIMESTAMP)`
+    `CREATE TABLE IF NOT EXISTS module_access_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, student_id INTEGER, student_email TEXT, module_name TEXT NOT NULL, old_value INTEGER DEFAULT 0, new_value INTEGER NOT NULL, action TEXT NOT NULL, admin_id INTEGER, admin_email TEXT, action_time DATETIME DEFAULT CURRENT_TIMESTAMP)`,
+    `CREATE TABLE IF NOT EXISTS mock_interviews (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, interviewer TEXT NOT NULL, interview_type TEXT DEFAULT 'full', experience_level TEXT DEFAULT 'Fresher', status TEXT DEFAULT 'active', question_count INTEGER DEFAULT 0, messages TEXT DEFAULT '[]', feedback TEXT, overall_score INTEGER, verdict TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ended_at DATETIME, FOREIGN KEY (user_id) REFERENCES users(id))`
   ];
   for (const sql of tables) {
     await sqlRun(sql);
@@ -648,6 +649,137 @@ const moduleAccessAudit = {
   }
 };
 
+// ==================== MOCK INTERVIEWS ====================
+function formatMockSession(row) {
+  if (!row) return null;
+  const messages = typeof row.messages === 'string' ? JSON.parse(row.messages || '[]') : (row.messages || []);
+  const feedback = typeof row.feedback === 'string' && row.feedback ? JSON.parse(row.feedback) : (row.feedback || null);
+  return {
+    id: row._id ? row._id.toString() : String(row.id),
+    user_id: row.user_id?._id ? row.user_id._id.toString() : String(row.user_id),
+    interviewer: row.interviewer,
+    interview_type: row.interview_type,
+    experience_level: row.experience_level,
+    status: row.status,
+    question_count: row.question_count || 0,
+    messages,
+    feedback,
+    overall_score: row.overall_score,
+    verdict: row.verdict,
+    created_at: row.created_at,
+    ended_at: row.ended_at,
+    student_name: row.student_name || row.user_id?.name || null,
+    student_email: row.student_email || row.user_id?.email || null
+  };
+}
+
+const mockInterviews = {
+  async create(data) {
+    const firstMsg = { role: 'interviewer', content: data.firstQuestion, at: new Date() };
+    if (USE_MONGODB) {
+      const doc = await mongo.MockInterview.create({
+        user_id: toObjectId(data.userId),
+        interviewer: data.interviewer,
+        interview_type: data.interviewType,
+        experience_level: data.experienceLevel,
+        messages: [firstMsg],
+        question_count: 1
+      });
+      return formatMockSession(doc.toObject());
+    }
+    const r = await sqlRun(
+      `INSERT INTO mock_interviews (user_id, interviewer, interview_type, experience_level, messages, question_count) VALUES (?, ?, ?, ?, ?, 1)`,
+      [data.userId, data.interviewer, data.interviewType, data.experienceLevel, JSON.stringify([firstMsg])]
+    );
+    return formatMockSession(await sqlGet('SELECT * FROM mock_interviews WHERE id = ?', [r.lastID]));
+  },
+  async findById(id) {
+    if (USE_MONGODB) {
+      const row = await mongo.MockInterview.findById(id).lean();
+      return formatMockSession(row);
+    }
+    return formatMockSession(await sqlGet('SELECT * FROM mock_interviews WHERE id = ?', [id]));
+  },
+  async findByIdForUser(id, userId) {
+    const session = await this.findById(id);
+    if (!session || String(session.user_id) !== String(userId)) return null;
+    return session;
+  },
+  async addMessage(id, role, content) {
+    const msg = { role, content, at: new Date() };
+    if (USE_MONGODB) {
+      const row = await mongo.MockInterview.findById(id);
+      if (!row) return null;
+      row.messages.push(msg);
+      if (role === 'interviewer') row.question_count = (row.question_count || 0) + 1;
+      await row.save();
+      return formatMockSession(row.toObject());
+    }
+    const row = await sqlGet('SELECT * FROM mock_interviews WHERE id = ?', [id]);
+    if (!row) return null;
+    const messages = JSON.parse(row.messages || '[]');
+    messages.push(msg);
+    const qCount = role === 'interviewer' ? (row.question_count || 0) + 1 : row.question_count;
+    await sqlRun('UPDATE mock_interviews SET messages = ?, question_count = ? WHERE id = ?', [JSON.stringify(messages), qCount, id]);
+    return formatMockSession(await sqlGet('SELECT * FROM mock_interviews WHERE id = ?', [id]));
+  },
+  async complete(id, feedback) {
+    const payload = {
+      status: 'completed',
+      feedback,
+      overall_score: feedback.overall_score,
+      verdict: feedback.verdict,
+      ended_at: new Date()
+    };
+    if (USE_MONGODB) {
+      const row = await mongo.MockInterview.findByIdAndUpdate(id, payload, { new: true }).lean();
+      return formatMockSession(row);
+    }
+    await sqlRun(
+      `UPDATE mock_interviews SET status = 'completed', feedback = ?, overall_score = ?, verdict = ?, ended_at = datetime('now') WHERE id = ?`,
+      [JSON.stringify(feedback), feedback.overall_score, feedback.verdict, id]
+    );
+    return formatMockSession(await sqlGet('SELECT * FROM mock_interviews WHERE id = ?', [id]));
+  },
+  async countTodayByUser(userId) {
+    if (USE_MONGODB) {
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      return mongo.MockInterview.countDocuments({ user_id: toObjectId(userId), created_at: { $gte: start } });
+    }
+    return (await sqlGet(
+      `SELECT COUNT(*) as c FROM mock_interviews WHERE user_id = ? AND date(created_at) = date('now')`,
+      [userId]
+    ))?.c || 0;
+  },
+  async getHistoryByUser(userId, limit = 20) {
+    if (USE_MONGODB) {
+      const rows = await mongo.MockInterview.find({ user_id: toObjectId(userId) })
+        .sort({ created_at: -1 }).limit(limit).lean();
+      return rows.map(formatMockSession);
+    }
+    const rows = await sqlAll(
+      'SELECT * FROM mock_interviews WHERE user_id = ? ORDER BY created_at DESC LIMIT ?',
+      [userId, limit]
+    );
+    return rows.map(formatMockSession);
+  },
+  async getAllAdmin(limit = 50) {
+    if (USE_MONGODB) {
+      const rows = await mongo.MockInterview.find()
+        .populate('user_id', 'name email')
+        .sort({ created_at: -1 }).limit(limit).lean();
+      return rows.map(r => formatMockSession({ ...r, student_name: r.user_id?.name, student_email: r.user_id?.email }));
+    }
+    return sqlAll(
+      `SELECT mi.*, u.name as student_name, u.email as student_email
+       FROM mock_interviews mi JOIN users u ON mi.user_id = u.id
+       ORDER BY mi.created_at DESC LIMIT ?`,
+      [limit]
+    ).then(rows => rows.map(formatMockSession));
+  }
+};
+
 // ==================== EXPORT ====================
 module.exports = {
   init,
@@ -662,5 +794,6 @@ module.exports = {
   landing,
   stats,
   moduleAccessAudit,
+  mockInterviews,
   USE_MONGODB
 };

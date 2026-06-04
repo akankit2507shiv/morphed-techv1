@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Mock Interview - Morphed Tech</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{primary:'#ff3d81',secondary:'#7c3cff',accent:'#00d4ff',dark:'#0b1020'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, #050816 0%, #0b1020 100%); min-height: 100vh; }
+    .gradient-text { background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; backdrop-filter: blur(10px); }
+    .interviewer-card { cursor: pointer; transition: all 0.2s; }
+    .interviewer-card.selected { border-color: #ff3d81; background: rgba(255,61,129,0.12); box-shadow: 0 0 24px rgba(255,61,129,0.25); }
+    .chat-bubble { max-width: 85%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.5; }
+    .chat-interviewer { background: rgba(124,60,255,0.2); border: 1px solid rgba(124,60,255,0.35); align-self: flex-start; }
+    .chat-student { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); align-self: flex-end; }
+    .score-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    #chatArea { display: flex; flex-direction: column; gap: 0.75rem; max-height: 420px; overflow-y: auto; }
+    .typing { animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+  </style>
+  <script src="security.js"></script>
+</head>
+<body class="text-white">
+  <nav class="glass mx-4 mt-4 px-6 py-4 flex items-center justify-between">
+    <a href="student-dashboard.html" class="text-gray-400 hover:text-white text-sm">← Back to Dashboard</a>
+    <h1 class="text-lg font-bold gradient-text">🤖 AI Mock Interview</h1>
+    <span id="dailyBadge" class="text-xs text-gray-400"></span>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- Setup -->
+    <section id="setupSection" class="glass p-6 space-y-6">
+      <div>
+        <h2 class="text-2xl font-bold text-white mb-1">Choose Your Interviewer</h2>
+        <p class="text-gray-400 text-sm">Realistic Data Engineering mock — powered by Google Gemini (free tier)</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4" id="interviewerCards"></div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm text-gray-300 block mb-2">Experience Level</label>
+          <select id="expLevel" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white">
+            <option value="Fresher">Fresher (0–1 year)</option>
+            <option value="1-3 YOE">1–3 years</option>
+            <option value="3+ YOE">3+ years</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm text-gray-300 block mb-2">Interview Type</label>
+          <select id="intType" class="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white">
+            <option value="full">Full DE Round</option>
+            <option value="sql">SQL Heavy</option>
+            <option value="python">Python Heavy</option>
+            <option value="project">Project Deep-Dive</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="startBtn" onclick="startInterview()" class="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-xl hover:opacity-90 transition">
+        Start Mock Interview
+      </button>
+      <p id="setupError" class="text-red-400 text-sm hidden"></p>
+    </section>
+
+    <!-- Chat -->
+    <section id="chatSection" class="hidden glass p-6 space-y-4">
+      <div class="flex items-center gap-3 pb-3 border-b border-white/10">
+        <span id="activeAvatar" class="text-4xl">👨‍💼</span>
+        <div>
+          <p id="activeName" class="font-bold text-white">Interviewer</p>
+          <p id="activeMeta" class="text-xs text-gray-400">Live mock interview</p>
+        </div>
+        <button onclick="endInterview()" id="endBtn" class="ml-auto px-4 py-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30">End Interview</button>
+      </div>
+      <div id="chatArea"></div>
+      <div id="typingIndicator" class="hidden text-gray-400 text-sm typing">Interviewer is thinking...</div>
+      <div class="flex gap-2">
+        <textarea id="answerInput" rows="3" placeholder="Type your answer like a real interview..." class="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white resize-none"></textarea>
+        <button id="sendBtn" onclick="sendAnswer()" class="px-5 py-3 bg-accent/20 text-accent font-bold rounded-lg hover:bg-accent/30 self-end">Send</button>
+      </div>
+    </section>
+
+    <!-- Feedback -->
+    <section id="feedbackSection" class="hidden glass p-6 space-y-6">
+      <div class="text-center">
+        <p class="text-gray-400 text-sm mb-1">Your Result</p>
+        <p id="overallScore" class="text-5xl font-black gradient-text">—</p>
+        <p id="verdict" class="text-xl font-bold mt-2 text-white">—</p>
+      </div>
+      <div id="scoreGrid" class="space-y-3"></div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
+          <h3 class="font-bold text-green-300 mb-2">✅ Strengths</h3>
+          <ul id="strengthsList" class="text-sm text-gray-300 space-y-1 list-disc list-inside"></ul>
+        </div>
+        <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <h3 class="font-bold text-red-300 mb-2">⚠️ Weaknesses</h3>
+          <ul id="weaknessesList" class="text-sm text-gray-300 space-y-1 list-disc list-inside"></ul>
+        </div>
+      </div>
+      <div class="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4">
+        <h3 class="font-bold text-orange-300 mb-2">❌ What Went Wrong</h3>
+        <ul id="wrongList" class="text-sm text-gray-300 space-y-1 list-disc list-inside"></ul>
+      </div>
+      <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+        <h3 class="font-bold text-blue-300 mb-2">📈 Where to Scale (Study These)</h3>
+        <div id="scaleList" class="space-y-2"></div>
+      </div>
+      <div class="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+        <h3 class="font-bold text-purple-300 mb-2">📅 7-Day Action Plan</h3>
+        <ul id="actionList" class="text-sm text-gray-300 space-y-1 list-decimal list-inside"></ul>
+      </div>
+      <button onclick="resetToSetup()" class="w-full py-3 bg-white/10 hover:bg-white/15 rounded-xl font-semibold">Start Another Mock</button>
+    </section>
+
+    <!-- History -->
+    <section class="glass p-6">
+      <h3 class="font-bold text-white mb-4">📋 Past Mock Interviews</h3>
+      <div id="historyList" class="text-gray-400 text-sm">Loading...</div>
+    </section>
+  </main>
+
+  <script>
+    const API = window.location.origin + '/api';
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'student-login.html';
+
+    let config = {};
+    let selectedInterviewer = 'rahul';
+    let sessionId = null;
+    let interviewDone = false;
+
+    const SCORE_LABELS = {
+      communication: 'Communication',
+      technical_depth: 'Technical Depth',
+      project_story: 'Project Story',
+      sql: 'SQL',
+      python: 'Python',
+      confidence: 'Confidence',
+      structure: 'Structure (STAR)'
+    };
+
+    async function init() {
+      try {
+        const r = await fetch(`${API}/mock-interview/config`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        config = await r.json();
+        if (!config.geminiConfigured) {
+          document.getElementById('setupError').textContent = '⚠️ Gemini API key not set on server. Ask admin to add GEMINI_API_KEY on Render.';
+          document.getElementById('setupError').classList.remove('hidden');
+          document.getElementById('startBtn').disabled = true;
+        }
+        document.getElementById('dailyBadge').textContent = `${config.dailyLimit || 3} mocks/day limit`;
+        renderInterviewerCards();
+        loadHistory();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderInterviewerCards() {
+      const wrap = document.getElementById('interviewerCards');
+      wrap.innerHTML = Object.values(config.interviewers || {}).map(p => `
+        <div class="interviewer-card glass p-5 border-2 border-transparent ${p.id === selectedInterviewer ? 'selected' : ''}"
+          data-id="${p.id}" onclick="selectInterviewer('${p.id}')">
+          <div class="text-5xl mb-3">${p.avatar}</div>
+          <p class="font-bold text-white text-lg">${p.name}</p>
+          <p class="text-sm text-gray-400">${p.title} · ${p.company}</p>
+          <p class="text-xs text-gray-500 mt-2">${p.style}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectInterviewer(id) {
+      selectedInterviewer = id;
+      renderInterviewerCards();
+    }
+
+    function appendBubble(role, text) {
+      const area = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.className = `chat-bubble ${role === 'interviewer' ? 'chat-interviewer' : 'chat-student'}`;
+      div.textContent = text;
+      area.appendChild(div);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    async function startInterview() {
+      document.getElementById('setupError').classList.add('hidden');
+      const btn = document.getElementById('startBtn');
+      btn.disabled = true;
+      btn.textContent = 'Starting...';
+      try {
+        const r = await fetch(`${API}/mock-interview/start`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            interviewer: selectedInterviewer,
+            experience_level: document.getElementById('expLevel').value,
+            interview_type: document.getElementById('intType').value
+          })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Failed to start');
+
+        sessionId = data.id;
+        interviewDone = false;
+        const persona = config.interviewers[selectedInterviewer];
+        document.getElementById('activeAvatar').textContent = persona.avatar;
+        document.getElementById('activeName').textContent = persona.name;
+        document.getElementById('activeMeta').textContent = `${persona.title} · ${document.getElementById('intType').selectedOptions[0].text}`;
+
+        document.getElementById('chatArea').innerHTML = '';
+        (data.messages || []).forEach(m => appendBubble(m.role, m.content));
+
+        document.getElementById('setupSection').classList.add('hidden');
+        document.getElementById('chatSection').classList.remove('hidden');
+        document.getElementById('feedbackSection').classList.add('hidden');
+      } catch (e) {
+        document.getElementById('setupError').textContent = e.message;
+        document.getElementById('setupError').classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Start Mock Interview';
+      }
+    }
+
+    async function sendAnswer() {
+      const input = document.getElementById('answerInput');
+      const text = input.value.trim();
+      if (!text || !sessionId || interviewDone) return;
+
+      appendBubble('student', text);
+      input.value = '';
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('typingIndicator').classList.remove('hidden');
+
+      try {
+        const r = await fetch(`${API}/mock-interview/message`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, message: text })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Failed');
+
+        appendBubble('interviewer', data.message);
+        if (data.done) {
+          interviewDone = true;
+          input.placeholder = 'Interview complete — click End Interview for your feedback report';
+          input.disabled = true;
+          document.getElementById('sendBtn').disabled = true;
+        }
+      } catch (e) {
+        appendBubble('interviewer', 'Sorry, there was an error. Please try again or click End Interview.');
+        alert(e.message);
+      } finally {
+        document.getElementById('typingIndicator').classList.add('hidden');
+        if (!interviewDone) document.getElementById('sendBtn').disabled = false;
+      }
+    }
+
+    async function endInterview() {
+      if (!sessionId) return;
+      if (!confirm('End interview and generate your feedback report?')) return;
+
+      document.getElementById('endBtn').disabled = true;
+      document.getElementById('endBtn').textContent = 'Analyzing...';
+
+      try {
+        const r = await fetch(`${API}/mock-interview/end`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Failed');
+
+        showFeedback(data.feedback);
+        document.getElementById('chatSection').classList.add('hidden');
+        document.getElementById('feedbackSection').classList.remove('hidden');
+        loadHistory();
+      } catch (e) {
+        alert(e.message);
+      } finally {
+        document.getElementById('endBtn').disabled = false;
+        document.getElementById('endBtn').textContent = 'End Interview';
+      }
+    }
+
+    function scoreColor(n) {
+      if (n >= 75) return '#10b981';
+      if (n >= 50) return '#f59e0b';
+      return '#ef4444';
+    }
+
+    function showFeedback(fb) {
+      if (!fb) return;
+      document.getElementById('overallScore').textContent = (fb.overall_score ?? '—') + '/100';
+      const v = fb.verdict || 'Needs Practice';
+      const vEl = document.getElementById('verdict');
+      vEl.textContent = v;
+      vEl.className = 'text-xl font-bold mt-2 ' + (
+        v === 'Interview Ready' ? 'text-green-400' : v === 'Not Ready' ? 'text-red-400' : 'text-yellow-400'
+      );
+
+      const grid = document.getElementById('scoreGrid');
+      grid.innerHTML = Object.entries(fb.scores || {}).map(([k, v]) => `
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-300">${SCORE_LABELS[k] || k}</span>
+            <span class="font-bold" style="color:${scoreColor(v)}">${v}</span>
+          </div>
+          <div class="score-bar"><div class="score-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+        </div>
+      `).join('');
+
+      const fillList = (id, items) => {
+        document.getElementById(id).innerHTML = (items || []).map(i => `<li>${i}</li>`).join('') || '<li>—</li>';
+      };
+      fillList('strengthsList', fb.strengths);
+      fillList('weaknessesList', fb.weaknesses);
+      fillList('wrongList', fb.what_went_wrong);
+      fillList('actionList', fb.action_items_7_days);
+
+      document.getElementById('scaleList').innerHTML = (fb.where_to_scale || []).map(s => `
+        <div class="bg-white/5 rounded-lg p-3">
+          <p class="font-semibold text-white">${s.topic || s}</p>
+          ${s.reason ? `<p class="text-xs text-gray-400 mt-1">${s.reason}</p>` : ''}
+          ${s.link ? `<a href="${s.link}" class="text-xs text-accent hover:underline mt-1 inline-block">Open module →</a>` : ''}
+        </div>
+      `).join('') || '<p class="text-gray-400 text-sm">Review weak score areas above in your dashboard modules.</p>';
+    }
+
+    function resetToSetup() {
+      sessionId = null;
+      interviewDone = false;
+      document.getElementById('answerInput').disabled = false;
+      document.getElementById('answerInput').placeholder = 'Type your answer like a real interview...';
+      document.getElementById('sendBtn').disabled = false;
+      document.getElementById('setupSection').classList.remove('hidden');
+      document.getElementById('feedbackSection').classList.add('hidden');
+    }
+
+    async function loadHistory() {
+      const el = document.getElementById('historyList');
+      try {
+        const r = await fetch(`${API}/mock-interview/history`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        const list = await r.json();
+        if (!list.length) {
+          el.innerHTML = '<p>No mock interviews yet. Start your first one above!</p>';
+          return;
+        }
+        el.innerHTML = list.map(s => {
+          const persona = config.interviewers?.[s.interviewer] || { name: s.interviewer, avatar: '🎤' };
+          const date = s.created_at ? new Date(s.created_at).toLocaleDateString('en-IN') : '—';
+          const score = s.overall_score != null ? `${s.overall_score}/100` : 'In progress';
+          return `<div class="flex justify-between items-center py-2 border-b border-white/5">
+            <span>${persona.avatar} ${persona.name} · ${date}</span>
+            <span class="text-white font-semibold">${score} ${s.verdict ? '· ' + s.verdict : ''}</span>
+          </div>`;
+        }).join('');
+      } catch (e) {
+        el.textContent = 'Could not load history';
+      }
+    }
+
+    document.getElementById('answerInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAnswer(); }
+    });
+
+    init();
+  </script>
+</body>
+</html>

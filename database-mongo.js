@@ -146,6 +146,22 @@ const moduleAccessAuditSchema = new mongoose.Schema({
   action_time: { type: Date, default: Date.now }
 });
 
+// AI Mock Interview Sessions
+const mockInterviewSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  interviewer: { type: String, enum: ['rahul', 'priya'], required: true },
+  interview_type: { type: String, default: 'full' },
+  experience_level: { type: String, default: 'Fresher' },
+  status: { type: String, enum: ['active', 'completed'], default: 'active' },
+  question_count: { type: Number, default: 0 },
+  messages: { type: [{ role: String, content: String, at: Date }], default: [] },
+  feedback: { type: mongoose.Schema.Types.Mixed, default: null },
+  overall_score: { type: Number, default: null },
+  verdict: { type: String, default: null },
+  created_at: { type: Date, default: Date.now },
+  ended_at: { type: Date, default: null }
+});
+
 // ==================== MODELS ====================
 const User = mongoose.model('User', userSchema);
 const Enrollment = mongoose.model('Enrollment', enrollmentSchema);
@@ -158,6 +174,7 @@ const BlockedUser = mongoose.model('BlockedUser', blockedUserSchema);
 const LandingSection = mongoose.model('LandingSection', landingSectionSchema);
 const LandingPricing = mongoose.model('LandingPricing', landingPricingSchema);
 const ModuleAccessAudit = mongoose.model('ModuleAccessAudit', moduleAccessAuditSchema);
+const MockInterview = mongoose.model('MockInterview', mockInterviewSchema);
 
 module.exports = {
   connectMongoDB,
@@ -171,5 +188,6 @@ module.exports = {
   BlockedUser,
   LandingSection,
   LandingPricing,
-  ModuleAccessAudit
+  ModuleAccessAudit,
+  MockInterview
 };
