@@ -133,10 +133,12 @@
   resetInactivityTimer();
 
   // ── 4. DEVTOOLS DETECTION ─────────────────────────────────────────
+  const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   let devToolsOpen = false;
   let devToolsWarningShown = false;
 
   function checkDevTools() {
+    if (isLocalDev) return;
     const threshold = 160;
     const widthDiff = window.outerWidth - window.innerWidth > threshold;
     const heightDiff = window.outerHeight - window.innerHeight > threshold;
@@ -156,8 +158,6 @@
       hideDevToolsWarning();
     }
   }
-
-  setInterval(checkDevTools, 1500);
 
   function blurPremiumContent(blur) {
     const selectors = ['#topicsGrid', '#projectsGrid', '.tab-content-inner.active', 'main'];
@@ -182,6 +182,13 @@
   function hideDevToolsWarning() {
     const el = document.getElementById('devtools-warning');
     if (el) el.remove();
+  }
+
+  if (isLocalDev) {
+    blurPremiumContent(false);
+    hideDevToolsWarning();
+  } else {
+    setInterval(checkDevTools, 1500);
   }
 
   // ── 5. CONTENT PROTECTION ─────────────────────────────────────────

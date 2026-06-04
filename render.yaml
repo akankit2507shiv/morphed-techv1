@@ -36,6 +36,10 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_MODEL
-        value: gemini-2.0-flash-lite
+        value: gemini-2.0-flash
       - key: MOCK_INTERVIEW_DAILY_LIMIT
         value: 3
+      - key: MOCK_INTERVIEW_FREE_TRIAL
+        value: 2
+      - key: STUDY_BOT_FREE_TRIAL
+        value: 7

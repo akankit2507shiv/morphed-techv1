@@ -59,7 +59,8 @@ const syllabusAccessSchema = new mongoose.Schema({
   databricks_access: { type: Number, default: 0 },
   aws_access: { type: Number, default: 0 },
   git_access: { type: Number, default: 0 },
-  projects_access: { type: Number, default: 0 }
+  projects_access: { type: Number, default: 0 },
+  mock_interview_access: { type: Number, default: 0 }
 });
 
 // Sub-topic Access
@@ -176,6 +177,14 @@ const LandingPricing = mongoose.model('LandingPricing', landingPricingSchema);
 const ModuleAccessAudit = mongoose.model('ModuleAccessAudit', moduleAccessAuditSchema);
 const MockInterview = mongoose.model('MockInterview', mockInterviewSchema);
 
+const studyBotUsageSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  question_count: { type: Number, default: 0 },
+  updated_at: { type: Date, default: Date.now }
+});
+
+const StudyBotUsage = mongoose.model('StudyBotUsage', studyBotUsageSchema);
+
 module.exports = {
   connectMongoDB,
   User,
@@ -189,5 +198,6 @@ module.exports = {
   LandingSection,
   LandingPricing,
   ModuleAccessAudit,
-  MockInterview
+  MockInterview,
+  StudyBotUsage
 };

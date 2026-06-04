@@ -63,10 +63,15 @@
       </div>
     </div>
 
+    <div id="syllabusStudentIntro"></div>
+
     <div id="projectsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </main>
 
   <script src="projects-content.js"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
+  <script src="syllabus-student-intro.js"></script>
   <script>
     const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
@@ -115,6 +120,7 @@
       document.getElementById('projectCount').textContent = `📚 ${visibleIds.length} Projects`;
       document.getElementById('progressLabel').textContent = readyCount ? `${doneCount} / ${readyCount} completed` : '';
       document.getElementById('progressBar').style.width = readyCount ? Math.round((doneCount / readyCount) * 100) + '%' : '0%';
+      injectSyllabusStudentIntro('projects', 'Real-World Data Engineering Projects', visibleIds.length);
 
       if (visibleIds.length === 0) {
         document.getElementById('projectsGrid').innerHTML = `

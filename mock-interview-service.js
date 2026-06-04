@@ -39,15 +39,15 @@ function getClient() {
 }
 
 function getModel(jsonMode = false) {
-  const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-lite';
+  const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
   const generationConfig = jsonMode ? { responseMimeType: 'application/json' } : {};
   return getClient().getGenerativeModel({ model: modelName, generationConfig });
 }
 
-const FALLBACK_MODELS = ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-2.5-flash'];
+const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-lite'];
 
 async function withGeminiFallback(fn) {
-  const preferred = process.env.GEMINI_MODEL || 'gemini-2.0-flash-lite';
+  const preferred = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
   const models = [preferred, ...FALLBACK_MODELS.filter(m => m !== preferred)];
   let lastError;
   for (const modelName of models) {
@@ -75,28 +75,54 @@ RULES:
 - Ask ONE question at a time. Keep questions short (1-3 sentences), like a real interviewer.
 - Listen to the candidate's last answer and ask a relevant follow-up when needed.
 - Mix: introduction, project deep-dive, SQL, Python, scenario, and behavioral (STAR).
-- Do NOT give answers, hints, or feedback during the interview.
 - Do NOT say you are an AI.
 - After ${MAX_QUESTIONS} questions total, say exactly: "Thank you. That concludes our interview. Please click End Interview to receive your detailed feedback report."
-- Use Indian company context when helpful (Flipkart, Amazon, Swiggy, etc.) but keep it professional.`;
+- Use Indian company context when helpful (Flipkart, Amazon, Swiggy, etc.) but keep it professional.
+- Speak naturally like a real human interviewer — conversational Indian English (not American accent words).
+- Use the candidate's first name when greeting (never write placeholders like [Candidate's Name]).
+- After EVERY candidate answer you will give brief teacher-style coaching feedback, then the next question.`;
 }
 
-function toGeminiHistory(messages) {
-  return messages
-    .filter(m => m.role === 'interviewer' || m.role === 'student')
+function toCoachHistory(messages) {
+  const turns = messages
+    .filter(m => ['interviewer', 'coach', 'student'].includes(m.role))
     .map(m => ({
-      role: m.role === 'interviewer' ? 'model' : 'user',
-      parts: [{ text: m.content }]
+      role: m.role === 'student' ? 'user' : 'model',
+      text: m.role === 'coach' ? `[Coach feedback] ${m.content}` : m.content
     }));
+
+  // Gemini requires alternating roles; merge consecutive same-role turns
+  const merged = [];
+  for (const turn of turns) {
+    const last = merged[merged.length - 1];
+    if (last && last.role === turn.role) {
+      last.text += '\n\n' + turn.text;
+    } else {
+      merged.push({ role: turn.role, text: turn.text });
+    }
+  }
+
+  // History must start with 'user', not 'model'
+  if (merged.length && merged[0].role === 'model') {
+    merged.unshift({ role: 'user', text: '[Mock interview session started.]' });
+  }
+
+  return merged.map(m => ({ role: m.role, parts: [{ text: m.text }] }));
 }
 
-async function generateFirstQuestion(interviewer, experienceLevel, interviewType) {
+function firstName(fullName) {
+  if (!fullName || typeof fullName !== 'string') return 'there';
+  return fullName.trim().split(/\s+/)[0];
+}
+
+async function generateFirstQuestion(interviewer, experienceLevel, interviewType, studentName) {
+  const name = firstName(studentName);
   const system = buildSystemPrompt(interviewer, experienceLevel, interviewType);
   return withGeminiFallback(async (modelName) => {
     const model = getClient().getGenerativeModel({ model: modelName, systemInstruction: system });
     const chat = model.startChat({ history: [] });
     const result = await chat.sendMessage(
-      'Begin the mock interview now. Greet briefly (one line) then ask your first question only.'
+      `Begin the mock interview now. Greet ${name} warmly in natural Indian English (one short sentence), then ask your first interview question only. Speak like a real Bangalore/Mumbai office interviewer — not robotic.`
     );
     return result.response.text().trim();
   });
@@ -110,30 +136,76 @@ async function generateNextQuestion(session) {
   }
 
   const qCount = messages.filter(m => m.role === 'interviewer').length;
-  if (qCount >= MAX_QUESTIONS) {
+  const isLast = qCount >= MAX_QUESTIONS;
+
+  if (isLast) {
     return {
-      content: 'Thank you. That concludes our interview. Please click **End Interview** to receive your detailed feedback report.',
+      teacher_feedback: 'Good effort today. Click End Interview below to get your full score report with detailed improvement areas.',
+      content: 'Thank you. That concludes our interview. Please click End Interview to receive your detailed feedback report.',
       done: true
     };
   }
 
+  const persona = INTERVIEWERS[session.interviewer];
   const system = buildSystemPrompt(session.interviewer, session.experience_level, session.interview_type);
-  const history = toGeminiHistory(messages.slice(0, -1));
+  const history = toCoachHistory(messages.slice(0, -1));
 
-  const text = await withGeminiFallback(async (modelName) => {
-    const model = getClient().getGenerativeModel({ model: modelName, systemInstruction: system });
+  const prompt = `The candidate just answered:
+"""
+${studentMsg.content}
+"""
+
+You are ${persona.name}, acting as both interviewer AND supportive coach (like a teacher in India).
+
+Step 1 — teacher_feedback (2-4 sentences, spoken naturally):
+- Start with one thing they did well (if any)
+- Clearly say what to improve in THIS answer (missing metrics, vague tools, no STAR structure, weak SQL, etc.)
+- Give one concrete tip: what to say next time
+
+Step 2 — next_question: Ask ONE new interview question only (short, realistic Indian DE interview style).
+
+Return ONLY valid JSON:
+{
+  "teacher_feedback": "...",
+  "next_question": "...",
+  "done": false
+}`;
+
+  const raw = await withGeminiFallback(async (modelName) => {
+    const model = getClient().getGenerativeModel({
+      model: modelName,
+      systemInstruction: system,
+      generationConfig: { responseMimeType: 'application/json' }
+    });
     const chat = model.startChat({ history });
-    const result = await chat.sendMessage(studentMsg.content);
-    return result.response.text().trim();
+    const result = await chat.sendMessage(prompt);
+    return result.response.text();
   });
 
-  const done = qCount + 1 >= MAX_QUESTIONS || text.includes('End Interview');
-  return { content: text, done };
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    const match = raw.match(/\{[\s\S]*\}/);
+    parsed = match ? JSON.parse(match[0]) : { teacher_feedback: 'Focus on adding metrics and your exact role.', next_question: raw, done: false };
+  }
+
+  const nextQ = (parsed.next_question || '').trim();
+  const done = parsed.done === true || nextQ.toLowerCase().includes('end interview');
+
+  return {
+    teacher_feedback: (parsed.teacher_feedback || 'Try to add numbers, tools, and your personal contribution.').trim(),
+    content: nextQ || 'Tell me about another data engineering project you worked on.',
+    done
+  };
 }
 
 async function generateFeedback(session, studentName) {
   const transcript = (session.messages || [])
-    .map(m => `${m.role === 'interviewer' ? 'Interviewer' : 'Candidate'}: ${m.content}`)
+    .map(m => {
+      const label = m.role === 'interviewer' ? 'Interviewer' : m.role === 'coach' ? 'Coach' : 'Candidate';
+      return `${label}: ${m.content}`;
+    })
     .join('\n\n');
 
   const prompt = `Analyze this Data Engineering mock interview transcript for candidate "${studentName || 'Student'}".
@@ -181,11 +253,33 @@ Return ONLY valid JSON with this exact structure:
   }
 }
 
+async function transcribeAudio(buffer, mimeType = 'audio/webm') {
+  if (!buffer?.length) throw new Error('Empty audio recording');
+  const safeMime = mimeType && mimeType.startsWith('audio/') ? mimeType.split(';')[0] : 'audio/webm';
+
+  return withGeminiFallback(async (modelName) => {
+    const model = getClient().getGenerativeModel({ model: modelName });
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType: safeMime,
+          data: Buffer.from(buffer).toString('base64')
+        }
+      },
+      {
+        text: 'Transcribe this interview answer to English text. The speaker may have an Indian accent. Return ONLY the spoken words — no labels, quotes, or commentary.'
+      }
+    ]);
+    return result.response.text().trim().replace(/^["']|["']$/g, '');
+  });
+}
+
 module.exports = {
   INTERVIEWERS,
   INTERVIEW_TYPES,
   MAX_QUESTIONS,
   generateFirstQuestion,
   generateNextQuestion,
-  generateFeedback
+  generateFeedback,
+  transcribeAudio
 };

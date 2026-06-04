@@ -88,6 +88,8 @@
       </div>
     </div>
 
+    <div id="studentGuidePanel" class="student-guide-card"></div>
+
     <!-- Horizontal Tabs -->
     <div class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('comic',this)">🎭 Comic</button>
@@ -186,6 +188,8 @@
   <script src="https://skulpt.org/js/skulpt.min.js"></script>
   <script src="https://skulpt.org/js/skulpt-stdlib.js"></script>
   <script src="pyspark-content.js"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const topicId = params.get('topic') || 'pyspark-intro';
@@ -295,6 +299,10 @@
       document.getElementById('interviewContent').textContent = topic.interview || '';
       document.getElementById('memoryContent').textContent = topic.memory || '';
       document.getElementById('revisionContent').textContent = topic.revision || '';
+
+      if (typeof TopicStudentView !== 'undefined') {
+        TopicStudentView.applyToTopicPage(topic, 'pyspark');
+      }
     }
 
     function switchTab(name, btn) {

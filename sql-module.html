@@ -53,19 +53,23 @@
 
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-white mb-2"><span id="studentName"></span>'s SQL Dashboard</h1>
-      <p class="text-gray-300 mb-4">Master SQL with 16 comprehensive topics — from core concepts to AI-powered future-ready engineering</p>
+      <p class="text-gray-300 mb-4">Master SQL with 17 comprehensive topics — from core concepts to AI-powered future-ready engineering</p>
       <div class="flex items-center gap-6 text-sm text-gray-400">
-        <span>📚 16 Topics</span>
+        <span>📚 17 Topics</span>
         <span>⏱️ Interview Ready</span>
         <span>🎯 Real-World Scenarios</span>
         <span id="progressLabel" class="text-accent font-semibold"></span>
       </div>
     </div>
 
+    <div id="syllabusStudentIntro"></div>
+
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="topicsGrid"></div>
 
   </main>
 
+  <script src="topic-student-view.js"></script>
+  <script src="syllabus-student-intro.js"></script>
   <script>
     const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
@@ -115,7 +119,10 @@
       { id: 'sql-interview-prep', title: 'SQL Interview Preparation', desc: 'Theory questions, Live coding, Scenario solving, Karat/Product company questions - complete interview mastery', icon: '🏆', color: 'from-amber-500 to-amber-600', diff: 'Interview Mastery', duration: '90 min', interviewQ: 15 },
       
       // 🤖 FUTURE READY
-      { id: 'ai-future-sql', title: 'AI + Future SQL', desc: 'Prompt to SQL, AI tools (ChatGPT, Copilot), Validation skills - 10x faster with AI assistance', icon: '🤖', color: 'from-cyan-500 to-blue-600', diff: 'Future Ready', duration: '60 min', interviewQ: 10 }
+      { id: 'ai-future-sql', title: 'AI + Future SQL', desc: 'Prompt to SQL, AI tools (ChatGPT, Copilot), Validation skills - 10x faster with AI assistance', icon: '🤖', color: 'from-cyan-500 to-blue-600', diff: 'Future Ready', duration: '60 min', interviewQ: 10 },
+
+      // 🎯 BONUS — critical interview gaps
+      { id: 'sql-set-operations-acid', title: 'SET Operations + ACID & Normalization (Bonus)', desc: 'UNION vs UNION ALL, INTERSECT, EXCEPT, ACID properties, 1NF–3NF — theory that eliminates candidates', icon: '🎯', color: 'from-red-500 to-pink-600', diff: 'Interview Bonus', duration: '45 min', interviewQ: 10 }
     ];
 
     const diffColor = { 
@@ -128,7 +135,8 @@
       Performance: 'text-xs font-bold px-2 py-1 rounded-full',
       'Interview Practice': 'text-xs font-bold px-2 py-1 rounded-full',
       'Interview Mastery': 'text-xs font-bold px-2 py-1 rounded-full',
-      'Future Ready': 'text-xs font-bold px-2 py-1 rounded-full'
+      'Future Ready': 'text-xs font-bold px-2 py-1 rounded-full',
+      'Interview Bonus': 'text-xs font-bold px-2 py-1 rounded-full'
     };
 
     const diffStyle = {
@@ -141,7 +149,8 @@
       Performance: 'background: linear-gradient(135deg, #ffbf3c, #ff3d81); color: white;',
       'Interview Practice': 'background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;',
       'Interview Mastery': 'background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;',
-      'Future Ready': 'background: linear-gradient(135deg, #00d4ff, #7c3cff); color: white;'
+      'Future Ready': 'background: linear-gradient(135deg, #00d4ff, #7c3cff); color: white;',
+      'Interview Bonus': 'background: linear-gradient(135deg, #ff3d81, #ffbf3c); color: white;'
     };
 
     function render() {
@@ -204,7 +213,12 @@
       window.location.href = `sql-topic.html?topic=${id}`;
     }
 
-    requireModuleAccess().then(ok => { if (ok) render(); });
+    requireModuleAccess().then(ok => {
+      if (ok) {
+        render();
+        injectSyllabusStudentIntro('sql', 'SQL Mastery', TOPICS.length);
+      }
+    });
 
     function goBackToSyllabus() {
       window.location.href = user.role === 'admin' ? 'admin-dashboard.html' : 'student-dashboard.html';

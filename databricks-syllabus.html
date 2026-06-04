@@ -63,10 +63,15 @@
       </div>
     </div>
 
+    <div id="syllabusStudentIntro"></div>
+
     <div id="topicsGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </main>
 
   <script src="databricks-content.js?v=13"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
+  <script src="syllabus-student-intro.js"></script>
   <script>
     const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
@@ -152,6 +157,7 @@
     }
 
     render();
+    injectSyllabusStudentIntro('databricks', 'Databricks for Data Engineering', Object.keys(databricksContent).length);
 
     function goBackToSyllabus() {
       const user = JSON.parse(localStorage.getItem('user') || '{}');

@@ -208,7 +208,7 @@
     </div>
 
     <!-- Primary Action Cards -->
-    <div class="grid md:grid-cols-3 gap-6 mb-8">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div onclick="toggleSection('resume')" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300">
         <div class="text-5xl mb-4">📝</div>
         <h3 class="text-2xl font-bold text-white mb-2">Build Resume First</h3>
@@ -223,11 +223,18 @@
         <span class="text-primary font-semibold">Master It →</span>
       </div>
 
-      <div onclick="window.location.href='mock-interview.html'" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300 border border-accent/20">
+      <div id="mockInterviewCard" onclick="openMockInterview()" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300 border border-accent/20">
         <div class="text-5xl mb-4">🤖</div>
         <h3 class="text-2xl font-bold text-white mb-2">AI Mock Interview</h3>
         <p class="text-gray-400 mb-4">Practice with Rahul or Priya · Gemini AI feedback</p>
-        <span class="text-accent font-semibold">Start Mock →</span>
+        <span id="mockInterviewCta" class="text-accent font-semibold">Start Mock →</span>
+      </div>
+
+      <div id="studyBotCard" onclick="openStudyBot()" class="glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300 border border-secondary/20">
+        <div class="text-5xl mb-4">📚</div>
+        <h3 class="text-2xl font-bold text-white mb-2">Study Bot (RAG)</h3>
+        <p class="text-gray-400 mb-4">Ask SQL, Python, Spark & projects — answers from your course</p>
+        <span id="studyBotCta" class="text-secondary font-semibold">Ask Now →</span>
       </div>
     </div>
 
@@ -1071,7 +1078,7 @@
         const enrollmentData = await r.json();
 
         // Get syllabus access (always fetch, regardless of payment status)
-        let syllabusAccess = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+        let syllabusAccess = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0, mock_interview_access: 0 };
         try {
           const sr = await fetch(`${API}/syllabus/access`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
           syllabusAccess = await sr.json();
@@ -1080,13 +1087,13 @@
         // Render Courses — access is purely driven by syllabusAccess from DB
         // Payment status only affects the enrollment status banner, not module visibility
         const courses = [
-          { name: 'SQL Mastery',   icon: '🗄️', topics: '15 Topics',   access: syllabusAccess.sql_access,        url: 'sql-module.html' },
-          { name: 'Python for DE', icon: '🐍', topics: '14 Topics',   access: syllabusAccess.python_access,     url: 'python-syllabus.html' },
-          { name: 'PySpark',       icon: '⚡',  topics: '15 Topics',   access: syllabusAccess.pyspark_access,    url: 'pyspark-syllabus.html' },
-          { name: 'AWS for DE',    icon: '☁️',  topics: '7 Flows',    access: syllabusAccess.aws_access,        url: 'aws-syllabus.html' },
-          { name: 'Databricks',    icon: '🧱', topics: '8 Topics',    access: syllabusAccess.databricks_access, url: 'databricks-syllabus.html' },
-          { name: 'Git & GitHub',  icon: '📦', topics: '7 Topics',    access: syllabusAccess.git_access,        url: 'git-syllabus.html' },
-          { name: 'Real Projects', icon: '🏗️', topics: '7 Projects', access: syllabusAccess.projects_access,   url: 'projects-syllabus.html' }
+          { name: 'SQL Mastery',   icon: '🗄️', topics: '17 Topics',   access: syllabusAccess.sql_access,        url: 'sql-module.html' },
+          { name: 'Python for DE', icon: '🐍', topics: '16 Topics',   access: syllabusAccess.python_access,     url: 'python-syllabus.html' },
+          { name: 'PySpark',       icon: '⚡',  topics: '16 Topics',   access: syllabusAccess.pyspark_access,    url: 'pyspark-syllabus.html' },
+          { name: 'AWS for DE',    icon: '☁️',  topics: '8 Flows',    access: syllabusAccess.aws_access,        url: 'aws-syllabus.html' },
+          { name: 'Databricks',    icon: '🧱', topics: '9 Topics',    access: syllabusAccess.databricks_access, url: 'databricks-syllabus.html' },
+          { name: 'Git & GitHub',  icon: '📦', topics: '8 Topics',    access: syllabusAccess.git_access,        url: 'git-syllabus.html' },
+          { name: 'Real Projects', icon: '🏗️', topics: '8 Projects', access: syllabusAccess.projects_access,   url: 'projects-syllabus.html' }
         ];
 
         document.getElementById('coursesList').innerHTML = courses.map(course => {
@@ -1151,6 +1158,10 @@
           `;
         }
 
+        window.syllabusAccess = syllabusAccess;
+        await updateMockInterviewCard(enrollmentData);
+        await updateStudyBotCard(enrollmentData);
+
       } catch(e) {
         console.error('Init error:', e);
       }
@@ -1159,6 +1170,96 @@
     }
 
     init();
+
+    async function updateMockInterviewCard(enrollmentData) {
+      const card = document.getElementById('mockInterviewCard');
+      const cta = document.getElementById('mockInterviewCta');
+      if (!card || !cta) return;
+
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      let status = { hasAccess: user.role === 'admin', fullAccess: user.role === 'admin', freeRemaining: 2, canStart: true, accessType: 'admin' };
+
+      try {
+        const r = await fetch(`${API}/mock-interview/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        if (r.ok) status = await r.json();
+      } catch (e) {}
+
+      window.mockInterviewStatus = status;
+
+      if (status.hasAccess) {
+        card.className = 'glass-card p-8 cursor-pointer hover:scale-105 transition-transform duration-300 border border-accent/20';
+        card.style.opacity = '';
+        if (status.fullAccess || status.accessType === 'admin') {
+          cta.textContent = 'Start Mock → Unlimited access';
+          cta.className = 'text-accent font-semibold';
+        } else if (status.canStart) {
+          cta.textContent = `Start Mock → ${status.freeRemaining} free trial${status.freeRemaining === 1 ? '' : 's'} left`;
+          cta.className = 'text-accent font-semibold';
+        } else {
+          cta.textContent = 'View history — free trials used. Ask admin to unlock';
+          cta.className = 'text-yellow-400 font-semibold text-sm';
+        }
+      } else {
+        card.className = 'glass-card p-8 relative border border-white/10';
+        card.style.opacity = '0.55';
+        cta.textContent = '🔒 Locked — contact admin';
+        cta.className = 'text-gray-500 font-semibold text-sm';
+      }
+    }
+
+    function openMockInterview() {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const status = window.mockInterviewStatus || {};
+      if (user.role !== 'admin' && !status.hasAccess) {
+        alert('AI Mock Interview is not available. Contact admin for access.');
+        return;
+      }
+      window.location.href = 'mock-interview.html';
+    }
+
+    async function updateStudyBotCard(enrollmentData) {
+      const card = document.getElementById('studyBotCard');
+      const cta = document.getElementById('studyBotCta');
+      if (!card || !cta) return;
+
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      let status = { canAsk: true, fullAccess: user.role === 'admin', freeRemaining: 7, accessType: 'trial' };
+
+      try {
+        const r = await fetch(`${API}/study-bot/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        if (r.ok) status = await r.json();
+      } catch (e) {}
+
+      window.studyBotStatus = status;
+
+      if (status.fullAccess || status.accessType === 'admin' || status.paid) {
+        cta.textContent = 'Ask Now → Unlimited (paid)';
+        cta.className = 'text-secondary font-semibold';
+      } else if (status.canAsk) {
+        cta.textContent = `Ask Now → ${status.freeRemaining} free question${status.freeRemaining === 1 ? '' : 's'} left`;
+        cta.className = 'text-secondary font-semibold';
+      } else {
+        cta.textContent = '🔒 7 free used — pay to unlock unlimited';
+        cta.className = 'text-yellow-400 font-semibold text-sm';
+      }
+    }
+
+    function openStudyBot() {
+      const status = window.studyBotStatus || {};
+      if (status.canAsk === false && !status.fullAccess && !status.paid) {
+        if (confirm('You used all 7 free Study Bot questions. Complete payment to unlock unlimited access?\n\nGo to payment page now?')) {
+          window.location.href = 'payment.html';
+        }
+        return;
+      }
+      window.location.href = 'study-bot.html';
+    }
 
     // Update streak and gamification
     function updateStreakAndGamification() {

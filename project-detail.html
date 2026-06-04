@@ -37,6 +37,8 @@
     <!-- Project Header -->
     <div id="projectHeader" class="card p-8 mb-8"></div>
 
+    <div id="studentGuidePanel" class="student-guide-card mb-8"></div>
+
     <!-- Navigation Tabs -->
     <div class="flex gap-2 border-b border-white/10 mb-8 overflow-x-auto pb-2">
       <button onclick="showTab('projectinfo')" id="tab-projectinfo" class="tab-btn active text-secondary">📋 Project Info</button>
@@ -74,6 +76,8 @@
   </main>
 
   <script src="projects-content.js"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
   <script>
     const token = localStorage.getItem('token');
     // Temporarily bypass login check for testing
@@ -990,6 +994,27 @@
     renderPractical();
     renderMemory();
     renderRevision();
+
+    if (typeof TopicStudentView !== 'undefined' && project) {
+      const comicStory = project.aatma?.['🎭 Comic']?.story || '';
+      const deepSteps = project.aatma?.['📚 Deep Dive']?.step_by_step;
+      const qna = project.aatma?.['💬 Q&A'] || [];
+      const qnaList = Array.isArray(qna) ? qna : (qna.questions || []);
+      TopicStudentView.applyToTopicPage({
+        title: project.title,
+        project_name: project.project_name,
+        description: project.subtitle || project.tagline,
+        comic: comicStory,
+        deepDive: Array.isArray(deepSteps) ? deepSteps.join('\n') : '',
+        memory: project.aatma?.['🧠 Memory']?.one_liner || project.aatma?.['🧠 Memory']?.summary || '',
+        qa: qnaList.map(q => ({ q: q.question, memory: q.memory_trick }))
+      }, 'projects');
+      document.querySelectorAll('#content-comic p, #content-deepdive p').forEach(p => {
+        if (p.textContent && !p.querySelector('code, strong, div')) {
+          p.innerHTML = TopicStudentView.formatRichText(p.textContent);
+        }
+      });
+    }
   </script>
 </body>
 </html>

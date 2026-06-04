@@ -17,11 +17,22 @@
     .chat-bubble { max-width: 85%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.5; }
     .chat-interviewer { background: rgba(124,60,255,0.2); border: 1px solid rgba(124,60,255,0.35); align-self: flex-start; }
     .chat-student { background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.3); align-self: flex-end; }
+    .chat-coach { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); align-self: flex-start; max-width: 92%; }
+    .chat-coach .coach-label { display: block; font-size: 0.7rem; font-weight: 700; color: #fcd34d; margin-bottom: 0.35rem; }
     .score-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; }
     .score-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-    #chatArea { display: flex; flex-direction: column; gap: 0.75rem; max-height: 420px; overflow-y: auto; }
+    #chatArea { display: flex; flex-direction: column; gap: 0.75rem; max-height: 320px; overflow-y: auto; }
     .typing { animation: pulse 1.2s infinite; }
     @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+    .interviewer-stage { text-align: center; padding: 1.25rem; background: rgba(124,60,255,0.08); border: 1px solid rgba(124,60,255,0.2); border-radius: 1rem; }
+    .avatar-ring { display: inline-flex; align-items: center; justify-content: center; width: 88px; height: 88px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.15); font-size: 2.5rem; transition: all 0.3s; }
+    .avatar-ring.speaking { border-color: #00d4ff; box-shadow: 0 0 0 4px rgba(0,212,255,0.25); animation: speakPulse 1s ease-in-out infinite; }
+    @keyframes speakPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+    .voice-bar { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .voice-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; transition: all 0.2s; }
+    .voice-btn.active { background: rgba(0,212,255,0.2); border-color: #00d4ff; color: #00d4ff; }
+    .voice-btn.listening { background: rgba(255,61,129,0.25); border-color: #ff3d81; animation: pulse 1s infinite; }
+    .live-caption { min-height: 2.5rem; font-size: 0.9rem; color: #cbd5e1; font-style: italic; padding: 0 0.5rem; }
   </style>
   <script src="security.js"></script>
 </head>
@@ -38,7 +49,7 @@
     <section id="setupSection" class="glass p-6 space-y-6">
       <div>
         <h2 class="text-2xl font-bold text-white mb-1">Choose Your Interviewer</h2>
-        <p class="text-gray-400 text-sm">Realistic Data Engineering mock — powered by Google Gemini (free tier)</p>
+        <p class="text-gray-400 text-sm">Natural Indian English voice — Rahul (Prabhat) or Priya (Neerja)</p>
       </div>
 
       <div class="grid sm:grid-cols-2 gap-4" id="interviewerCards"></div>
@@ -72,17 +83,33 @@
     <!-- Chat -->
     <section id="chatSection" class="hidden glass p-6 space-y-4">
       <div class="flex items-center gap-3 pb-3 border-b border-white/10">
-        <span id="activeAvatar" class="text-4xl">👨‍💼</span>
-        <div>
+        <div class="flex-1">
           <p id="activeName" class="font-bold text-white">Interviewer</p>
-          <p id="activeMeta" class="text-xs text-gray-400">Live mock interview</p>
+          <p id="activeMeta" class="text-xs text-gray-400">Live voice mock interview</p>
         </div>
-        <button onclick="endInterview()" id="endBtn" class="ml-auto px-4 py-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30">End Interview</button>
+        <button onclick="endInterview()" id="endBtn" class="px-4 py-2 bg-red-500/20 text-red-300 rounded-lg text-sm hover:bg-red-500/30">End Interview</button>
       </div>
+
+      <!-- Interviewer speaking stage -->
+      <div class="interviewer-stage">
+        <div id="avatarRing" class="avatar-ring mb-2"><span id="activeAvatar">👨‍💼</span></div>
+        <p id="speakStatus" class="text-sm text-accent font-semibold mb-1">Ready to start</p>
+        <p id="liveCaption" class="live-caption">Interviewer will speak questions — use mic or type your answer</p>
+      </div>
+
+      <div class="voice-bar">
+        <button type="button" id="voiceToggle" class="voice-btn active" onclick="toggleVoice()">🔊 Voice ON</button>
+        <button type="button" id="micBtn" class="voice-btn" onclick="toggleMic()">🎤 Speak Answer</button>
+        <button type="button" id="replayBtn" class="voice-btn hidden" onclick="replayLastQuestion()">↺ Replay Question</button>
+        <span id="micHint" class="text-xs text-gray-500">🎤 Record answer → Gemini transcribes (works in all browsers)</span>
+        <span id="micStatus" class="text-xs text-yellow-400 w-full hidden"></span>
+        <span id="voiceName" class="text-xs text-accent ml-auto"></span>
+      </div>
+
       <div id="chatArea"></div>
-      <div id="typingIndicator" class="hidden text-gray-400 text-sm typing">Interviewer is thinking...</div>
+      <div id="typingIndicator" class="hidden text-gray-400 text-sm typing">📚 Reviewing your answer...</div>
       <div class="flex gap-2">
-        <textarea id="answerInput" rows="3" placeholder="Type your answer like a real interview..." class="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white resize-none"></textarea>
+        <textarea id="answerInput" rows="3" placeholder="Speak using 🎤 or type your answer..." class="flex-1 bg-white/5 border border-white/10 rounded-lg p-3 text-white resize-none"></textarea>
         <button id="sendBtn" onclick="sendAnswer()" class="px-5 py-3 bg-accent/20 text-accent font-bold rounded-lg hover:bg-accent/30 self-end">Send</button>
       </div>
     </section>
@@ -130,12 +157,54 @@
   <script>
     const API = window.location.origin + '/api';
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) window.location.href = 'student-login.html';
+
+    async function requireMockInterviewAccess() {
+      if (user.role === 'admin') return true;
+      try {
+        const r = await fetch(`${API}/mock-interview/status`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const status = await parseApiJson(r);
+        if (r.ok && status.hasAccess) {
+          window.mockInterviewStatus = status;
+          return true;
+        }
+        alert(status.error || 'AI Mock Interview is not available. Ask admin to unlock access.');
+      } catch (e) {}
+      window.location.href = 'student-dashboard.html';
+      return false;
+    }
+
+    function updateAccessBadge() {
+      const badge = document.getElementById('dailyBadge');
+      const status = window.mockInterviewStatus || config;
+      if (!badge) return;
+
+      if (status.fullAccess || status.accessType === 'admin') {
+        badge.textContent = `${config.dailyLimit || status.dailyLimit || 3} mocks/day · Unlimited plan`;
+      } else if (status.accessType === 'expired') {
+        badge.textContent = 'Free trials used · Ask admin to unlock';
+      } else {
+        const left = status.freeRemaining ?? status.freeTrialLimit ?? 2;
+        badge.textContent = `${left} free mock${left === 1 ? '' : 's'} remaining`;
+      }
+    }
 
     let config = {};
     let selectedInterviewer = 'rahul';
     let sessionId = null;
     let interviewDone = false;
+    let voiceEnabled = true;
+    let lastQuestionText = '';
+    let isListening = false;
+    let isSpeaking = false;
+    let currentAudio = null;
+    let mediaRecorder = null;
+    let micStream = null;
+    let audioChunks = [];
+
+    const studentUser = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) { return {}; } })();
+    const studentFirstName = (studentUser.name || 'there').trim().split(/\s+/)[0];
 
     const SCORE_LABELS = {
       communication: 'Communication',
@@ -147,21 +216,48 @@
       structure: 'Structure (STAR)'
     };
 
+    async function parseApiJson(response) {
+      const text = await response.text();
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch {
+        if (/^\s*</.test(text)) {
+          throw new Error('Server not updated — stop and run: npm start');
+        }
+        throw new Error(text.slice(0, 150) || `Request failed (${response.status})`);
+      }
+    }
+
     async function init() {
       try {
         const r = await fetch(`${API}/mock-interview/config`, {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store'
         });
-        config = await r.json();
+        config = await parseApiJson(r);
+        if (!r.ok) throw new Error(config.error || 'Failed to load config');
+        window.mockInterviewStatus = {
+          freeTrialLimit: config.freeTrialLimit,
+          lifetimeUsed: config.lifetimeUsed,
+          freeRemaining: config.freeRemaining,
+          fullAccess: config.fullAccess,
+          canStart: config.canStart,
+          accessType: config.accessType
+        };
         if (!config.geminiConfigured) {
           document.getElementById('setupError').textContent = '⚠️ Gemini API key not set on server. Ask admin to add GEMINI_API_KEY on Render.';
           document.getElementById('setupError').classList.remove('hidden');
           document.getElementById('startBtn').disabled = true;
+        } else if (config.canStart === false) {
+          document.getElementById('setupError').textContent = `You've used your ${config.freeTrialLimit || 2} free mock interviews. Ask admin to unlock unlimited access.`;
+          document.getElementById('setupError').classList.remove('hidden');
+          document.getElementById('startBtn').disabled = true;
         }
-        document.getElementById('dailyBadge').textContent = `${config.dailyLimit || 3} mocks/day limit`;
+        updateAccessBadge();
         renderInterviewerCards();
         loadHistory();
+        setTimeout(showActiveVoice, 500);
       } catch (e) {
         console.error(e);
       }
@@ -183,15 +279,277 @@
     function selectInterviewer(id) {
       selectedInterviewer = id;
       renderInterviewerCards();
+      showActiveVoice();
+    }
+
+    // ── Indian Neural TTS (Microsoft Edge en-IN — server-side, natural speech) ──
+    function cleanSpeechText(text) {
+      if (!text) return '';
+      return text
+        .replace(/\*\*/g, '')
+        .replace(/\[Candidate'?s Name\]/gi, studentFirstName)
+        .replace(/\[Your Name\]/gi, studentFirstName)
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function showActiveVoice() {
+      const el = document.getElementById('voiceName');
+      const label = config.voiceLabels?.[selectedInterviewer]
+        || (selectedInterviewer === 'rahul' ? 'Prabhat · Indian English Male' : 'Neerja · Indian English Female');
+      if (el) el.textContent = `🇮🇳 ${label}`;
+    }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function stopSpeech() {
+      window.speechSynthesis?.cancel();
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.src = '';
+        currentAudio = null;
+      }
+    }
+
+    async function playIndianSpeech(text, mode = 'interview') {
+      const cleaned = cleanSpeechText(text);
+      if (!voiceEnabled || !cleaned) return;
+
+      stopSpeech();
+
+      if (mode === 'coach') {
+        document.getElementById('speakStatus').textContent = '📚 Coach explaining what to improve...';
+      } else {
+        document.getElementById('speakStatus').textContent = '🎙️ Interviewer speaking...';
+      }
+      setSpeakingUI(true, cleaned.length > 100 ? cleaned.slice(0, 100) + '…' : cleaned);
+
+      try {
+        const r = await fetch(`${API}/mock-interview/speak`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: cleaned, interviewer: selectedInterviewer, mode })
+        });
+        if (!r.ok) {
+          const err = await parseApiJson(r);
+          throw new Error(err.error || 'Neural TTS failed');
+        }
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        await new Promise((resolve, reject) => {
+          currentAudio = new Audio(url);
+          currentAudio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+          currentAudio.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Playback error')); };
+          currentAudio.play().catch(reject);
+        });
+      } catch (e) {
+        console.warn('Neural TTS error:', e.message);
+        showMicStatus('Interviewer voice needs internet — text still works below', true);
+        setTimeout(() => showMicStatus(''), 5000);
+      } finally {
+        setSpeakingUI(false);
+        if (!interviewDone) {
+          document.getElementById('micBtn').disabled = false;
+          showMicStatus('Your turn — click 🎤 Speak Answer or type below', false);
+          setTimeout(() => showMicStatus(''), 4000);
+        }
+      }
+    }
+
+    function setSpeakingUI(active, caption) {
+      isSpeaking = active;
+      document.getElementById('avatarRing').classList.toggle('speaking', active);
+      document.getElementById('speakStatus').textContent = active ? '🎙️ Interviewer speaking...' : '👂 Your turn — answer now';
+      if (caption) document.getElementById('liveCaption').textContent = caption;
+      document.getElementById('sendBtn').disabled = active || interviewDone;
+      document.getElementById('micBtn').disabled = active || interviewDone;
+      if (active && isListening) stopMic();
+    }
+
+    function showMicStatus(msg, isError = false) {
+      const el = document.getElementById('micStatus');
+      if (!el) return;
+      if (!msg) { el.classList.add('hidden'); el.textContent = ''; return; }
+      el.textContent = msg;
+      el.className = 'text-xs w-full ' + (isError ? 'text-red-400' : 'text-green-400');
+      el.classList.remove('hidden');
+    }
+
+    function initMicRecorder() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        document.getElementById('micBtn').disabled = true;
+        showMicStatus('Microphone not supported — type your answer instead', true);
+      }
+    }
+
+    function getRecorderMime() {
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus';
+      if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/mp4')) return 'audio/mp4';
+      return '';
+    }
+
+    async function toggleMic() {
+      if (isSpeaking || interviewDone) {
+        if (isSpeaking) showMicStatus('Wait until interviewer finishes speaking', true);
+        return;
+      }
+      if (isListening) await stopMicAndTranscribe();
+      else await startMicRecording();
+    }
+
+    async function startMicRecording() {
+      stopSpeech();
+      showMicStatus('');
+      const micBtn = document.getElementById('micBtn');
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioChunks = [];
+        const mime = getRecorderMime();
+        mediaRecorder = mime ? new MediaRecorder(micStream, { mimeType: mime }) : new MediaRecorder(micStream);
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onerror = () => showMicStatus('Recording error — try again', true);
+        mediaRecorder.start(250);
+        isListening = true;
+        micBtn.classList.add('listening');
+        micBtn.textContent = '⏹ Stop & Transcribe';
+        showMicStatus('🔴 Recording… speak your full answer, then click Stop', false);
+        document.getElementById('answerInput').placeholder = 'Recording in progress…';
+      } catch (e) {
+        showMicStatus('Allow microphone — System Settings → Privacy → Microphone → Chrome', true);
+        micBtn.disabled = false;
+      }
+    }
+
+    async function stopMicAndTranscribe() {
+      const micBtn = document.getElementById('micBtn');
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤 Speak Answer';
+      micBtn.disabled = true;
+
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        micBtn.disabled = false;
+        return;
+      }
+
+      showMicStatus('⏳ Transcribing your speech…', false);
+
+      await new Promise((resolve) => {
+        mediaRecorder.onstop = resolve;
+        try { mediaRecorder.stop(); } catch (e) { resolve(); }
+      });
+
+      const mime = mediaRecorder.mimeType || 'audio/webm';
+      mediaRecorder = null;
+
+      if (!audioChunks.length) {
+        showMicStatus('No audio captured — speak longer (3+ seconds) and try again', true);
+        micBtn.disabled = false;
+        return;
+      }
+
+      const blob = new Blob(audioChunks, { type: mime });
+      audioChunks = [];
+
+      if (blob.size < 1000) {
+        showMicStatus('Recording too short — speak at least 3 seconds', true);
+        micBtn.disabled = false;
+        return;
+      }
+
+      try {
+        const fd = new FormData();
+        fd.append('audio', blob, 'answer.webm');
+        const r = await fetch(`${API}/mock-interview/transcribe`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd
+        });
+        const data = await parseApiJson(r);
+        if (!r.ok) throw new Error(data.error || 'Transcription failed');
+
+        const input = document.getElementById('answerInput');
+        const prev = input.value.trim();
+        const text = (data.text || '').trim();
+        input.value = prev ? (prev + ' ' + text).trim() : text;
+        showMicStatus(text ? '✅ Transcribed — review and click Send' : 'Could not hear words — try again or type', !text);
+        if (text) setTimeout(() => showMicStatus(''), 5000);
+      } catch (e) {
+        showMicStatus(e.message + ' — or type your answer below', true);
+      } finally {
+        micBtn.disabled = false;
+        document.getElementById('answerInput').placeholder = 'Speak using 🎤 or type your answer...';
+      }
+    }
+
+    function stopMic(clearStatus = true) {
+      isListening = false;
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try { mediaRecorder.stop(); } catch (e) {}
+      }
+      if (micStream) {
+        micStream.getTracks().forEach(t => t.stop());
+        micStream = null;
+      }
+      mediaRecorder = null;
+      audioChunks = [];
+      document.getElementById('micBtn').classList.remove('listening');
+      document.getElementById('micBtn').textContent = '🎤 Speak Answer';
+      document.getElementById('answerInput').placeholder = 'Speak using 🎤 or type your answer...';
+      if (clearStatus) showMicStatus('');
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const btn = document.getElementById('voiceToggle');
+      btn.textContent = voiceEnabled ? '🔊 Voice ON' : '🔇 Voice OFF';
+      btn.classList.toggle('active', voiceEnabled);
+      if (!voiceEnabled) stopSpeech();
+    }
+
+    function replayLastQuestion() {
+      if (lastQuestionText) playIndianSpeech(lastQuestionText, 'interview');
+    }
+
+    async function onCoachFeedback(text) {
+      const cleaned = cleanSpeechText(text);
+      appendBubble('coach', cleaned);
+      await playIndianSpeech(cleaned, 'coach');
+    }
+
+    async function onInterviewerMessage(text) {
+      const cleaned = cleanSpeechText(text);
+      lastQuestionText = cleaned;
+      document.getElementById('replayBtn').classList.remove('hidden');
+      appendBubble('interviewer', cleaned);
+      await delay(300);
+      await playIndianSpeech(cleaned, 'interview');
     }
 
     function appendBubble(role, text) {
       const area = document.getElementById('chatArea');
       const div = document.createElement('div');
-      div.className = `chat-bubble ${role === 'interviewer' ? 'chat-interviewer' : 'chat-student'}`;
-      div.textContent = text;
+      if (role === 'coach') {
+        div.className = 'chat-bubble chat-coach';
+        div.innerHTML = `<span class="coach-label">📚 What to improve</span>${escapeHtml(text)}`;
+      } else {
+        div.className = `chat-bubble ${role === 'interviewer' ? 'chat-interviewer' : 'chat-student'}`;
+        div.textContent = text;
+      }
       area.appendChild(div);
       area.scrollTop = area.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
     }
 
     async function startInterview() {
@@ -209,7 +567,7 @@
             interview_type: document.getElementById('intType').value
           })
         });
-        const data = await r.json();
+        const data = await parseApiJson(r);
         if (!r.ok) throw new Error(data.error || 'Failed to start');
 
         sessionId = data.id;
@@ -220,11 +578,24 @@
         document.getElementById('activeMeta').textContent = `${persona.title} · ${document.getElementById('intType').selectedOptions[0].text}`;
 
         document.getElementById('chatArea').innerHTML = '';
-        (data.messages || []).forEach(m => appendBubble(m.role, m.content));
+        const firstMsg = (data.messages || []).find(m => m.role === 'interviewer');
+        if (firstMsg) await onInterviewerMessage(firstMsg.content);
+        else (data.messages || []).forEach(m => appendBubble(m.role, cleanSpeechText(m.content)));
 
         document.getElementById('setupSection').classList.add('hidden');
         document.getElementById('chatSection').classList.remove('hidden');
         document.getElementById('feedbackSection').classList.add('hidden');
+        document.getElementById('speakStatus').textContent = '👂 Your turn — answer now';
+        showActiveVoice();
+        if (window.mockInterviewStatus && !window.mockInterviewStatus.fullAccess) {
+          window.mockInterviewStatus.lifetimeUsed = (window.mockInterviewStatus.lifetimeUsed || 0) + 1;
+          window.mockInterviewStatus.freeRemaining = Math.max(0, (window.mockInterviewStatus.freeTrialLimit || 2) - window.mockInterviewStatus.lifetimeUsed);
+          window.mockInterviewStatus.canStart = window.mockInterviewStatus.lifetimeUsed < (window.mockInterviewStatus.freeTrialLimit || 2);
+          if (window.mockInterviewStatus.accessType !== 'admin') {
+            window.mockInterviewStatus.accessType = window.mockInterviewStatus.canStart ? 'trial' : 'expired';
+          }
+          updateAccessBadge();
+        }
       } catch (e) {
         document.getElementById('setupError').textContent = e.message;
         document.getElementById('setupError').classList.remove('hidden');
@@ -237,8 +608,9 @@
     async function sendAnswer() {
       const input = document.getElementById('answerInput');
       const text = input.value.trim();
-      if (!text || !sessionId || interviewDone) return;
+      if (!text || !sessionId || interviewDone || isSpeaking) return;
 
+      stopMic(false);
       appendBubble('student', text);
       input.value = '';
       document.getElementById('sendBtn').disabled = true;
@@ -250,10 +622,15 @@
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId, message: text })
         });
-        const data = await r.json();
+        const data = await parseApiJson(r);
         if (!r.ok) throw new Error(data.error || 'Failed');
 
-        appendBubble('interviewer', data.message);
+        if (data.feedback) {
+          await onCoachFeedback(data.feedback);
+        }
+        if (data.message) {
+          await onInterviewerMessage(data.message);
+        }
         if (data.done) {
           interviewDone = true;
           input.placeholder = 'Interview complete — click End Interview for your feedback report';
@@ -273,6 +650,8 @@
       if (!sessionId) return;
       if (!confirm('End interview and generate your feedback report?')) return;
 
+      stopSpeech();
+      stopMic();
       document.getElementById('endBtn').disabled = true;
       document.getElementById('endBtn').textContent = 'Analyzing...';
 
@@ -282,7 +661,7 @@
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId })
         });
-        const data = await r.json();
+        const data = await parseApiJson(r);
         if (!r.ok) throw new Error(data.error || 'Failed');
 
         showFeedback(data.feedback);
@@ -341,14 +720,36 @@
       `).join('') || '<p class="text-gray-400 text-sm">Review weak score areas above in your dashboard modules.</p>';
     }
 
-    function resetToSetup() {
+    async function resetToSetup() {
+      window.speechSynthesis?.cancel();
+      stopSpeech();
+      stopMic();
       sessionId = null;
       interviewDone = false;
       document.getElementById('answerInput').disabled = false;
       document.getElementById('answerInput').placeholder = 'Type your answer like a real interview...';
       document.getElementById('sendBtn').disabled = false;
       document.getElementById('setupSection').classList.remove('hidden');
+      document.getElementById('chatSection').classList.add('hidden');
       document.getElementById('feedbackSection').classList.add('hidden');
+      document.getElementById('setupError').classList.add('hidden');
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('startBtn').textContent = 'Start Mock Interview';
+
+      try {
+        const r = await fetch(`${API}/mock-interview/status`, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
+        const status = await parseApiJson(r);
+        if (r.ok) {
+          window.mockInterviewStatus = status;
+          config = { ...config, ...status };
+          updateAccessBadge();
+          if (!status.canStart && user.role !== 'admin') {
+            document.getElementById('setupError').textContent = `You've used your ${status.freeTrialLimit || 2} free mock interviews. Ask admin to unlock unlimited access.`;
+            document.getElementById('setupError').classList.remove('hidden');
+            document.getElementById('startBtn').disabled = true;
+          }
+        }
+      } catch (e) {}
     }
 
     async function loadHistory() {
@@ -358,7 +759,7 @@
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store'
         });
-        const list = await r.json();
+        const list = await parseApiJson(r);
         if (!list.length) {
           el.innerHTML = '<p>No mock interviews yet. Start your first one above!</p>';
           return;
@@ -381,7 +782,8 @@
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAnswer(); }
     });
 
-    init();
+    initMicRecorder();
+    requireMockInterviewAccess().then(ok => { if (ok) init(); });
   </script>
 </body>
 </html>

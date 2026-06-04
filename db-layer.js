@@ -21,7 +21,7 @@ if (USE_MONGODB) {
 
 // Helper: normalize syllabus access document to API shape
 function formatSyllabusAccess(row) {
-  const defaults = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0 };
+  const defaults = { sql_access: 0, python_access: 0, pyspark_access: 0, databricks_access: 0, aws_access: 0, git_access: 0, projects_access: 0, mock_interview_access: 0 };
   if (!row) return defaults;
   return {
     sql_access: row.sql_access ? 1 : 0,
@@ -30,7 +30,8 @@ function formatSyllabusAccess(row) {
     databricks_access: row.databricks_access ? 1 : 0,
     aws_access: row.aws_access ? 1 : 0,
     git_access: row.git_access ? 1 : 0,
-    projects_access: row.projects_access ? 1 : 0
+    projects_access: row.projects_access ? 1 : 0,
+    mock_interview_access: row.mock_interview_access ? 1 : 0
   };
 }
 
@@ -160,7 +161,7 @@ async function initSQLiteTables() {
   const tables = [
     `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, phone TEXT, role TEXT DEFAULT 'student', target_role TEXT, experience_level TEXT, learning_pace TEXT, onboarding_completed BOOLEAN DEFAULT 0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS enrollments (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, course_name TEXT DEFAULT 'Data Engineering Mastery', payment_status TEXT DEFAULT 'pending', payment_amount REAL, payment_method TEXT, transaction_id TEXT, payment_date DATETIME, enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP, course_completed BOOLEAN DEFAULT 0, certificate_issued BOOLEAN DEFAULT 0, content_access_granted BOOLEAN DEFAULT 1, FOREIGN KEY (user_id) REFERENCES users(id))`,
-    `CREATE TABLE IF NOT EXISTS syllabus_access (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, sql_access INTEGER DEFAULT 0, python_access INTEGER DEFAULT 0, pyspark_access INTEGER DEFAULT 0, databricks_access INTEGER DEFAULT 0, aws_access INTEGER DEFAULT 0, git_access INTEGER DEFAULT 0, projects_access INTEGER DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id))`,
+    `CREATE TABLE IF NOT EXISTS syllabus_access (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL UNIQUE, sql_access INTEGER DEFAULT 0, python_access INTEGER DEFAULT 0, pyspark_access INTEGER DEFAULT 0, databricks_access INTEGER DEFAULT 0, aws_access INTEGER DEFAULT 0, git_access INTEGER DEFAULT 0, projects_access INTEGER DEFAULT 0, mock_interview_access INTEGER DEFAULT 0, FOREIGN KEY (user_id) REFERENCES users(id))`,
     `CREATE TABLE IF NOT EXISTS subtopic_access (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, module TEXT NOT NULL, group_name TEXT NOT NULL, access_granted INTEGER DEFAULT 0, UNIQUE(user_id, module, group_name), FOREIGN KEY (user_id) REFERENCES users(id))`,
     `CREATE TABLE IF NOT EXISTS feature_access (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, feature_type TEXT NOT NULL, tab_number INTEGER NOT NULL, access_granted INTEGER DEFAULT 0, UNIQUE(user_id, feature_type, tab_number), FOREIGN KEY (user_id) REFERENCES users(id))`,
     `CREATE TABLE IF NOT EXISTS security_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, user_email TEXT, event_type TEXT NOT NULL, detail TEXT, severity TEXT DEFAULT 'LOW', page TEXT, user_agent TEXT, device_type TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)`,
@@ -169,7 +170,8 @@ async function initSQLiteTables() {
     `CREATE TABLE IF NOT EXISTS landing_sections (id INTEGER PRIMARY KEY, name TEXT NOT NULL, type TEXT NOT NULL, display_order INTEGER DEFAULT 1, title TEXT, subtitle TEXT, content TEXT, visible INTEGER DEFAULT 1, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS landing_pricing (id INTEGER PRIMARY KEY AUTOINCREMENT, regular_price INTEGER NOT NULL, offer_price INTEGER NOT NULL, offer_days INTEGER DEFAULT 3, limited_seats INTEGER DEFAULT 100, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP)`,
     `CREATE TABLE IF NOT EXISTS module_access_audit (id INTEGER PRIMARY KEY AUTOINCREMENT, student_id INTEGER, student_email TEXT, module_name TEXT NOT NULL, old_value INTEGER DEFAULT 0, new_value INTEGER NOT NULL, action TEXT NOT NULL, admin_id INTEGER, admin_email TEXT, action_time DATETIME DEFAULT CURRENT_TIMESTAMP)`,
-    `CREATE TABLE IF NOT EXISTS mock_interviews (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, interviewer TEXT NOT NULL, interview_type TEXT DEFAULT 'full', experience_level TEXT DEFAULT 'Fresher', status TEXT DEFAULT 'active', question_count INTEGER DEFAULT 0, messages TEXT DEFAULT '[]', feedback TEXT, overall_score INTEGER, verdict TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ended_at DATETIME, FOREIGN KEY (user_id) REFERENCES users(id))`
+    `CREATE TABLE IF NOT EXISTS mock_interviews (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, interviewer TEXT NOT NULL, interview_type TEXT DEFAULT 'full', experience_level TEXT DEFAULT 'Fresher', status TEXT DEFAULT 'active', question_count INTEGER DEFAULT 0, messages TEXT DEFAULT '[]', feedback TEXT, overall_score INTEGER, verdict TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, ended_at DATETIME, FOREIGN KEY (user_id) REFERENCES users(id))`,
+    `CREATE TABLE IF NOT EXISTS study_bot_usage (user_id INTEGER PRIMARY KEY, question_count INTEGER DEFAULT 0, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id))`
   ];
   for (const sql of tables) {
     await sqlRun(sql);
@@ -183,6 +185,7 @@ async function initSQLiteTables() {
     `ALTER TABLE syllabus_access ADD COLUMN projects_access INTEGER DEFAULT 0`,
     `ALTER TABLE syllabus_access ADD COLUMN aws_access INTEGER DEFAULT 0`,
     `ALTER TABLE syllabus_access ADD COLUMN git_access INTEGER DEFAULT 0`,
+    `ALTER TABLE syllabus_access ADD COLUMN mock_interview_access INTEGER DEFAULT 0`,
     `ALTER TABLE enrollments ADD COLUMN course_completed BOOLEAN DEFAULT 0`,
     `ALTER TABLE enrollments ADD COLUMN certificate_issued BOOLEAN DEFAULT 0`,
     `ALTER TABLE enrollments ADD COLUMN content_access_granted BOOLEAN DEFAULT 1`
@@ -376,7 +379,8 @@ const syllabusAccess = {
       databricks_access: data.databricks_access !== undefined ? (data.databricks_access ? 1 : 0) : existing.databricks_access,
       aws_access: data.aws_access !== undefined ? (data.aws_access ? 1 : 0) : existing.aws_access,
       git_access: data.git_access !== undefined ? (data.git_access ? 1 : 0) : existing.git_access,
-      projects_access: data.projects_access !== undefined ? (data.projects_access ? 1 : 0) : existing.projects_access
+      projects_access: data.projects_access !== undefined ? (data.projects_access ? 1 : 0) : existing.projects_access,
+      mock_interview_access: data.mock_interview_access !== undefined ? (data.mock_interview_access ? 1 : 0) : existing.mock_interview_access
     };
     if (USE_MONGODB) {
       await mongo.SyllabusAccess.findOneAndUpdate(
@@ -386,7 +390,7 @@ const syllabusAccess = {
       );
       return { changes: 1 };
     }
-    return sqlRun(`INSERT INTO syllabus_access (user_id, sql_access, python_access, pyspark_access, databricks_access, aws_access, git_access, projects_access) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET sql_access = excluded.sql_access, python_access = excluded.python_access, pyspark_access = excluded.pyspark_access, databricks_access = excluded.databricks_access, aws_access = excluded.aws_access, git_access = excluded.git_access, projects_access = excluded.projects_access`, [userId, merged.sql_access, merged.python_access, merged.pyspark_access, merged.databricks_access, merged.aws_access, merged.git_access, merged.projects_access]);
+    return sqlRun(`INSERT INTO syllabus_access (user_id, sql_access, python_access, pyspark_access, databricks_access, aws_access, git_access, projects_access, mock_interview_access) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET sql_access = excluded.sql_access, python_access = excluded.python_access, pyspark_access = excluded.pyspark_access, databricks_access = excluded.databricks_access, aws_access = excluded.aws_access, git_access = excluded.git_access, projects_access = excluded.projects_access, mock_interview_access = excluded.mock_interview_access`, [userId, merged.sql_access, merged.python_access, merged.pyspark_access, merged.databricks_access, merged.aws_access, merged.git_access, merged.projects_access, merged.mock_interview_access]);
   },
   async updateSingle(userId, module, value) {
     if (USE_MONGODB) {
@@ -752,6 +756,15 @@ const mockInterviews = {
       [userId]
     ))?.c || 0;
   },
+  async countByUser(userId) {
+    if (USE_MONGODB) {
+      return mongo.MockInterview.countDocuments({ user_id: toObjectId(userId) });
+    }
+    return (await sqlGet(
+      `SELECT COUNT(*) as c FROM mock_interviews WHERE user_id = ?`,
+      [userId]
+    ))?.c || 0;
+  },
   async getHistoryByUser(userId, limit = 20) {
     if (USE_MONGODB) {
       const rows = await mongo.MockInterview.find({ user_id: toObjectId(userId) })
@@ -780,6 +793,33 @@ const mockInterviews = {
   }
 };
 
+// ==================== STUDY BOT USAGE ====================
+const studyBotUsage = {
+  async getCount(userId) {
+    if (USE_MONGODB) {
+      const row = await mongo.StudyBotUsage.findOne({ user_id: toObjectId(userId) }).lean();
+      return row?.question_count || 0;
+    }
+    return (await sqlGet('SELECT question_count FROM study_bot_usage WHERE user_id = ?', [userId]))?.question_count || 0;
+  },
+  async increment(userId) {
+    if (USE_MONGODB) {
+      const row = await mongo.StudyBotUsage.findOneAndUpdate(
+        { user_id: toObjectId(userId) },
+        { $inc: { question_count: 1 }, $set: { user_id: toObjectId(userId), updated_at: new Date() } },
+        { upsert: true, new: true }
+      ).lean();
+      return row.question_count;
+    }
+    await sqlRun(
+      `INSERT INTO study_bot_usage (user_id, question_count, updated_at) VALUES (?, 1, datetime('now'))
+       ON CONFLICT(user_id) DO UPDATE SET question_count = question_count + 1, updated_at = datetime('now')`,
+      [userId]
+    );
+    return this.getCount(userId);
+  }
+};
+
 // ==================== EXPORT ====================
 module.exports = {
   init,
@@ -795,5 +835,6 @@ module.exports = {
   stats,
   moduleAccessAudit,
   mockInterviews,
+  studyBotUsage,
   USE_MONGODB
 };

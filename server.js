@@ -3,6 +3,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
+const multer = require('multer');
 const { sendPaymentNotification } = require('./telegram-helper');
 require('dotenv').config();
 
@@ -28,6 +29,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
+const audioUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 }
+});
+
 // ==================== ADMIN ACCESS SECURITY ====================
 app.get('/admin-login.html', (req, res) => {
   res.redirect('/student-login.html');
@@ -36,8 +42,6 @@ app.get('/admin-login.html', (req, res) => {
 app.get('/secure-admin', (req, res) => {
   res.sendFile(__dirname + '/admin-login.html');
 });
-
-app.use(express.static('.'));
 
 app.get('/learning-data.json', (req, res) => {
   res.sendFile(__dirname + '/learning-data.json');
@@ -233,7 +237,7 @@ app.post('/api/admin/enrollments/create', authenticateToken, authenticateAdmin, 
 app.put('/api/admin/access/:userId', authenticateToken, authenticateAdmin, async (req, res) => {
   try {
     const { module, value } = req.body;
-    const allowed = ['sql_access','python_access','pyspark_access','databricks_access','aws_access','git_access','projects_access'];
+    const allowed = ['sql_access','python_access','pyspark_access','databricks_access','aws_access','git_access','projects_access','mock_interview_access'];
     if (!allowed.includes(module)) return res.status(400).json({ error: 'Invalid module' });
     await DB.syllabusAccess.updateSingle(req.params.userId, module, !!value);
     res.json({ message: 'Access updated', module, value: value ? 1 : 0 });
@@ -260,7 +264,7 @@ app.get('/api/admin/receipt/:enrollmentId', authenticateToken, authenticateAdmin
 app.get('/api/syllabus/access', authenticateToken, async (req, res) => {
   try {
     res.set('Cache-Control', 'no-store');
-    if (req.user.role === 'admin') return res.json({ sql_access: 1, python_access: 1, pyspark_access: 1, databricks_access: 1, aws_access: 1, projects_access: 1, git_access: 1 });
+    if (req.user.role === 'admin') return res.json({ sql_access: 1, python_access: 1, pyspark_access: 1, databricks_access: 1, aws_access: 1, projects_access: 1, git_access: 1, mock_interview_access: 1 });
     res.json(await DB.syllabusAccess.get(req.user.id));
   } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
@@ -279,7 +283,7 @@ app.put('/api/admin/syllabus/:userId', authenticateToken, authenticateAdmin, asy
     await DB.syllabusAccess.update(req.params.userId, req.body);
 
     // Audit log — track each module change
-    const modules = ['sql_access', 'python_access', 'pyspark_access', 'databricks_access', 'aws_access', 'git_access', 'projects_access'];
+    const modules = ['sql_access', 'python_access', 'pyspark_access', 'databricks_access', 'aws_access', 'git_access', 'projects_access', 'mock_interview_access'];
     const student = await DB.users.findById(req.params.userId);
     for (const mod of modules) {
       const oldVal = oldAccess[mod] || 0;
@@ -493,6 +497,7 @@ app.get('/api/admin/module-audit/:studentId', authenticateToken, authenticateAdm
 
 // ==================== AI MOCK INTERVIEW (Gemini) ====================
 const mockInterviewAI = require('./mock-interview-service');
+const FREE_MOCK_TRIAL = parseInt(process.env.MOCK_INTERVIEW_FREE_TRIAL || '2', 10);
 
 const mockInterviewLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -502,28 +507,148 @@ const mockInterviewLimiter = rateLimit({
   legacyHeaders: false
 });
 
-app.get('/api/mock-interview/config', authenticateToken, (req, res) => {
+async function getMockInterviewAccessStatus(userId, role) {
+  if (role === 'admin') {
+    return {
+      hasAccess: true,
+      fullAccess: true,
+      freeTrialLimit: FREE_MOCK_TRIAL,
+      lifetimeUsed: 0,
+      freeRemaining: FREE_MOCK_TRIAL,
+      canStart: true,
+      accessType: 'admin'
+    };
+  }
+
+  const [access, lifetimeUsed] = await Promise.all([
+    DB.syllabusAccess.get(userId),
+    DB.mockInterviews.countByUser(userId)
+  ]);
+  const fullAccess = !!access.mock_interview_access;
+  const freeRemaining = Math.max(0, FREE_MOCK_TRIAL - lifetimeUsed);
+  const hasAccess = fullAccess || lifetimeUsed <= FREE_MOCK_TRIAL;
+  const canStart = fullAccess || lifetimeUsed < FREE_MOCK_TRIAL;
+
+  return {
+    hasAccess,
+    fullAccess,
+    freeTrialLimit: FREE_MOCK_TRIAL,
+    lifetimeUsed,
+    freeRemaining,
+    canStart,
+    accessType: fullAccess ? 'full' : (freeRemaining > 0 ? 'trial' : 'expired')
+  };
+}
+
+async function requireMockInterviewAccess(req, res, next) {
+  if (req.user.role === 'admin') {
+    req.mockInterviewStatus = await getMockInterviewAccessStatus(req.user.id, req.user.role);
+    return next();
+  }
+  try {
+    const status = await getMockInterviewAccessStatus(req.user.id, req.user.role);
+    if (!status.hasAccess) {
+      return res.status(403).json({
+        error: `You've used your ${FREE_MOCK_TRIAL} free mock interviews. Ask admin to unlock unlimited access.`
+      });
+    }
+    req.mockInterviewStatus = status;
+    next();
+  } catch (error) {
+    console.error('Mock interview access check error:', error);
+    return res.status(500).json({ error: 'Access check failed' });
+  }
+}
+
+app.get('/api/mock-interview/status', authenticateToken, async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+    const status = await getMockInterviewAccessStatus(req.user.id, req.user.role);
+    const dailyLimit = parseInt(process.env.MOCK_INTERVIEW_DAILY_LIMIT || '3', 10);
+    let dailyUsed = 0;
+    if (req.user.role !== 'admin') {
+      dailyUsed = await DB.mockInterviews.countTodayByUser(req.user.id);
+    }
+    res.json({ ...status, dailyLimit, dailyUsed, geminiConfigured: !!process.env.GEMINI_API_KEY });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load mock interview status' });
+  }
+});
+
+app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAccess, async (req, res) => {
   res.set('Cache-Control', 'no-store');
+  const indianTts = require('./indian-tts-service');
+  const status = req.mockInterviewStatus || await getMockInterviewAccessStatus(req.user.id, req.user.role);
   res.json({
     interviewers: mockInterviewAI.INTERVIEWERS,
     interviewTypes: mockInterviewAI.INTERVIEW_TYPES,
     maxQuestions: mockInterviewAI.MAX_QUESTIONS,
     dailyLimit: parseInt(process.env.MOCK_INTERVIEW_DAILY_LIMIT || '3', 10),
-    geminiConfigured: !!process.env.GEMINI_API_KEY
+    geminiConfigured: !!process.env.GEMINI_API_KEY,
+    ttsEngine: 'edge-neural-en-IN',
+    voiceLabels: {
+      rahul: indianTts.getVoiceLabel('rahul'),
+      priya: indianTts.getVoiceLabel('priya')
+    },
+    freeTrialLimit: status.freeTrialLimit,
+    lifetimeUsed: status.lifetimeUsed,
+    freeRemaining: status.freeRemaining,
+    fullAccess: status.fullAccess,
+    canStart: status.canStart,
+    accessType: status.accessType
   });
 });
 
-app.post('/api/mock-interview/start', authenticateToken, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
+  try {
+    const { text, interviewer, mode } = req.body;
+    if (!text?.trim()) return res.status(400).json({ error: 'Text required' });
+    const indianTts = require('./indian-tts-service');
+    const audio = await indianTts.synthesize(text, interviewer || 'rahul', mode || 'interview');
+    res.set('Content-Type', 'audio/mpeg');
+    res.set('Cache-Control', 'no-store');
+    res.send(audio);
+  } catch (error) {
+    console.error('Indian TTS error:', error.message);
+    res.status(500).json({ error: 'Speech generation failed — check server internet connection' });
+  }
+});
+
+app.post('/api/mock-interview/transcribe', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, audioUpload.single('audio'), async (req, res) => {
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(503).json({ error: 'Gemini API not configured' });
+    }
+    if (!req.file?.buffer?.length) {
+      return res.status(400).json({ error: 'No audio received — record at least 2 seconds' });
+    }
+    const text = await mockInterviewAI.transcribeAudio(req.file.buffer, req.file.mimetype);
+    res.json({ text: text || '' });
+  } catch (error) {
+    console.error('Transcribe error:', error.message);
+    res.status(500).json({ error: 'Could not transcribe audio — try again or type your answer' });
+  }
+});
+
+app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'AI mock interview is not configured yet. Admin must add GEMINI_API_KEY.' });
+    }
+    const status = req.mockInterviewStatus || await getMockInterviewAccessStatus(req.user.id, req.user.role);
+    if (!status.canStart) {
+      return res.status(403).json({
+        error: `You've used your ${FREE_MOCK_TRIAL} free mock interviews. Ask admin to unlock unlimited access.`
+      });
     }
     const { interviewer, experience_level, interview_type } = req.body;
     if (!['rahul', 'priya'].includes(interviewer)) {
       return res.status(400).json({ error: 'Select interviewer: rahul or priya' });
     }
     const dailyLimit = parseInt(process.env.MOCK_INTERVIEW_DAILY_LIMIT || '3', 10);
-    if (req.user.role !== 'admin') {
+    const isLocalDev = (process.env.FRONTEND_URL || '').includes('localhost') || (process.env.FRONTEND_URL || '').includes('127.0.0.1');
+    const skipDailyLimit = isLocalDev || dailyLimit <= 0 || req.user.role === 'admin' || !status.fullAccess;
+    if (!skipDailyLimit) {
       const used = await DB.mockInterviews.countTodayByUser(req.user.id);
       if (used >= dailyLimit) {
         return res.status(429).json({ error: `Daily limit reached (${dailyLimit} mock interviews per day). Try again tomorrow.` });
@@ -531,7 +656,8 @@ app.post('/api/mock-interview/start', authenticateToken, mockInterviewLimiter, a
     }
     const exp = experience_level || 'Fresher';
     const type = interview_type || 'full';
-    const firstQuestion = await mockInterviewAI.generateFirstQuestion(interviewer, exp, type);
+    const user = await DB.users.findById(req.user.id);
+    const firstQuestion = await mockInterviewAI.generateFirstQuestion(interviewer, exp, type, user?.name);
     const session = await DB.mockInterviews.create({
       userId: req.user.id,
       interviewer,
@@ -546,7 +672,7 @@ app.post('/api/mock-interview/start', authenticateToken, mockInterviewLimiter, a
   }
 });
 
-app.post('/api/mock-interview/message', authenticateToken, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId, message } = req.body;
     if (!sessionId || !message?.trim()) {
@@ -562,16 +688,26 @@ app.post('/api/mock-interview/message', authenticateToken, mockInterviewLimiter,
     const updated = await DB.mockInterviews.findById(sessionId);
     const next = await mockInterviewAI.generateNextQuestion(updated);
 
-    await DB.mockInterviews.addMessage(sessionId, 'interviewer', next.content);
+    if (next.teacher_feedback) {
+      await DB.mockInterviews.addMessage(sessionId, 'coach', next.teacher_feedback);
+    }
+    if (next.content) {
+      await DB.mockInterviews.addMessage(sessionId, 'interviewer', next.content);
+    }
     const finalSession = await DB.mockInterviews.findById(sessionId);
-    res.json({ message: next.content, done: next.done, session: finalSession });
+    res.json({
+      feedback: next.teacher_feedback || '',
+      message: next.content,
+      done: next.done,
+      session: finalSession
+    });
   } catch (error) {
     console.error('Mock interview message error:', error);
     res.status(500).json({ error: error.message || 'Failed to process answer' });
   }
 });
 
-app.post('/api/mock-interview/end', authenticateToken, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/end', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId } = req.body;
     if (!sessionId) return res.status(400).json({ error: 'Session ID required' });
@@ -594,7 +730,7 @@ app.post('/api/mock-interview/end', authenticateToken, mockInterviewLimiter, asy
   }
 });
 
-app.get('/api/mock-interview/history', authenticateToken, async (req, res) => {
+app.get('/api/mock-interview/history', authenticateToken, requireMockInterviewAccess, async (req, res) => {
   try {
     res.set('Cache-Control', 'no-store');
     res.json(await DB.mockInterviews.getHistoryByUser(req.user.id));
@@ -612,11 +748,174 @@ app.get('/api/admin/mock-interviews', authenticateToken, authenticateAdmin, asyn
   }
 });
 
+// ==================== RAG STUDY BOT ====================
+const ragService = require('./rag-service');
+const ragIndex = require('./rag-index');
+
+const studyBotLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.STUDY_BOT_RATE_LIMIT || '15', 10),
+  message: { error: 'Too many questions. Please wait a minute.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const STUDY_BOT_FREE_TRIAL = parseInt(process.env.STUDY_BOT_FREE_TRIAL || '7', 10);
+
+async function getStudyBotAccessStatus(userId, role) {
+  if (role === 'admin') {
+    return {
+      hasAccess: true,
+      paid: true,
+      fullAccess: true,
+      freeTrialLimit: STUDY_BOT_FREE_TRIAL,
+      questionsUsed: 0,
+      freeRemaining: STUDY_BOT_FREE_TRIAL,
+      canAsk: true,
+      accessType: 'admin'
+    };
+  }
+
+  const [enrollment, questionsUsed] = await Promise.all([
+    DB.enrollments.findByUserId(userId),
+    DB.studyBotUsage.getCount(userId)
+  ]);
+  const paid = enrollment?.payment_status === 'completed';
+  const freeRemaining = Math.max(0, STUDY_BOT_FREE_TRIAL - questionsUsed);
+  const fullAccess = paid;
+  const canAsk = fullAccess || questionsUsed < STUDY_BOT_FREE_TRIAL;
+  const hasAccess = canAsk || questionsUsed > 0;
+
+  return {
+    hasAccess,
+    paid,
+    fullAccess,
+    freeTrialLimit: STUDY_BOT_FREE_TRIAL,
+    questionsUsed,
+    freeRemaining,
+    canAsk,
+    accessType: fullAccess ? 'paid' : (freeRemaining > 0 ? 'trial' : 'expired')
+  };
+}
+
+app.get('/api/study-bot/status', authenticateToken, async (req, res) => {
+  try {
+    res.set('Cache-Control', 'no-store');
+    const status = await getStudyBotAccessStatus(req.user.id, req.user.role);
+    ragIndex.ensureIndex();
+    const stats = ragService.getStats();
+    res.json({
+      ...status,
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+      indexReady: ragIndex.indexReady,
+      totalChunks: stats.totalChunks
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load study bot status' });
+  }
+});
+
+app.get('/api/study-bot/config', authenticateToken, async (req, res) => {
+  try {
+    ragIndex.ensureIndex();
+    const stats = ragService.getStats();
+    const status = await getStudyBotAccessStatus(req.user.id, req.user.role);
+    res.json({
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+      indexReady: ragIndex.indexReady,
+      totalChunks: stats.totalChunks,
+      modules: stats.moduleLabels,
+      freeTrialLimit: status.freeTrialLimit,
+      questionsUsed: status.questionsUsed,
+      freeRemaining: status.freeRemaining,
+      paid: status.paid,
+      fullAccess: status.fullAccess,
+      canAsk: status.canAsk,
+      accessType: status.accessType
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Study bot config failed' });
+  }
+});
+
+app.post('/api/study-bot/ask', authenticateToken, studyBotLimiter, async (req, res) => {
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(503).json({ error: 'Study bot not configured. Admin must add GEMINI_API_KEY.' });
+    }
+    const status = await getStudyBotAccessStatus(req.user.id, req.user.role);
+    if (!status.canAsk) {
+      return res.status(403).json({
+        error: `Free limit reached (${STUDY_BOT_FREE_TRIAL} questions). Complete payment to unlock unlimited Study Bot access.`,
+        paid: false,
+        freeTrialLimit: STUDY_BOT_FREE_TRIAL,
+        questionsUsed: status.questionsUsed,
+        paymentUrl: '/payment.html'
+      });
+    }
+
+    const { message, history } = req.body;
+    if (!message?.trim()) {
+      return res.status(400).json({ error: 'Message required' });
+    }
+
+    const syllabusAccess = req.user.role === 'admin'
+      ? null
+      : await DB.syllabusAccess.get(req.user.id);
+
+    const result = await ragService.ask(message.trim(), {
+      syllabusAccess,
+      role: req.user.role,
+      history: Array.isArray(history) ? history : []
+    });
+
+    let newCount = status.questionsUsed;
+    if (req.user.role !== 'admin') {
+      newCount = await DB.studyBotUsage.increment(req.user.id);
+    }
+    const updatedStatus = await getStudyBotAccessStatus(req.user.id, req.user.role);
+
+    res.json({
+      ...result,
+      questionsUsed: newCount,
+      freeRemaining: updatedStatus.freeRemaining,
+      canAsk: updatedStatus.canAsk,
+      fullAccess: updatedStatus.fullAccess
+    });
+  } catch (error) {
+    console.error('Study bot error:', error);
+    const friendly = ragService.formatGeminiError(error);
+    const status = ragService.isQuotaError(error) ? 429 : 500;
+    res.status(status).json({ error: friendly, quotaExceeded: ragService.isQuotaError(error) });
+  }
+});
+
+app.get('/api/admin/study-bot/stats', authenticateToken, authenticateAdmin, (req, res) => {
+  try {
+    ragIndex.ensureIndex();
+    res.json(ragService.getStats());
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load RAG stats' });
+  }
+});
+
+// Static files AFTER all API routes (prevents HTML 404 on /api/*)
+app.use(express.static('.'));
+
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'API route not found — restart server with: npm start' });
+});
+
 // ==================== START SERVER ====================
 async function startServer() {
   try {
     const dbType = await DB.init();
     console.log(`📦 Database: ${dbType.toUpperCase()}`);
+    try {
+      ragIndex.buildIndex();
+    } catch (e) {
+      console.warn('⚠️ RAG index build failed:', e.message);
+    }
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
       console.log(`🔒 Admin Portal: http://localhost:${PORT}/secure-admin (HIDDEN)`);

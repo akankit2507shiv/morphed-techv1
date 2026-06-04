@@ -97,6 +97,7 @@
       <button onclick="showTab('payments')" id="tab-payments" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">💳 Payments</button>
       <button onclick="showTab('access')" id="tab-access" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🔐 Module Access</button>
       <button onclick="showTab('features')" id="tab-features" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📝 Resume & Interview</button>
+      <button onclick="showTab('mockinterview')" id="tab-mockinterview" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🤖 AI Mock Interview</button>
       <button onclick="showTab('syllabus')" id="tab-syllabus" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">📚 Syllabus & Content</button>
       <button onclick="showTab('security')" id="tab-security" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🛡️ Security Alerts <span id="secAlertBadge" class="hidden ml-1 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">0</span></button>
       <button onclick="openNewPage('admin-landing-cms.html')" class="tab-btn pb-3 font-semibold text-gray-400 hover:text-white whitespace-nowrap">🎨 Landing Page CMS</button>
@@ -193,6 +194,34 @@
       </div>
     </div>
 
+    <!-- AI MOCK INTERVIEW ACCESS TAB -->
+    <div id="content-mockinterview" class="hidden">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-white">AI Mock Interview Access</h2>
+          <p class="text-gray-400 text-sm">Grant unlimited access per student. New students get 2 free mocks automatically.</p>
+        </div>
+        <button type="button" id="refreshMockInterviewBtn" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm transition">🔄 Refresh from DB</button>
+      </div>
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="border-b border-white/10">
+              <tr>
+                <th class="text-left py-3 px-4 text-gray-400 text-sm sticky left-0 bg-dark/80">Student</th>
+                <th class="text-center py-3 px-4 text-gray-400 text-sm">🤖 AI Mock Interview</th>
+                <th class="text-center py-3 px-4 text-gray-400 text-sm">Grant</th>
+                <th class="text-center py-3 px-4 text-gray-400 text-sm">Revoke</th>
+              </tr>
+            </thead>
+            <tbody id="mockInterviewBody">
+              <tr><td colspan="4" class="text-center py-8 text-gray-400">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- ACCESS CONTROL TAB -->
     <div id="content-access" class="hidden">
       <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -239,7 +268,7 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-1">SQL Mastery</h3>
-              <p class="text-gray-400 text-sm">15 Topics</p>
+              <p class="text-gray-400 text-sm">16 Topics</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
@@ -253,7 +282,7 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-1">Python for DE</h3>
-              <p class="text-gray-400 text-sm">14 Topics</p>
+              <p class="text-gray-400 text-sm">15 Topics</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
@@ -269,7 +298,7 @@
               <h3 class="text-lg font-bold text-white mb-1">PySpark</h3>
               <p class="text-gray-400 text-sm">15 Topics</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;">🚧 In Progress</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
           <a href="pyspark-syllabus.html" target="_blank" class="block w-full py-3 text-center font-bold rounded-xl text-sm transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); color: white; box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">View PySpark →</a>
         </div>
@@ -281,9 +310,9 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-1">AWS for DE</h3>
-              <p class="text-gray-400 text-sm">7 Flows</p>
+              <p class="text-gray-400 text-sm">17 Flows</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;">🚧 In Progress</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
           <a href="aws-syllabus.html" target="_blank" class="block w-full py-3 text-center font-bold rounded-xl text-sm transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); color: white; box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">View AWS →</a>
         </div>
@@ -295,9 +324,9 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-1">Databricks</h3>
-              <p class="text-gray-400 text-sm">8 Topics</p>
+              <p class="text-gray-400 text-sm">14 Topics</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;">🚧 In Progress</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
           <a href="databricks-syllabus.html" target="_blank" class="block w-full py-3 text-center font-bold rounded-xl text-sm transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); color: white; box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">View Databricks →</a>
         </div>
@@ -309,7 +338,7 @@
             </div>
             <div class="flex-1">
               <h3 class="text-lg font-bold text-white mb-1">Git & GitHub</h3>
-              <p class="text-gray-400 text-sm">7 Topics</p>
+              <p class="text-gray-400 text-sm">11 Topics</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
@@ -325,7 +354,7 @@
               <h3 class="text-lg font-bold text-white mb-1">Real Projects</h3>
               <p class="text-gray-400 text-sm">7 Industry Projects</p>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #ff3d81, #7c3cff); color: white;">🚧 In Progress</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background: linear-gradient(135deg, #b8ff3c, #00d4ff); color: #071018;">✅ Active</span>
           </div>
           <a href="projects-syllabus.html" target="_blank" class="block w-full py-3 text-center font-bold rounded-xl text-sm transition-all duration-300 hover:scale-105" style="background: linear-gradient(135deg, #ff3d81, #7c3cff, #00d4ff); color: white; box-shadow: 0 4px 15px rgba(255, 61, 129, 0.4);">View Projects →</a>
         </div>
@@ -496,7 +525,7 @@
 
     async function showTab(name) {
       console.log('📂 Switching to tab:', name);
-      ['students','payments','access','features','syllabus','security'].forEach(t => {
+      ['students','payments','access','features','mockinterview','syllabus','security'].forEach(t => {
         const content = document.getElementById('content-' + t);
         if (content) content.classList.add('hidden');
         const btn = document.getElementById('tab-' + t);
@@ -535,6 +564,13 @@
           await renderFeatures(false);
         }
       }
+      if (name === 'mockinterview') {
+        if (mockInterviewDataLoaded && allStudents.length && Object.keys(mockInterviewAccessData).length >= allStudents.length) {
+          paintMockInterviewTable();
+        } else {
+          await renderMockInterviewAccess(false);
+        }
+      }
       if (name === 'security') { loadSecurityStats(); loadSecurityLogs(); loadActiveSessions(); }
     }
 
@@ -563,6 +599,8 @@
         accessDataLoaded = false;
         featureAccessData = {};
         featureDataLoaded = false;
+        mockInterviewAccessData = {};
+        mockInterviewDataLoaded = false;
         console.log(`✅ Loaded ${allStudents.length} students`);
         renderStudents(allStudents);
       } catch(e) {
@@ -1136,6 +1174,154 @@
       const revokeBtn = e.target.closest('.feature-revoke-all');
       if (revokeBtn) {
         await revokeAllFeatures(revokeBtn.dataset.userId);
+      }
+    });
+
+    // ── AI MOCK INTERVIEW ACCESS ───────────────────────────────────
+    const MOCK_INTERVIEW_KEY = 'mock_interview_access';
+    let mockInterviewAccessData = {};
+    let mockInterviewDataLoaded = false;
+
+    function emptyMockInterviewAccess() {
+      return { mock_interview_access: 0 };
+    }
+
+    function normalizeMockInterviewAccess(raw) {
+      const out = emptyMockInterviewAccess();
+      if (!raw || raw.error) return out;
+      out.mock_interview_access = raw.mock_interview_access ? 1 : 0;
+      return out;
+    }
+
+    function paintMockInterviewTable() {
+      const tbody = document.getElementById('mockInterviewBody');
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">🤖 No students to manage</p><p class="text-sm">AI Mock Interview controls appear here once students register</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = allStudents.map(s => {
+        const sid = String(s.id);
+        const a = mockInterviewAccessData[sid] || emptyMockInterviewAccess();
+        return `
+          <tr class="border-b border-white/5 hover:bg-white/5 transition" id="mock-row-${sid}">
+            <td class="py-4 px-4 sticky left-0 bg-transparent">
+              <p class="text-white font-medium text-sm">${s.name}</p>
+              <p class="text-gray-500 text-xs">${s.email}</p>
+            </td>
+            <td class="py-4 px-4 text-center">
+              <label class="toggle">
+                <input type="checkbox" class="mock-interview-access-toggle"
+                  data-user-id="${sid}" data-module="${MOCK_INTERVIEW_KEY}"
+                  ${isAccessOn(a, MOCK_INTERVIEW_KEY) ? 'checked' : ''}>
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td class="py-4 px-4 text-center">
+              <button type="button" class="mock-grant px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Grant</button>
+            </td>
+            <td class="py-4 px-4 text-center">
+              <button type="button" class="mock-revoke px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition font-semibold" data-user-id="${sid}">Revoke</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadMockInterviewData(force = false) {
+      if (!allStudents.length) return;
+      if (mockInterviewDataLoaded && !force && Object.keys(mockInterviewAccessData).length >= allStudents.length) return;
+
+      await Promise.all(allStudents.map(async s => {
+        const sid = String(s.id);
+        try {
+          const r = await fetch(`${API}/admin/syllabus/${encodeURIComponent(sid)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            cache: 'no-store'
+          });
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          mockInterviewAccessData[sid] = normalizeMockInterviewAccess(await r.json());
+        } catch (e) {
+          console.error('Mock interview access load failed for', sid, e);
+          if (!mockInterviewAccessData[sid]) mockInterviewAccessData[sid] = emptyMockInterviewAccess();
+        }
+      }));
+      mockInterviewDataLoaded = true;
+    }
+
+    async function setMockInterviewAccess(userId, value) {
+      userId = String(userId);
+      const r = await fetch(`${API}/admin/access/${encodeURIComponent(userId)}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ module: MOCK_INTERVIEW_KEY, value: value ? 1 : 0 })
+      });
+      const payload = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(payload.error || `Save failed (${r.status})`);
+
+      if (!mockInterviewAccessData[userId]) mockInterviewAccessData[userId] = emptyMockInterviewAccess();
+      mockInterviewAccessData[userId][MOCK_INTERVIEW_KEY] = value ? 1 : 0;
+      mockInterviewDataLoaded = true;
+
+      const studentName = allStudents.find(s => String(s.id) === userId)?.name || 'Student';
+      showToast(`${value ? '✅ Saved & granted' : '✅ Saved & revoked'} AI Mock Interview for ${studentName}`);
+    }
+
+    async function renderMockInterviewAccess(forceReload = false) {
+      const tbody = document.getElementById('mockInterviewBody');
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400">Loading AI Mock Interview access...</td></tr>';
+
+      if (!allStudents.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-12"><div class="text-gray-400"><p class="text-lg mb-2">🤖 No students to manage</p></div></td></tr>`;
+        return;
+      }
+
+      if (forceReload) {
+        mockInterviewAccessData = {};
+        mockInterviewDataLoaded = false;
+      }
+      await loadMockInterviewData(forceReload);
+      paintMockInterviewTable();
+    }
+
+    async function grantMockInterview(userId) {
+      await setMockInterviewAccess(userId, true);
+      paintMockInterviewTable();
+    }
+
+    async function revokeMockInterview(userId) {
+      userId = String(userId);
+      if (!confirm('Revoke AI Mock Interview access for this student?')) return;
+      await setMockInterviewAccess(userId, false);
+      paintMockInterviewTable();
+    }
+
+    document.getElementById('refreshMockInterviewBtn').addEventListener('click', () => renderMockInterviewAccess(true));
+
+    document.getElementById('content-mockinterview').addEventListener('change', async (e) => {
+      const cb = e.target;
+      if (!cb.classList.contains('mock-interview-access-toggle')) return;
+      const userId = cb.dataset.userId;
+      const value = cb.checked;
+      cb.disabled = true;
+      try {
+        await setMockInterviewAccess(userId, value);
+      } catch (err) {
+        cb.checked = !value;
+        showToast('❌ ' + err.message);
+      } finally {
+        cb.disabled = false;
+      }
+    });
+
+    document.getElementById('content-mockinterview').addEventListener('click', async (e) => {
+      const grantBtn = e.target.closest('.mock-grant');
+      if (grantBtn) {
+        await grantMockInterview(grantBtn.dataset.userId);
+        return;
+      }
+      const revokeBtn = e.target.closest('.mock-revoke');
+      if (revokeBtn) {
+        await revokeMockInterview(revokeBtn.dataset.userId);
       }
     });
 

@@ -269,6 +269,9 @@
       </div>
     </div>
 
+    <!-- Student learning path (all topics) -->
+    <div id="studentGuidePanel" class="student-guide-card"></div>
+
     <!-- Horizontal Tab Navigation -->
     <div class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('comic', this)">🎭 Comic</button>
@@ -405,6 +408,8 @@
   <!-- SQL.js for in-browser SQLite -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
   <script src="sql-content.js"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
   
   <!-- Premium Multilingual & Audio System -->
   <script src="premium-language-audio.js"></script>
@@ -623,6 +628,10 @@
       const hist = JSON.parse(localStorage.getItem('searchHistory') || '[]');
       hist.unshift({ type: 'sql', title: topic.title, url: `sql-topic.html?topic=${topicId}`, time: new Date().toISOString() });
       localStorage.setItem('searchHistory', JSON.stringify(hist.slice(0, 50)));
+
+      if (typeof TopicStudentView !== 'undefined') {
+        TopicStudentView.applyToTopicPage(topic, 'sql');
+      }
     }
     })();
 

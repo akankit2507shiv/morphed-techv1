@@ -83,6 +83,8 @@
       </div>
     </div>
 
+    <div id="studentGuidePanel" class="student-guide-card"></div>
+
     <!-- Tabs -->
     <div class="tab-nav">
       <button class="tab-btn active" onclick="switchTab('comic',this)">🎭 Comic</button>
@@ -227,6 +229,8 @@
   </main>
 
   <script src="aws-content.js"></script>
+  <script src="bonus-de-topics.js"></script>
+  <script src="topic-student-view.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
     const topicId = params.get('topic') || 'aws-flow-1';
@@ -492,6 +496,10 @@
       }
 
       window._topicId = topicId;
+
+      if (typeof TopicStudentView !== 'undefined') {
+        TopicStudentView.applyToTopicPage(topic, 'aws');
+      }
     }
 
     function switchTab(name, btn) {
