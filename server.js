@@ -15,23 +15,45 @@ const DB = require('./db-layer');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-function isAiComingSoon() {
-  return config.features.AI_COMING_SOON;
+function isMockInterviewComingSoon() {
+  return config.features.MOCK_INTERVIEW_COMING_SOON;
 }
 
-function aiComingSoonPayload() {
-  if (!isAiComingSoon()) return { comingSoon: false };
+function isStudyBotComingSoon() {
+  return config.features.STUDY_BOT_COMING_SOON;
+}
+
+function mockInterviewComingSoonPayload() {
+  if (!isMockInterviewComingSoon()) return { comingSoon: false };
+  return {
+    comingSoon: true,
+    message: 'AI Mock Interview is coming soon. All course modules and projects are available now.'
+  };
+}
+
+function studyBotComingSoonPayload() {
+  if (!isStudyBotComingSoon()) return { comingSoon: false };
   return {
     comingSoon: true,
     message: config.features.AI_COMING_SOON_MESSAGE
   };
 }
 
-function blockAiIfComingSoon(req, res, next) {
-  if (isAiComingSoon()) {
+function blockMockInterviewIfComingSoon(req, res, next) {
+  if (isMockInterviewComingSoon()) {
+    return res.status(503).json({
+      error: 'AI Mock Interview is coming soon.',
+      ...mockInterviewComingSoonPayload()
+    });
+  }
+  next();
+}
+
+function blockStudyBotIfComingSoon(req, res, next) {
+  if (isStudyBotComingSoon()) {
     return res.status(503).json({
       error: config.features.AI_COMING_SOON_MESSAGE,
-      ...aiComingSoonPayload()
+      ...studyBotComingSoonPayload()
     });
   }
   next();
@@ -586,7 +608,7 @@ app.get('/api/admin/module-audit/:studentId', authenticateToken, authenticateAdm
 
 // ==================== AI MOCK INTERVIEW (Gemini) ====================
 const mockInterviewAI = require('./mock-interview-service');
-const FREE_MOCK_TRIAL = parseInt(process.env.MOCK_INTERVIEW_FREE_TRIAL || '2', 10);
+const FREE_MOCK_TRIAL = parseInt(process.env.MOCK_INTERVIEW_FREE_TRIAL || '1', 10);
 
 const mockInterviewLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -663,7 +685,7 @@ app.get('/api/mock-interview/status', authenticateToken, async (req, res) => {
       dailyLimit,
       dailyUsed,
       geminiConfigured: !!process.env.GEMINI_API_KEY,
-      ...aiComingSoonPayload()
+      ...mockInterviewComingSoonPayload()
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to load mock interview status' });
@@ -672,8 +694,8 @@ app.get('/api/mock-interview/status', authenticateToken, async (req, res) => {
 
 app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAccess, async (req, res) => {
   res.set('Cache-Control', 'no-store');
-  if (isAiComingSoon()) {
-    return res.json({ ...aiComingSoonPayload(), geminiConfigured: !!process.env.GEMINI_API_KEY });
+  if (isMockInterviewComingSoon()) {
+    return res.json({ ...mockInterviewComingSoonPayload(), geminiConfigured: !!process.env.GEMINI_API_KEY });
   }
   const indianTts = require('./indian-tts-service');
   const status = req.mockInterviewStatus || await getMockInterviewAccessStatus(req.user.id, req.user.role);
@@ -697,7 +719,7 @@ app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAcc
   });
 });
 
-app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAccess, blockMockInterviewIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { text, interviewer, mode } = req.body;
     if (!text?.trim()) return res.status(400).json({ error: 'Text required' });
@@ -712,7 +734,7 @@ app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAcc
   }
 });
 
-app.post('/api/mock-interview/transcribe', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, audioUpload.single('audio'), async (req, res) => {
+app.post('/api/mock-interview/transcribe', authenticateToken, requireMockInterviewAccess, blockMockInterviewIfComingSoon, mockInterviewLimiter, audioUpload.single('audio'), async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'Gemini API not configured' });
@@ -728,7 +750,7 @@ app.post('/api/mock-interview/transcribe', authenticateToken, requireMockIntervi
   }
 });
 
-app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAccess, blockMockInterviewIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'AI mock interview is not configured yet. Admin must add GEMINI_API_KEY.' });
@@ -770,7 +792,7 @@ app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAcc
   }
 });
 
-app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewAccess, blockMockInterviewIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId, message } = req.body;
     if (!sessionId || !message?.trim()) {
@@ -805,7 +827,7 @@ app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewA
   }
 });
 
-app.post('/api/mock-interview/end', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/end', authenticateToken, requireMockInterviewAccess, blockMockInterviewIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId } = req.body;
     if (!sessionId) return res.status(400).json({ error: 'Session ID required' });
@@ -907,7 +929,7 @@ app.get('/api/study-bot/status', authenticateToken, async (req, res) => {
       geminiConfigured: !!process.env.GEMINI_API_KEY,
       indexReady: ragIndex.indexReady,
       totalChunks: stats.totalChunks,
-      ...aiComingSoonPayload()
+      ...studyBotComingSoonPayload()
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to load study bot status' });
@@ -929,16 +951,16 @@ app.get('/api/study-bot/config', authenticateToken, async (req, res) => {
       freeRemaining: status.freeRemaining,
       paid: status.paid,
       fullAccess: status.fullAccess,
-      canAsk: isAiComingSoon() ? false : status.canAsk,
+      canAsk: isStudyBotComingSoon() ? false : status.canAsk,
       accessType: status.accessType,
-      ...aiComingSoonPayload()
+      ...studyBotComingSoonPayload()
     });
   } catch (error) {
     res.status(500).json({ error: 'Study bot config failed' });
   }
 });
 
-app.post('/api/study-bot/ask', authenticateToken, studyBotLimiter, blockAiIfComingSoon, async (req, res) => {
+app.post('/api/study-bot/ask', authenticateToken, studyBotLimiter, blockStudyBotIfComingSoon, async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'Study bot not configured. Admin must add GEMINI_API_KEY.' });

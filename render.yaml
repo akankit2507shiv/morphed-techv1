@@ -25,6 +25,8 @@ services:
         value: "Mrs HIRA ANGAD KAMBALE"
       - key: COURSE_PRICE
         value: "7777"
+      - key: REGULAR_PRICE
+        value: "11111"
       - key: LIMITED_SEATS
         value: "54"
       - key: MONGODB_URI
@@ -38,7 +40,7 @@ services:
       - key: MOCK_INTERVIEW_DAILY_LIMIT
         value: "3"
       - key: MOCK_INTERVIEW_FREE_TRIAL
-        value: "2"
+        value: "1"
       - key: STUDY_BOT_FREE_TRIAL
         value: "7"
       - key: AI_FEATURES_COMING_SOON

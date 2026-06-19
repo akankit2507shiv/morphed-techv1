@@ -96,9 +96,10 @@ const config = {
     ENABLE_2FA: process.env.ENABLE_2FA === 'true',
     ENABLE_ANALYTICS: process.env.ENABLE_ANALYTICS === 'true',
     MAINTENANCE_MODE: process.env.MAINTENANCE_MODE === 'true',
-    // AI Mock Interview + Study Bot — set AI_FEATURES_COMING_SOON=false on Render when Gemini is ready
-    AI_COMING_SOON: !(process.env.AI_FEATURES_COMING_SOON === 'false' || process.env.AI_FEATURES_COMING_SOON === '0'),
-    AI_COMING_SOON_MESSAGE: process.env.AI_COMING_SOON_MESSAGE || 'AI Mock Interview & Study Bot are coming soon. All course modules and projects are available now.',
+    // AI Mock Interview + Study Bot — control separately
+    MOCK_INTERVIEW_COMING_SOON: process.env.MOCK_INTERVIEW_COMING_SOON === 'true',
+    STUDY_BOT_COMING_SOON: process.env.STUDY_BOT_COMING_SOON === 'true' || (process.env.AI_FEATURES_COMING_SOON !== 'false' && process.env.STUDY_BOT_COMING_SOON !== 'false'),
+    AI_COMING_SOON_MESSAGE: process.env.AI_COMING_SOON_MESSAGE || 'Study Bot is coming soon. AI Mock Interview includes 1 free trial for new students.',
   },
 };
 

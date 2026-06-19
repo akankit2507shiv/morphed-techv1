@@ -142,7 +142,7 @@ async function init() {
     // Default pricing
     const pricing = await mongo.LandingPricing.findOne();
     if (!pricing) {
-      await mongo.LandingPricing.create({ regular_price: 6999, offer_price: 1111, offer_days: 3, limited_seats: 100 });
+      await mongo.LandingPricing.create({ regular_price: 11111, offer_price: 7777, offer_days: 3, limited_seats: 54 });
     }
     return 'mongodb';
   } else {
@@ -194,7 +194,7 @@ async function initSQLiteTables() {
     try { await sqlRun(sql); } catch(e) {} // ignore if column exists
   }
   // Default pricing
-  await sqlRun(`INSERT OR IGNORE INTO landing_pricing (id, regular_price, offer_price, offer_days, limited_seats) VALUES (1, 6999, 1111, 3, 100)`);
+  await sqlRun(`INSERT OR IGNORE INTO landing_pricing (id, regular_price, offer_price, offer_days, limited_seats) VALUES (1, 11111, 7777, 3, 54)`);
   // Create admin
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -617,12 +617,25 @@ const landing = {
     return { ok: true };
   },
   async getPricing() {
+    const envRegular = parseInt(process.env.REGULAR_PRICE || '', 10);
+    const envOffer = parseInt(process.env.COURSE_PRICE || process.env.OFFER_PRICE || '', 10);
+    const envSeats = parseInt(process.env.LIMITED_SEATS || '', 10);
+    const envDays = parseInt(process.env.OFFER_DAYS || '', 10);
+
+    let p;
     if (USE_MONGODB) {
-      const p = await mongo.LandingPricing.findOne().sort({ updated_at: -1 }).lean();
-      return p || { regular_price: 6999, offer_price: 1111, offer_days: 3, limited_seats: 100 };
+      p = await mongo.LandingPricing.findOne().sort({ updated_at: -1 }).lean();
+      if (!p) p = { regular_price: 11111, offer_price: 7777, offer_days: 3, limited_seats: 54 };
+    } else {
+      const row = await sqlGet('SELECT * FROM landing_pricing ORDER BY id DESC LIMIT 1');
+      p = row || { regular_price: 11111, offer_price: 7777, offer_days: 3, limited_seats: 54 };
     }
-    const row = await sqlGet('SELECT * FROM landing_pricing ORDER BY id DESC LIMIT 1');
-    return row || { regular_price: 6999, offer_price: 1111, offer_days: 3, limited_seats: 100 };
+
+    if (envRegular) p.regular_price = envRegular;
+    if (envOffer) p.offer_price = envOffer;
+    if (envSeats) p.limited_seats = envSeats;
+    if (envDays) p.offer_days = envDays;
+    return p;
   },
   async savePricing(data) {
     if (USE_MONGODB) {
