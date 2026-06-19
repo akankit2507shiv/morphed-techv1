@@ -80,7 +80,45 @@ async function sendTestNotification() {
   }
 }
 
+/**
+ * Notify admin when first launch lot (LIMITED_SEATS) is fully sold
+ */
+async function sendFirstLotCompletedNotification({ count, limit, revenue }) {
+  if (!TELEGRAM_API || !process.env.TELEGRAM_CHAT_ID) {
+    console.log('⚠️ Telegram not configured - skipping first-lot notification');
+    return;
+  }
+
+  try {
+    const revenueStr = Number(revenue || 0).toLocaleString('en-IN');
+    const message = `
+🎉 *FIRST LOT COMPLETED!*
+
+✅ *${count} / ${limit} seats filled*
+💰 *Total revenue:* ₹${revenueStr}
+
+🔥 Launch offer batch (First ${limit} Students) is now **SOLD OUT**.
+
+⏰ *Time:* ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+🎓 *MORPHED TECH - Data Engineering*
+Consider updating landing page pricing / seat counter.
+    `.trim();
+
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'Markdown'
+    });
+
+    console.log('✅ First-lot completed Telegram notification sent');
+  } catch (error) {
+    console.error('❌ First-lot Telegram notification failed:', error.message);
+  }
+}
+
 module.exports = {
   sendPaymentNotification,
-  sendTestNotification
+  sendTestNotification,
+  sendFirstLotCompletedNotification
 };

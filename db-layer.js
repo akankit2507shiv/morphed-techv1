@@ -357,6 +357,24 @@ const enrollments = {
       return { name: u?.name, email: u?.email, phone: u?.phone, payment_amount: e.payment_amount };
     }
     return sqlGet('SELECT u.name, u.email, u.phone, e.payment_amount FROM users u JOIN enrollments e ON u.id = e.user_id WHERE e.id = ?', [enrollmentId]);
+  },
+  async countCompleted() {
+    if (USE_MONGODB) {
+      return mongo.Enrollment.countDocuments({ payment_status: 'completed' });
+    }
+    const row = await sqlGet('SELECT COUNT(*) as total FROM enrollments WHERE payment_status = "completed"');
+    return row?.total || 0;
+  },
+  async getCompletedRevenue() {
+    if (USE_MONGODB) {
+      const result = await mongo.Enrollment.aggregate([
+        { $match: { payment_status: 'completed' } },
+        { $group: { _id: null, total: { $sum: '$payment_amount' } } }
+      ]);
+      return result[0]?.total || 0;
+    }
+    const row = await sqlGet('SELECT SUM(payment_amount) as total FROM enrollments WHERE payment_status = "completed"');
+    return row?.total || 0;
   }
 };
 

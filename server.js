@@ -4,13 +4,76 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const QRCode = require('qrcode');
 const multer = require('multer');
-const { sendPaymentNotification } = require('./telegram-helper');
+const fs = require('fs');
+const path = require('path');
+const { sendPaymentNotification, sendFirstLotCompletedNotification } = require('./telegram-helper');
 require('dotenv').config();
 
+const config = require('./config');
 const DB = require('./db-layer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+function isAiComingSoon() {
+  return config.features.AI_COMING_SOON;
+}
+
+function aiComingSoonPayload() {
+  if (!isAiComingSoon()) return { comingSoon: false };
+  return {
+    comingSoon: true,
+    message: config.features.AI_COMING_SOON_MESSAGE
+  };
+}
+
+function blockAiIfComingSoon(req, res, next) {
+  if (isAiComingSoon()) {
+    return res.status(503).json({
+      error: config.features.AI_COMING_SOON_MESSAGE,
+      ...aiComingSoonPayload()
+    });
+  }
+  next();
+}
+
+const FIRST_LOT_FLAG = path.join(__dirname, 'data', 'first-lot-notified.json');
+
+function ensureDataDir() {
+  const dir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
+
+function isFirstLotNotified() {
+  try {
+    if (fs.existsSync(FIRST_LOT_FLAG)) {
+      const data = JSON.parse(fs.readFileSync(FIRST_LOT_FLAG, 'utf8'));
+      return !!data.notified;
+    }
+  } catch (e) { /* ignore */ }
+  return false;
+}
+
+function markFirstLotNotified(count, limit) {
+  ensureDataDir();
+  fs.writeFileSync(FIRST_LOT_FLAG, JSON.stringify({
+    notified: true,
+    count,
+    limit,
+    at: new Date().toISOString()
+  }, null, 2));
+}
+
+async function maybeNotifyFirstLotComplete() {
+  if (isFirstLotNotified()) return;
+  const limit = parseInt(process.env.LIMITED_SEATS || String(config.payment.LIMITED_SEATS || 54), 10);
+  const count = await DB.enrollments.countCompleted();
+  if (count >= limit) {
+    const revenue = await DB.enrollments.getCompletedRevenue();
+    await sendFirstLotCompletedNotification({ count, limit, revenue });
+    markFirstLotNotified(count, limit);
+  }
+}
 
 // Middleware
 const rateLimit = require('express-rate-limit');
@@ -164,6 +227,7 @@ app.post('/api/enrollment/confirm-payment', authenticateToken, async (req, res) 
     if (user) {
       sendPaymentNotification({ studentName: user.name, studentEmail: user.email, phone: user.phone, amount: user.payment_amount, transactionId, status: 'completed' }).catch(() => {});
     }
+    maybeNotifyFirstLotComplete().catch(() => {});
     res.json({ message: 'Payment confirmed successfully! You now have access to all courses.', success: true });
   } catch (error) { res.status(500).json({ error: 'Payment confirmation failed' }); }
 });
@@ -223,6 +287,9 @@ app.put('/api/admin/enrollments/:id', authenticateToken, authenticateAdmin, asyn
   try {
     const r = await DB.enrollments.adminUpdate(req.params.id, req.body);
     if (r.changes === 0) return res.status(404).json({ error: 'Enrollment not found' });
+    if (req.body.payment_status === 'completed') {
+      maybeNotifyFirstLotComplete().catch(() => {});
+    }
     res.json({ message: 'Enrollment updated successfully' });
   } catch (error) { res.status(500).json({ error: 'Update failed' }); }
 });
@@ -230,6 +297,9 @@ app.put('/api/admin/enrollments/:id', authenticateToken, authenticateAdmin, asyn
 app.post('/api/admin/enrollments/create', authenticateToken, authenticateAdmin, async (req, res) => {
   try {
     const result = await DB.enrollments.adminCreate(req.body);
+    if ((req.body.payment_status || 'completed') === 'completed') {
+      maybeNotifyFirstLotComplete().catch(() => {});
+    }
     res.json({ message: 'Enrollment created successfully', enrollmentId: result.id });
   } catch (error) { res.status(500).json({ error: 'Failed to create enrollment' }); }
 });
@@ -404,11 +474,22 @@ app.post('/api/landing/pricing', authenticateToken, authenticateAdmin, async (re
 app.get('/api/payment/qr-code', async (req, res) => {
   try {
     const upiId = process.env.UPI_ID;
-    const upiName = process.env.UPI_NAME;
-    const amount = process.env.COURSE_PRICE;
+    const upiName = process.env.UPI_NAME || 'Morphed Tech';
+    const amount = req.query.amount || process.env.COURSE_PRICE;
+    const staticQrPath = path.join(__dirname, 'assets', 'upi-qr.png');
+    const payload = { upiId, upiName, amount };
+
+    if (fs.existsSync(staticQrPath)) {
+      return res.json({ ...payload, staticQrUrl: '/assets/upi-qr.png', qrCode: null });
+    }
+
+    if (!upiId || upiId === 'YOUR_UPI_ID') {
+      return res.status(503).json({ error: 'UPI ID not configured yet. Admin will update shortly.', ...payload });
+    }
+
     const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('MORPHED TECH Course Payment')}`;
     const qrCodeDataURL = await QRCode.toDataURL(upiString, { width: 300, margin: 2, color: { dark: '#000000', light: '#FFFFFF' } });
-    res.json({ qrCode: qrCodeDataURL, upiId, upiName, amount });
+    res.json({ ...payload, qrCode: qrCodeDataURL, staticQrUrl: null });
   } catch (error) { res.status(500).json({ error: 'Failed to generate QR code' }); }
 });
 
@@ -569,7 +650,13 @@ app.get('/api/mock-interview/status', authenticateToken, async (req, res) => {
     if (req.user.role !== 'admin') {
       dailyUsed = await DB.mockInterviews.countTodayByUser(req.user.id);
     }
-    res.json({ ...status, dailyLimit, dailyUsed, geminiConfigured: !!process.env.GEMINI_API_KEY });
+    res.json({
+      ...status,
+      dailyLimit,
+      dailyUsed,
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+      ...aiComingSoonPayload()
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to load mock interview status' });
   }
@@ -577,6 +664,9 @@ app.get('/api/mock-interview/status', authenticateToken, async (req, res) => {
 
 app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAccess, async (req, res) => {
   res.set('Cache-Control', 'no-store');
+  if (isAiComingSoon()) {
+    return res.json({ ...aiComingSoonPayload(), geminiConfigured: !!process.env.GEMINI_API_KEY });
+  }
   const indianTts = require('./indian-tts-service');
   const status = req.mockInterviewStatus || await getMockInterviewAccessStatus(req.user.id, req.user.role);
   res.json({
@@ -599,7 +689,7 @@ app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAcc
   });
 });
 
-app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { text, interviewer, mode } = req.body;
     if (!text?.trim()) return res.status(400).json({ error: 'Text required' });
@@ -614,7 +704,7 @@ app.post('/api/mock-interview/speak', authenticateToken, requireMockInterviewAcc
   }
 });
 
-app.post('/api/mock-interview/transcribe', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, audioUpload.single('audio'), async (req, res) => {
+app.post('/api/mock-interview/transcribe', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, audioUpload.single('audio'), async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'Gemini API not configured' });
@@ -630,7 +720,7 @@ app.post('/api/mock-interview/transcribe', authenticateToken, requireMockIntervi
   }
 });
 
-app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'AI mock interview is not configured yet. Admin must add GEMINI_API_KEY.' });
@@ -672,7 +762,7 @@ app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAcc
   }
 });
 
-app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId, message } = req.body;
     if (!sessionId || !message?.trim()) {
@@ -707,7 +797,7 @@ app.post('/api/mock-interview/message', authenticateToken, requireMockInterviewA
   }
 });
 
-app.post('/api/mock-interview/end', authenticateToken, requireMockInterviewAccess, mockInterviewLimiter, async (req, res) => {
+app.post('/api/mock-interview/end', authenticateToken, requireMockInterviewAccess, blockAiIfComingSoon, mockInterviewLimiter, async (req, res) => {
   try {
     const { sessionId } = req.body;
     if (!sessionId) return res.status(400).json({ error: 'Session ID required' });
@@ -808,7 +898,8 @@ app.get('/api/study-bot/status', authenticateToken, async (req, res) => {
       ...status,
       geminiConfigured: !!process.env.GEMINI_API_KEY,
       indexReady: ragIndex.indexReady,
-      totalChunks: stats.totalChunks
+      totalChunks: stats.totalChunks,
+      ...aiComingSoonPayload()
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to load study bot status' });
@@ -830,15 +921,16 @@ app.get('/api/study-bot/config', authenticateToken, async (req, res) => {
       freeRemaining: status.freeRemaining,
       paid: status.paid,
       fullAccess: status.fullAccess,
-      canAsk: status.canAsk,
-      accessType: status.accessType
+      canAsk: isAiComingSoon() ? false : status.canAsk,
+      accessType: status.accessType,
+      ...aiComingSoonPayload()
     });
   } catch (error) {
     res.status(500).json({ error: 'Study bot config failed' });
   }
 });
 
-app.post('/api/study-bot/ask', authenticateToken, studyBotLimiter, async (req, res) => {
+app.post('/api/study-bot/ask', authenticateToken, studyBotLimiter, blockAiIfComingSoon, async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({ error: 'Study bot not configured. Admin must add GEMINI_API_KEY.' });

@@ -20,11 +20,13 @@ services:
       - key: ADMIN_PASSWORD
         value: YOUR_ADMIN_PASSWORD
       - key: UPI_ID
-        value: YOUR_UPI_ID
+        value: 7038376253@ybl
       - key: UPI_NAME
-        value: Morphed Tech
+        value: Mrs HIRA ANGAD KAMBALE
       - key: COURSE_PRICE
         value: 7777
+      - key: LIMITED_SEATS
+        value: 54
       - key: TELEGRAM_BOT_TOKEN
         value: YOUR_TELEGRAM_BOT_TOKEN
       - key: TELEGRAM_CHAT_ID
@@ -43,3 +45,5 @@ services:
         value: 2
       - key: STUDY_BOT_FREE_TRIAL
         value: 7
+      - key: AI_FEATURES_COMING_SOON
+        value: "true"

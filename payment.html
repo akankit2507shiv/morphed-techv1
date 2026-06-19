@@ -153,13 +153,25 @@
             </div>
           </div>
 
+          <div id="qrSection" class="bg-white/10 rounded-lg p-4 mb-4 hidden">
+            <p class="text-sm text-gray-400 mb-3 text-center">Scan QR to Pay</p>
+            <div class="flex justify-center">
+              <img id="qrImage" src="" alt="UPI QR Code" class="max-w-[220px] w-full rounded-lg bg-white p-2">
+            </div>
+            <p id="qrUpiName" class="text-xs text-gray-400 text-center mt-2"></p>
+          </div>
+
+          <div id="qrPending" class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-sm text-amber-200 hidden">
+            QR scanner will appear here once UPI is configured. You can still pay using the UPI ID above.
+          </div>
+
           <div class="bg-white/10 rounded-lg p-4 mb-4">
             <p class="text-sm text-gray-400 mb-2">Amount to Pay</p>
             <p class="text-3xl font-black text-accent">₹7,777</p>
           </div>
 
           <div class="space-y-3 text-sm text-gray-300">
-            <p>📌 <strong>Step 1:</strong> Copy the UPI ID above</p>
+            <p>📌 <strong>Step 1:</strong> Scan QR or copy the UPI ID above</p>
             <p>📌 <strong>Step 2:</strong> Open any UPI app (GPay, PhonePe, Paytm)</p>
             <p>📌 <strong>Step 3:</strong> Send ₹7,777 to the UPI ID</p>
             <p>📌 <strong>Step 4:</strong> Enter Transaction ID below</p>
@@ -337,16 +349,43 @@
           }
         });
 
-        // Load UPI ID from backend (never hardcode in frontend)
+        // Load UPI ID + QR from backend
+        const qrRes = await fetch(`${API}/payment/qr-code?amount=${offer}`);
+        const qrData = await qrRes.json().catch(() => ({}));
+
+        if (qrData.upiId && qrData.upiId !== 'YOUR_UPI_ID') {
+          document.getElementById('upiId').textContent = qrData.upiId;
+        } else if (qrRes.status === 503) {
+          document.getElementById('upiId').textContent = 'Updating soon…';
+          document.getElementById('qrPending').classList.remove('hidden');
+        }
+
+        if (qrRes.ok) {
+          const qrImg = document.getElementById('qrImage');
+          if (qrData.staticQrUrl) {
+            qrImg.src = qrData.staticQrUrl;
+            document.getElementById('qrSection').classList.remove('hidden');
+          } else if (qrData.qrCode) {
+            qrImg.src = qrData.qrCode;
+            document.getElementById('qrSection').classList.remove('hidden');
+          }
+          if (qrData.upiName) {
+            document.getElementById('qrUpiName').textContent = 'Pay to: ' + qrData.upiName;
+          }
+        } else if (!qrData.staticQrUrl && !qrData.qrCode) {
+          document.getElementById('qrPending').classList.remove('hidden');
+        }
+
+        // Fallback: enrollment create also returns UPI ID
         const token = localStorage.getItem('token');
-        if (token) {
+        if (token && document.getElementById('upiId').textContent === 'Loading...') {
           const enrollRes = await fetch(`${API}/enrollment/create`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ paymentMethod: 'UPI' })
           });
           const enrollData = await enrollRes.json();
-          if (enrollData.upiId) {
+          if (enrollData.upiId && enrollData.upiId !== 'YOUR_UPI_ID') {
             document.getElementById('upiId').textContent = enrollData.upiId;
           }
         }
