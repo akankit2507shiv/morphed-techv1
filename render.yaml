@@ -10,46 +10,46 @@ services:
       sizeGB: 1
     envVars:
       - key: PORT
-        value: 10000
+        value: "10000"
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET
         generateValue: true
       - key: ADMIN_EMAIL
-        value: YOUR_ADMIN_EMAIL
+        sync: false
       - key: ADMIN_PASSWORD
-        value: YOUR_ADMIN_PASSWORD
+        sync: false
       - key: UPI_ID
-        value: 7038376253@ybl
+        value: "7038376253@ybl"
       - key: UPI_NAME
-        value: Mrs HIRA ANGAD KAMBALE
+        value: "Mrs HIRA ANGAD KAMBALE"
       - key: COURSE_PRICE
-        value: 7777
+        value: "7777"
       - key: LIMITED_SEATS
-        value: 54
+        value: "54"
+      - key: MONGODB_URI
+        sync: false
+      - key: FRONTEND_URL
+        value: "https://morphedtechai.com"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: MOCK_INTERVIEW_DAILY_LIMIT
+        value: "3"
+      - key: MOCK_INTERVIEW_FREE_TRIAL
+        value: "2"
+      - key: STUDY_BOT_FREE_TRIAL
+        value: "7"
+      - key: AI_FEATURES_COMING_SOON
+        value: "true"
       - key: TELEGRAM_BOT_TOKEN
-        value: YOUR_TELEGRAM_BOT_TOKEN
+        sync: false
       - key: TELEGRAM_CHAT_ID
-        value: YOUR_TELEGRAM_CHAT_ID
+        sync: false
       - key: WHATSAPP_TOKEN
         sync: false
       - key: WHATSAPP_PHONE_NUMBER_ID
         sync: false
       - key: WHATSAPP_ADMIN_PHONE
         sync: false
-      - key: MONGODB_URI
-        sync: false
-      - key: FRONTEND_URL
-        value: https://morphedtechai.com
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GEMINI_MODEL
-        value: gemini-2.0-flash
-      - key: MOCK_INTERVIEW_DAILY_LIMIT
-        value: 3
-      - key: MOCK_INTERVIEW_FREE_TRIAL
-        value: 2
-      - key: STUDY_BOT_FREE_TRIAL
-        value: 7
-      - key: AI_FEATURES_COMING_SOON
-        value: "true"

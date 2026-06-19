@@ -353,14 +353,30 @@
         const qrRes = await fetch(`${API}/payment/qr-code?amount=${offer}`);
         const qrData = await qrRes.json().catch(() => ({}));
 
-        if (qrData.upiId && qrData.upiId !== 'YOUR_UPI_ID') {
-          document.getElementById('upiId').textContent = qrData.upiId;
-        } else if (qrRes.status === 503) {
+        // UPI ID — from qr-code API or enrollment fallback
+        const token = localStorage.getItem('token');
+        let upiId = qrData.upiId;
+        let upiName = qrData.upiName;
+
+        if ((!upiId || upiId === 'YOUR_UPI_ID') && token) {
+          const enrollRes = await fetch(`${API}/enrollment/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ paymentMethod: 'UPI' })
+          });
+          const enrollData = await enrollRes.json();
+          if (enrollData.upiId && enrollData.upiId !== 'YOUR_UPI_ID') upiId = enrollData.upiId;
+          if (enrollData.upiName) upiName = enrollData.upiName;
+        }
+
+        if (upiId && upiId !== 'YOUR_UPI_ID') {
+          document.getElementById('upiId').textContent = upiId;
+        } else {
           document.getElementById('upiId').textContent = 'Updating soon…';
           document.getElementById('qrPending').classList.remove('hidden');
         }
 
-        if (qrRes.ok) {
+        if (qrRes.ok || qrData.qrCode || qrData.staticQrUrl) {
           const qrImg = document.getElementById('qrImage');
           if (qrData.staticQrUrl) {
             qrImg.src = qrData.staticQrUrl;
@@ -369,25 +385,11 @@
             qrImg.src = qrData.qrCode;
             document.getElementById('qrSection').classList.remove('hidden');
           }
-          if (qrData.upiName) {
-            document.getElementById('qrUpiName').textContent = 'Pay to: ' + qrData.upiName;
+          if (upiName) {
+            document.getElementById('qrUpiName').textContent = 'Pay to: ' + upiName;
           }
         } else if (!qrData.staticQrUrl && !qrData.qrCode) {
           document.getElementById('qrPending').classList.remove('hidden');
-        }
-
-        // Fallback: enrollment create also returns UPI ID
-        const token = localStorage.getItem('token');
-        if (token && document.getElementById('upiId').textContent === 'Loading...') {
-          const enrollRes = await fetch(`${API}/enrollment/create`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ paymentMethod: 'UPI' })
-          });
-          const enrollData = await enrollRes.json();
-          if (enrollData.upiId && enrollData.upiId !== 'YOUR_UPI_ID') {
-            document.getElementById('upiId').textContent = enrollData.upiId;
-          }
         }
         
       } catch(e) {
