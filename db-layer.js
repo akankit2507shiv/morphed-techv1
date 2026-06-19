@@ -420,6 +420,18 @@ const syllabusAccess = {
       return { changes: 1 };
     }
     return sqlRun(`INSERT INTO syllabus_access (user_id, ${module}) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET ${module} = excluded.${module}`, [userId, value ? 1 : 0]);
+  },
+  /** Unlock all 7 course modules + projects after verified payment */
+  async grantAllPaidModules(userId) {
+    return this.update(userId, {
+      sql_access: 1,
+      python_access: 1,
+      pyspark_access: 1,
+      databricks_access: 1,
+      aws_access: 1,
+      git_access: 1,
+      projects_access: 1
+    });
   }
 };
 

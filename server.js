@@ -222,7 +222,8 @@ app.post('/api/enrollment/confirm-payment', authenticateToken, async (req, res) 
     const result = await DB.enrollments.confirmPayment(enrollmentId, req.user.id, transactionId);
     if (result.changes === 0) return res.status(404).json({ error: 'Enrollment not found' });
 
-    // Telegram notification
+    await DB.syllabusAccess.grantAllPaidModules(req.user.id);
+
     const user = await DB.enrollments.getUserForNotification(enrollmentId);
     if (user) {
       sendPaymentNotification({ studentName: user.name, studentEmail: user.email, phone: user.phone, amount: user.payment_amount, transactionId, status: 'completed' }).catch(() => {});
@@ -288,6 +289,8 @@ app.put('/api/admin/enrollments/:id', authenticateToken, authenticateAdmin, asyn
     const r = await DB.enrollments.adminUpdate(req.params.id, req.body);
     if (r.changes === 0) return res.status(404).json({ error: 'Enrollment not found' });
     if (req.body.payment_status === 'completed') {
+      const receipt = await DB.enrollments.getReceiptAdmin(req.params.id);
+      if (receipt?.user_id) await DB.syllabusAccess.grantAllPaidModules(receipt.user_id);
       maybeNotifyFirstLotComplete().catch(() => {});
     }
     res.json({ message: 'Enrollment updated successfully' });
@@ -298,6 +301,7 @@ app.post('/api/admin/enrollments/create', authenticateToken, authenticateAdmin, 
   try {
     const result = await DB.enrollments.adminCreate(req.body);
     if ((req.body.payment_status || 'completed') === 'completed') {
+      if (req.body.user_id) await DB.syllabusAccess.grantAllPaidModules(req.body.user_id);
       maybeNotifyFirstLotComplete().catch(() => {});
     }
     res.json({ message: 'Enrollment created successfully', enrollmentId: result.id });
