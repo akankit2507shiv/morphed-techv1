@@ -501,21 +501,29 @@ app.get('/api/payment/qr-code', async (req, res) => {
   try {
     const upiId = process.env.UPI_ID;
     const upiName = process.env.UPI_NAME || 'Morphed Tech';
-    const amount = req.query.amount || process.env.COURSE_PRICE;
-    const staticQrPath = path.join(__dirname, 'assets', 'upi-qr.png');
+    const pricing = await DB.landing.getPricing();
+    const amount = String(
+      parseInt(req.query.amount || process.env.COURSE_PRICE || pricing?.offer_price || '7777', 10)
+    );
     const payload = { upiId, upiName, amount };
 
-    if (fs.existsSync(staticQrPath)) {
-      return res.json({ ...payload, staticQrUrl: '/assets/upi-qr.png', qrCode: null });
-    }
-
     if (!upiId || upiId === 'YOUR_UPI_ID') {
+      const staticQrPath = path.join(__dirname, 'assets', 'upi-qr.png');
+      if (fs.existsSync(staticQrPath)) {
+        return res.status(503).json({
+          error: 'UPI ID not configured — static QR may not include amount. Set UPI_ID on server.',
+          ...payload,
+          staticQrUrl: '/assets/upi-qr.png',
+          qrCode: null
+        });
+      }
       return res.status(503).json({ error: 'UPI ID not configured yet. Admin will update shortly.', ...payload });
     }
 
-    const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('MORPHED TECH Course Payment')}`;
+    // Dynamic QR — amount ₹7777 (or current offer) auto-fills in GPay / PhonePe when scanned
+    const upiString = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR&tn=${encodeURIComponent('Morphed Tech Course')}`;
     const qrCodeDataURL = await QRCode.toDataURL(upiString, { width: 300, margin: 2, color: { dark: '#000000', light: '#FFFFFF' } });
-    res.json({ ...payload, qrCode: qrCodeDataURL, staticQrUrl: null });
+    res.json({ ...payload, qrCode: qrCodeDataURL, staticQrUrl: null, amountPrefilled: true });
   } catch (error) { res.status(500).json({ error: 'Failed to generate QR code' }); }
 });
 
