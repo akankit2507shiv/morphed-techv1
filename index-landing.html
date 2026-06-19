@@ -1023,34 +1023,37 @@
 
     // Load dynamic pricing from admin CMS
     function loadPricing() {
-      // First try localStorage (admin settings)
-      const savedPricing = JSON.parse(localStorage.getItem('landingPricing') || '{}');
-      
-      let reg = savedPricing.regularPrice || 11111;
-      let offer = savedPricing.offerPrice || 7777;
-      let seats = savedPricing.limitedSeats || 54;
-      let days = savedPricing.offerDays || 3;
-      
-      // Then try API (if backend is running)
-      fetch('/api/landing/pricing')
+      fetch('/api/landing/pricing', { cache: 'no-store' })
         .then(r => r.json())
         .then(data => {
-          reg = data.regular_price || reg;
-          offer = data.offer_price || offer;
-          seats = data.limited_seats || seats;
-          days = data.offer_days || days;
+          const reg = data.regular_price || 11111;
+          const offer = data.offer_price || 7777;
+          const seats = data.limited_seats || 54;
+          const days = data.offer_days || 3;
           updatePricingUI(reg, offer, seats, days);
         })
         .catch(() => {
-          // Use localStorage or defaults
-          updatePricingUI(reg, offer, seats, days);
+          const saved = JSON.parse(localStorage.getItem('landingPricing') || '{}');
+          updatePricingUI(
+            saved.regularPrice || 11111,
+            saved.offerPrice || 7777,
+            saved.limitedSeats || 54,
+            saved.offerDays || 3
+          );
         });
     }
     
     function updatePricingUI(reg, offer, seats, days) {
       const saved = reg - offer;
       const pct = Math.round((saved / reg) * 100);
-      
+
+      localStorage.setItem('landingPricing', JSON.stringify({
+        regularPrice: reg,
+        offerPrice: offer,
+        limitedSeats: seats,
+        offerDays: days
+      }));
+
       document.getElementById('regularPrice').textContent = '₹' + reg.toLocaleString('en-IN');
       document.getElementById('offerPrice').textContent = '₹' + offer.toLocaleString('en-IN');
       document.getElementById('savingsBadge').textContent = `💰 Save ₹${saved.toLocaleString('en-IN')} (${pct}% OFF) - First ${seats} Students Only!`;

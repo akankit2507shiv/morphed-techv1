@@ -167,7 +167,7 @@
 
           <div class="bg-white/10 rounded-lg p-4 mb-4">
             <p class="text-sm text-gray-400 mb-2">Amount to Pay</p>
-            <p class="text-3xl font-black text-accent">₹7,777</p>
+            <p class="text-3xl font-black text-accent" id="amountToPay">₹7,777</p>
           </div>
 
           <div class="space-y-3 text-sm text-gray-300">
@@ -310,46 +310,60 @@
       }
     }
 
-    // Load UPI details from server
+    function applyPricing(reg, offer) {
+      const saved = reg - offer;
+      const pct = Math.round((saved / reg) * 100);
+
+      const regularPriceEl = document.querySelector('.line-through');
+      if (regularPriceEl) regularPriceEl.textContent = '₹' + reg.toLocaleString('en-IN');
+
+      const pricingCard = document.querySelector('.glass-card');
+      if (pricingCard) {
+        const offerPriceInCard = pricingCard.querySelectorAll('.text-accent')[0];
+        if (offerPriceInCard) offerPriceInCard.textContent = '₹' + offer.toLocaleString('en-IN');
+      }
+
+      const savingsEl = document.querySelector('.text-green-400');
+      if (savingsEl) savingsEl.textContent = `🔥 Save ₹${saved.toLocaleString('en-IN')} (${pct}% OFF)`;
+
+      const amountEl = document.getElementById('amountToPay');
+      if (amountEl) amountEl.textContent = '₹' + offer.toLocaleString('en-IN');
+
+      document.querySelectorAll('.space-y-3 p').forEach(step => {
+        if (step.textContent.includes('Step 3:')) {
+          step.innerHTML = `📌 <strong>Step 3:</strong> Send ₹${offer.toLocaleString('en-IN')} to the UPI ID`;
+        }
+      });
+
+      return offer;
+    }
+
+    // Load UPI details from server — always fetch live price from API (not stale localStorage)
     async function loadPaymentDetails() {
       try {
-        const savedPricing = JSON.parse(localStorage.getItem('landingPricing') || '{}');
-        
-        let reg = savedPricing.regularPrice || 11111;
-        let offer = savedPricing.offerPrice || 7777;
-        
-        // Update all pricing displays
-        const saved = reg - offer;
-        const pct = Math.round((saved / reg) * 100);
-        
-        // Update Regular Price (strikethrough)
-        const regularPriceEl = document.querySelector('.line-through');
-        if (regularPriceEl) regularPriceEl.textContent = '₹' + reg.toLocaleString('en-IN');
-        
-        // Update Offer Price in pricing card (first occurrence)
-        const pricingCard = document.querySelector('.glass-card');
-        if (pricingCard) {
-          const offerPriceInCard = pricingCard.querySelectorAll('.text-accent')[0];
-          if (offerPriceInCard) offerPriceInCard.textContent = '₹' + offer.toLocaleString('en-IN');
-        }
-        
-        // Update Savings
-        const savingsEl = document.querySelector('.text-green-400');
-        if (savingsEl) savingsEl.textContent = `🔥 Save ₹${saved.toLocaleString('en-IN')} (${pct}% OFF)`;
-        
-        // Update Amount to Pay section
-        const amountSection = document.querySelector('.bg-white\\/10 .text-accent');
-        if (amountSection) amountSection.textContent = '₹' + offer.toLocaleString('en-IN');
-        
-        // Update Step 3 text
-        const steps = document.querySelectorAll('.space-y-3 p');
-        steps.forEach(step => {
-          if (step.textContent.includes('Step 3:')) {
-            step.innerHTML = `📌 <strong>Step 3:</strong> Send ₹${offer.toLocaleString('en-IN')} to the UPI ID`;
-          }
-        });
+        let reg = 11111;
+        let offer = 7777;
 
-        // Load UPI ID + QR from backend
+        try {
+          const pr = await fetch(`${API}/landing/pricing`, { cache: 'no-store' });
+          if (pr.ok) {
+            const data = await pr.json();
+            reg = data.regular_price || reg;
+            offer = data.offer_price || offer;
+            localStorage.setItem('landingPricing', JSON.stringify({
+              regularPrice: reg,
+              offerPrice: offer,
+              limitedSeats: data.limited_seats || 54,
+              offerDays: data.offer_days || 3
+            }));
+          }
+        } catch (e) {
+          const saved = JSON.parse(localStorage.getItem('landingPricing') || '{}');
+          if (saved.regularPrice) reg = saved.regularPrice;
+          if (saved.offerPrice) offer = saved.offerPrice;
+        }
+
+        offer = applyPricing(reg, offer);
         const qrRes = await fetch(`${API}/payment/qr-code?amount=${offer}`);
         const qrData = await qrRes.json().catch(() => ({}));
 
