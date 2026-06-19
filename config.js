@@ -104,35 +104,41 @@ const config = {
 
 // ==================== VALIDATION ====================
 function validateConfig() {
-  const errors = [];
+  const critical = [];
+  const warnings = [];
 
-  // Critical validations for production
   if (config.IS_PRODUCTION) {
     if (config.security.JWT_SECRET === 'your_super_secret_jwt_key_change_this_in_production') {
-      errors.push('❌ CRITICAL: JWT_SECRET must be changed in production!');
+      critical.push('❌ CRITICAL: JWT_SECRET must be changed in production!');
     }
     if (config.admin.PASSWORD === 'ChangeThisPassword123!') {
-      errors.push('❌ CRITICAL: ADMIN_PASSWORD must be changed in production!');
+      critical.push('❌ CRITICAL: ADMIN_PASSWORD must be changed in production!');
     }
     if (config.cors.ORIGIN === '*') {
-      errors.push('⚠️  WARNING: CORS_ORIGIN should be restricted in production!');
+      warnings.push('⚠️  WARNING: CORS_ORIGIN should be restricted in production!');
     }
     if (!config.email.SMTP_USER || !config.email.SMTP_PASSWORD) {
-      errors.push('⚠️  WARNING: Email configuration is incomplete!');
+      warnings.push('⚠️  WARNING: Email configuration is incomplete (optional — server will still run).');
     }
   }
 
-  if (errors.length > 0) {
+  if (warnings.length > 0) {
+    console.warn('\n⚠️  CONFIGURATION WARNINGS:\n');
+    warnings.forEach(msg => console.warn(msg));
+    console.warn('');
+  }
+
+  if (critical.length > 0) {
     console.error('\n🚨 CONFIGURATION ERRORS:\n');
-    errors.forEach(err => console.error(err));
+    critical.forEach(msg => console.error(msg));
     if (config.IS_PRODUCTION) {
-      console.error('\n❌ Cannot start in production with configuration errors!\n');
+      console.error('\n❌ Cannot start in production until critical errors are fixed!\n');
       process.exit(1);
-    } else {
-      console.warn('\n⚠️  Running in development mode with warnings.\n');
     }
-  } else {
+  } else if (warnings.length === 0) {
     console.log('✅ Configuration validated successfully');
+  } else {
+    console.log('✅ Configuration OK (with warnings above)');
   }
 }
 
