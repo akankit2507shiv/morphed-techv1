@@ -15,7 +15,7 @@ const TELEGRAM_API = process.env.TELEGRAM_BOT_TOKEN
 async function sendPaymentNotification(paymentData) {
   if (!TELEGRAM_API || !process.env.TELEGRAM_CHAT_ID) {
     console.log('⚠️ Telegram not configured - skipping notification');
-    return;
+    return { ok: false, skipped: true };
   }
 
   try {
@@ -44,8 +44,10 @@ async function sendPaymentNotification(paymentData) {
     });
 
     console.log('✅ Telegram notification sent');
+    return { ok: true };
   } catch (error) {
     console.error('❌ Telegram notification failed:', error.message);
+    return { ok: false, error: error.message };
   }
 }
 
@@ -86,7 +88,7 @@ async function sendTestNotification() {
 async function sendFirstLotCompletedNotification({ count, limit, revenue }) {
   if (!TELEGRAM_API || !process.env.TELEGRAM_CHAT_ID) {
     console.log('⚠️ Telegram not configured - skipping first-lot notification');
-    return;
+    return { ok: false, skipped: true };
   }
 
   try {
@@ -112,8 +114,10 @@ Consider updating landing page pricing / seat counter.
     });
 
     console.log('✅ First-lot completed Telegram notification sent');
+    return { ok: true };
   } catch (error) {
     console.error('❌ First-lot Telegram notification failed:', error.message);
+    return { ok: false, error: error.message };
   }
 }
 

@@ -6,7 +6,7 @@ const QRCode = require('qrcode');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
-const { sendPaymentNotification, sendFirstLotCompletedNotification } = require('./telegram-helper');
+const { sendPaymentNotification, sendFirstLotCompletedNotification, sendTestNotifications } = require('./notification-helper');
 require('dotenv').config();
 
 const config = require('./config');
@@ -494,8 +494,12 @@ app.get('/api/payment/qr-code', async (req, res) => {
 });
 
 app.get('/api/test-telegram', async (req, res) => {
-  const { sendTestNotification } = require('./telegram-helper');
-  const result = await sendTestNotification();
+  const result = await sendTestNotifications();
+  res.json(result);
+});
+
+app.get('/api/test-notifications', async (req, res) => {
+  const result = await sendTestNotifications();
   res.json(result);
 });
 
