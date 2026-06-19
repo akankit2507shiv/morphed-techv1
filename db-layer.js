@@ -123,22 +123,45 @@ function sqlRun(sql, params = []) {
   });
 }
 
+// ==================== ADMIN SEED / SYNC ====================
+async function ensureAdminUser() {
+  const adminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) {
+    console.warn('⚠️ ADMIN_EMAIL or ADMIN_PASSWORD not set — admin login may not work');
+    return;
+  }
+
+  const hashed = await bcrypt.hash(adminPassword, 10);
+
+  if (USE_MONGODB) {
+    const existing = await mongo.User.findOne({ email: adminEmail });
+    if (existing) {
+      await mongo.User.updateOne({ _id: existing._id }, { $set: { password: hashed, role: 'admin', name: existing.name || 'Admin' } });
+      console.log('✅ Admin credentials synced from ADMIN_EMAIL / ADMIN_PASSWORD');
+    } else {
+      await mongo.User.create({ name: 'Admin', email: adminEmail, password: hashed, role: 'admin' });
+      console.log('✅ Admin user created');
+    }
+    return;
+  }
+
+  const existing = await sqlGet('SELECT * FROM users WHERE email = ?', [adminEmail]);
+  if (existing) {
+    await sqlRun('UPDATE users SET password = ?, role = ? WHERE email = ?', [hashed, 'admin', adminEmail]);
+    console.log('✅ Admin credentials synced from ADMIN_EMAIL / ADMIN_PASSWORD');
+  } else {
+    await sqlRun('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', ['Admin', adminEmail, hashed, 'admin']);
+    console.log('✅ Admin user created');
+  }
+}
+
 // ==================== INIT ====================
 async function init() {
   if (USE_MONGODB) {
     const connected = await mongo.connectMongoDB(process.env.MONGODB_URI);
     if (!connected) throw new Error('MongoDB connection failed');
-    // Create admin if not exists
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (adminEmail && adminPassword) {
-      const existing = await mongo.User.findOne({ email: adminEmail });
-      if (!existing) {
-        const hashed = await bcrypt.hash(adminPassword, 10);
-        await mongo.User.create({ name: 'Admin', email: adminEmail, password: hashed, role: 'admin' });
-        console.log('✅ Admin user created');
-      }
-    }
+    await ensureAdminUser();
     // Default pricing
     const pricing = await mongo.LandingPricing.findOne();
     if (!pricing) {
@@ -195,17 +218,7 @@ async function initSQLiteTables() {
   }
   // Default pricing
   await sqlRun(`INSERT OR IGNORE INTO landing_pricing (id, regular_price, offer_price, offer_days, limited_seats) VALUES (1, 11111, 7777, 3, 54)`);
-  // Create admin
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (adminEmail && adminPassword) {
-    const existing = await sqlGet('SELECT * FROM users WHERE email = ?', [adminEmail]);
-    if (!existing) {
-      const hashed = await bcrypt.hash(adminPassword, 10);
-      await sqlRun('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', ['Admin', adminEmail, hashed, 'admin']);
-      console.log('✅ Admin user created');
-    }
-  }
+  await ensureAdminUser();
 }
 
 // ==================== USERS ====================

@@ -187,7 +187,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
-    const user = await DB.users.findByEmail(email);
+    const user = await DB.users.findByEmail(String(email).trim().toLowerCase());
     if (!user) return res.status(401).json({ error: 'Invalid email or password' });
 
     const validPassword = await bcrypt.compare(password, user.password);

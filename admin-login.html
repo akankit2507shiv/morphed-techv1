@@ -255,7 +255,7 @@
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const email = document.getElementById('adminEmail').value;
+      const email = document.getElementById('adminEmail').value.trim().toLowerCase();
       const password = document.getElementById('adminPassword').value;
 
       try {
