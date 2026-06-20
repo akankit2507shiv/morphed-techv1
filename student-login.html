@@ -194,6 +194,16 @@
       btn.style.opacity = loading ? '0.6' : '1';
     }
 
+    function deviceMeta() {
+      const raw = [navigator.userAgent, screen.width + 'x' + screen.height, navigator.language].join('|');
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) { hash = ((hash << 5) - hash) + raw.charCodeAt(i); hash |= 0; }
+      return {
+        device_fp: Math.abs(hash).toString(36),
+        device_type: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+      };
+    }
+
     // Student Login
     document.getElementById('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
@@ -202,23 +212,17 @@
         const r = await fetch(`${API}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: document.getElementById('loginEmail').value, password: document.getElementById('loginPassword').value })
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value,
+            ...deviceMeta()
+          })
         });
         const d = await r.json();
         if (r.ok) {
           localStorage.setItem('token', d.token);
           localStorage.setItem('user', JSON.stringify(d.user));
           showMsg('✅ Login successful! Redirecting...', true);
-          // Register session with server for tracking
-          fetch(window.location.origin + '/api/security/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + d.token },
-            body: JSON.stringify({
-              device_type: /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-              user_agent: navigator.userAgent.substring(0, 200),
-              device_fp: btoa([navigator.userAgent, screen.width + 'x' + screen.height, navigator.language].join('|')).substring(0, 50)
-            })
-          }).catch(() => {});
           setTimeout(() => { window.location.href = 'student-dashboard.html#resume'; }, 800);
         } else {
           showMsg(d.error || 'Login failed', false);
@@ -269,7 +273,7 @@
         const r = await fetch(`${API}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, password })
+          body: JSON.stringify({ name, email, phone, password, ...deviceMeta() })
         });
         const d = await r.json();
         if (r.ok) {
@@ -292,12 +296,13 @@
       e.preventDefault();
       showModal('Terms & Conditions', `
         <p><strong>1. Account Usage:</strong> Your account is personal and non-transferable. You are responsible for maintaining the confidentiality of your login credentials.</p>
-        <p><strong>2. Content Access:</strong> Course content is for personal learning only. Sharing, copying, or distributing content is strictly prohibited.</p>
-        <p><strong>3. Payment:</strong> All payments are non-refundable once course access is granted. Payment confirmation may take up to 24 hours.</p>
-        <p><strong>4. Code of Conduct:</strong> Users must not attempt to hack, reverse-engineer, or misuse the platform. Violations will result in permanent account suspension.</p>
-        <p><strong>5. Intellectual Property:</strong> All course materials, videos, and content are owned by Morphed Tech. Unauthorized reproduction is prohibited.</p>
-        <p><strong>6. Account Termination:</strong> We reserve the right to suspend or terminate accounts that violate these terms without prior notice.</p>
-        <p><strong>7. Modifications:</strong> We may update these terms at any time. Continued use of the platform constitutes acceptance of updated terms.</p>
+        <p><strong>2. Content Protection:</strong> No screenshots, screen recording, copying, or sharing course content. Content is watermarked to your email. Violations lead to immediate account suspension.</p>
+        <p><strong>3. One Device Only:</strong> Only one active login session is allowed per account. Logging in on a new device will log out the previous device.</p>
+        <p><strong>4. Payment:</strong> All payments are non-refundable once course access is granted. Payment confirmation may take up to 24 hours.</p>
+        <p><strong>5. Code of Conduct:</strong> Users must not attempt to hack, reverse-engineer, record, or misuse the platform.</p>
+        <p><strong>6. Intellectual Property:</strong> All course materials are owned by Morphed Tech. Unauthorized reproduction is prohibited.</p>
+        <p><strong>7. Account Termination:</strong> We reserve the right to suspend accounts that violate these terms without prior notice.</p>
+        <p><strong>8. Modifications:</strong> We may update these terms at any time. Continued use constitutes acceptance.</p>
       `);
     }
 
@@ -308,7 +313,7 @@
         <p><strong>2. Data Usage:</strong> Your data is used solely for providing platform services, sending course updates, and processing payments.</p>
         <p><strong>3. Data Security:</strong> We use industry-standard encryption (JWT, bcrypt) to protect your personal information.</p>
         <p><strong>4. No Third-Party Sharing:</strong> We do not sell or share your personal data with third parties for marketing purposes.</p>
-        <p><strong>5. Session Tracking:</strong> We track login sessions and device information for security purposes (fraud prevention).</p>
+        <p><strong>5. Session Tracking:</strong> We track login sessions and device information for security (single-device policy, fraud prevention).</p>
         <p><strong>6. Cookies:</strong> We use localStorage for session management. No third-party tracking cookies are used.</p>
         <p><strong>7. Data Deletion:</strong> You may request account deletion by contacting support@morphedtechai.com. All personal data will be removed within 30 days.</p>
         <p><strong>8. Contact:</strong> For privacy concerns, email us at support@morphedtechai.com</p>

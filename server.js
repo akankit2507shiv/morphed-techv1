@@ -133,15 +133,52 @@ app.get('/learning-data.json', (req, res) => {
 });
 
 // ==================== AUTH MIDDLEWARE ====================
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Access token required' });
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid or expired token' });
-    req.user = user;
-    next();
+function verifyJwt(token) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) reject(err);
+      else resolve(user);
+    });
   });
+}
+
+async function registerUserSession(userId, token, meta = {}) {
+  await DB.sessions.upsert(userId, {
+    session_token: token,
+    device_fp: meta.device_fp || '',
+    device_type: meta.device_type || 'Desktop',
+    user_agent: (meta.user_agent || '').substring(0, 200)
+  });
+}
+
+const authenticateToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Access token required' });
+
+    const user = await verifyJwt(token);
+    req.user = user;
+    req.token = token;
+
+    const block = await DB.blockedUsers.check(user.id);
+    if (block?.blocked) {
+      return res.status(403).json({ error: 'Account suspended. Contact support@morphedtechai.com' });
+    }
+
+    if (user.role !== 'admin') {
+      const active = await DB.sessions.isTokenActive(user.id, token);
+      if (!active) {
+        return res.status(401).json({
+          error: 'Logged in on another device. Only one active session is allowed.',
+          code: 'SESSION_REPLACED'
+        });
+      }
+    }
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
 };
 
 const authenticateAdmin = (req, res, next) => {
@@ -175,6 +212,11 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
     // No syllabus access on registration — only hardcoded free topics (Joins, Aggregations, Lists, Dicts)
     const token = jwt.sign({ id: user.id, email: email.trim().toLowerCase(), role: 'student' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    await registerUserSession(user.id, token, {
+      device_fp: req.body.device_fp,
+      device_type: req.body.device_type,
+      user_agent: req.headers['user-agent']
+    });
     res.json({ message: 'Registration successful', token, user: { id: user.id, name: name.trim(), email, role: 'student' } });
   } catch (error) {
     console.error('Register error:', error);
@@ -184,7 +226,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
 app.post('/api/auth/login', authLimiter, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, device_fp, device_type } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
 
     const user = await DB.users.findByEmail(String(email).trim().toLowerCase());
@@ -194,6 +236,13 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     if (!validPassword) return res.status(401).json({ error: 'Invalid email or password' });
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    if (user.role !== 'admin') {
+      await registerUserSession(user.id, token, {
+        device_fp,
+        device_type,
+        user_agent: req.headers['user-agent']
+      });
+    }
     res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
     console.error('Login error:', error);
@@ -590,9 +639,13 @@ app.get('/api/security/check/:userId', authenticateToken, async (req, res) => {
 app.post('/api/security/session', authenticateToken, async (req, res) => {
   try {
     const { device_fp, device_type, user_agent } = req.body;
-    await DB.sessions.upsert(req.user.id, { session_token: req.headers.authorization?.split(' ')[1] || '', device_fp, device_type, user_agent });
+    await DB.sessions.upsert(req.user.id, { session_token: req.token || req.headers.authorization?.split(' ')[1] || '', device_fp, device_type, user_agent });
     res.json({ ok: true });
   } catch (error) { res.status(500).json({ error: 'Session update failed' }); }
+});
+
+app.get('/api/security/session/verify', authenticateToken, async (req, res) => {
+  res.json({ valid: true, singleDevice: true });
 });
 
 app.get('/api/admin/security/sessions', authenticateToken, authenticateAdmin, async (req, res) => {

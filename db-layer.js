@@ -547,6 +547,17 @@ const securityLogs = {
 
 // ==================== SESSIONS ====================
 const sessions = {
+  async getByUserId(userId) {
+    if (USE_MONGODB) {
+      return mongo.ActiveSession.findOne({ user_id: toObjectId(userId) }).lean();
+    }
+    return sqlGet('SELECT * FROM active_sessions WHERE user_id = ?', [userId]);
+  },
+  async isTokenActive(userId, token) {
+    const row = await this.getByUserId(userId);
+    if (!row || !row.session_token) return true;
+    return row.session_token === token;
+  },
   async upsert(userId, data) {
     if (USE_MONGODB) {
       await mongo.ActiveSession.findOneAndUpdate({ user_id: toObjectId(userId) }, { ...data, user_id: toObjectId(userId), last_active: new Date() }, { upsert: true });

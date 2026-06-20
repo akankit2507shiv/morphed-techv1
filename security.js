@@ -52,7 +52,21 @@
   }
 
   // ── 2. ROUTE GUARD — call on every protected page ─────────────────
+  function getCurrentUser() {
+    try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch (e) { return {}; }
+  }
+
+  function getDeviceMeta() {
+    const fp = getFingerprint();
+    return {
+      device_fp: fp,
+      device_type: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+      user_agent: navigator.userAgent.substring(0, 200)
+    };
+  }
+
   window.MorphedAuth = {
+    getDeviceMeta,
     requireLogin: function (redirectTo) {
       const token = localStorage.getItem('token');
       const user = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) { return {}; } })();
@@ -160,14 +174,32 @@
   }
 
   function blurPremiumContent(blur) {
-    const selectors = ['#topicsGrid', '#projectsGrid', '.tab-content-inner.active', 'main'];
+    const selectors = ['main', '#topicsGrid', '#projectsGrid', '.tab-content-inner.active', '.glass-card', '.glass'];
     selectors.forEach(sel => {
-      const el = document.querySelector(sel);
-      if (el) {
-        el.style.filter = blur ? 'blur(6px)' : '';
+      document.querySelectorAll(sel).forEach(el => {
+        el.style.filter = blur ? 'blur(10px)' : '';
         el.style.userSelect = blur ? 'none' : '';
-      }
+      });
     });
+  }
+
+  function setContentShield(active, reason) {
+    document.body.classList.toggle('morphed-shielded', !!active);
+    if (active && reason) {
+      logEvent('CONTENT_SHIELD', reason, 'MEDIUM');
+    }
+  }
+
+  function flashCaptureShield() {
+    setContentShield(true, 'Capture attempt');
+    const flash = document.createElement('div');
+    flash.id = 'capture-flash';
+    flash.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#000;opacity:0.92;pointer-events:none;';
+    document.body.appendChild(flash);
+    setTimeout(() => {
+      flash.remove();
+      if (!document.hidden) setContentShield(false);
+    }, 1800);
   }
 
   function showDevToolsWarning() {
@@ -195,33 +227,42 @@
   // Skip all content protection for admin users
   const _currentUser = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}'); } catch(e) { return {}; } })();
   if (_currentUser.role === 'admin') {
-    // Admin: no watermark, no content restrictions
     window.MorphedWatermark = { apply: function() {} };
   } else {
+  document.body.classList.add('morphed-protected');
+
   document.addEventListener('contextmenu', function (e) {
-    const premiumSelectors = ['#topicsGrid', '#projectsGrid', '.tab-content-inner'];
-    const isPremium = premiumSelectors.some(sel => e.target.closest(sel));
-    if (isPremium) {
-      e.preventDefault();
-      return false;
-    }
+    e.preventDefault();
+    return false;
   });
 
-  // Disable text selection on premium content
   const style = document.createElement('style');
   style.textContent = `
-    #topicsGrid, #projectsGrid, .tab-content-inner {
+    body.morphed-protected {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+    body.morphed-protected img, body.morphed-protected video {
+      pointer-events: none;
+    }
+    body.morphed-shielded main,
+    body.morphed-shielded .glass-card,
+    body.morphed-shielded .glass {
+      filter: blur(14px) !important;
+    }
+    #topicsGrid, #projectsGrid, .tab-content-inner, main {
       -webkit-user-select: none;
       -moz-user-select: none;
       user-select: none;
     }
-    /* Watermark overlay on premium content */
     .morphed-watermark {
       position: fixed;
       pointer-events: none;
       z-index: 9998;
-      opacity: 0.04;
-      font-size: 18px;
+      opacity: 0.09;
+      font-size: 16px;
       font-weight: 900;
       color: #fff;
       transform: rotate(-30deg);
@@ -229,23 +270,83 @@
       font-family: Inter, sans-serif;
       letter-spacing: 2px;
     }
+    #security-policy-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 9997;
+      background: rgba(11,16,32,0.92);
+      border-top: 1px solid rgba(255,61,129,0.35);
+      color: #94a3b8;
+      font-size: 11px;
+      text-align: center;
+      padding: 6px 12px;
+      font-family: Inter, sans-serif;
+    }
   `;
   document.head.appendChild(style);
 
-  // Disable keyboard shortcuts for saving/printing
+  if (!document.getElementById('security-policy-bar')) {
+    const bar = document.createElement('div');
+    bar.id = 'security-policy-bar';
+    bar.textContent = '🛡️ Protected content — No screenshots, screen recording, or sharing. One device per account. Watermarked to your email.';
+    document.body.appendChild(bar);
+  }
+
   document.addEventListener('keydown', function (e) {
-    // Block Ctrl+S, Ctrl+P, Ctrl+U (view source)
-    if (e.ctrlKey && ['s', 'p', 'u'].includes(e.key.toLowerCase())) {
+    const key = e.key?.toLowerCase();
+    if (e.ctrlKey && ['s', 'p', 'u', 'c', 'a'].includes(key)) {
       e.preventDefault();
+      logEvent('BLOCKED_SHORTCUT', key, 'LOW');
       return false;
     }
-    // Block F12
-    if (e.key === 'F12') {
+    if (e.metaKey && e.shiftKey && ['3', '4', '5', 's'].includes(key)) {
       e.preventDefault();
-      logEvent('DEVTOOLS_SHORTCUT', 'F12 pressed', 'LOW');
+      flashCaptureShield();
+      logEvent('SCREENSHOT_ATTEMPT', 'Mac capture shortcut', 'HIGH');
+      return false;
+    }
+    if (e.key === 'F12' || e.key === 'PrintScreen') {
+      e.preventDefault();
+      flashCaptureShield();
+      logEvent('SCREENSHOT_ATTEMPT', e.key, 'HIGH');
       return false;
     }
   });
+
+  document.addEventListener('keyup', function (e) {
+    if (e.key === 'PrintScreen') {
+      flashCaptureShield();
+      logEvent('SCREENSHOT_ATTEMPT', 'PrintScreen', 'HIGH');
+    }
+  });
+
+  document.addEventListener('copy', e => {
+    e.preventDefault();
+    logEvent('COPY_BLOCKED', window.location.pathname, 'LOW');
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      setContentShield(true, 'Tab hidden — possible capture');
+    } else {
+      setContentShield(false);
+    }
+  });
+
+  window.addEventListener('blur', () => setContentShield(true, 'Window blur'));
+  window.addEventListener('focus', () => setContentShield(false));
+
+  if (navigator.mediaDevices?.getDisplayMedia) {
+    const original = navigator.mediaDevices.getDisplayMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getDisplayMedia = function () {
+      logEvent('SCREEN_RECORD_ATTEMPT', 'getDisplayMedia blocked', 'HIGH');
+      flashCaptureShield();
+      return Promise.reject(new Error('Screen recording is not allowed on Morphed Tech.'));
+    };
+    navigator.mediaDevices._morphedOriginalDisplayMedia = original;
+  }
 
   // ── 6. WATERMARK ──────────────────────────────────────────────────
   window.MorphedWatermark = {
@@ -256,11 +357,11 @@
       // Remove existing
       document.querySelectorAll('.morphed-watermark').forEach(el => el.remove());
 
-      const text = user.email + ' • MORPHED TECH';
+      const text = (user.email || 'student') + ' • MORPHED TECH • ' + new Date().toISOString().slice(0, 10);
       const positions = [
-        { top: '15%', left: '10%' }, { top: '35%', left: '55%' },
-        { top: '55%', left: '20%' }, { top: '75%', left: '65%' },
-        { top: '85%', left: '35%' }
+        { top: '8%', left: '5%' }, { top: '22%', left: '48%' }, { top: '38%', left: '12%' },
+        { top: '52%', left: '55%' }, { top: '68%', left: '18%' }, { top: '82%', left: '50%' },
+        { top: '92%', left: '30%' }
       ];
 
       positions.forEach(pos => {
@@ -392,5 +493,80 @@
     logEvent('DEVICE_CHANGE', 'Different device/browser fingerprint detected', 'MEDIUM');
   }
   localStorage.setItem('device_fp', currentFP);
+
+  // ── 12. SINGLE DEVICE SESSION GUARD ───────────────────────────────
+  let sessionGuardTimer;
+
+  function handleSessionReplaced(message) {
+    logEvent('SESSION_REPLACED', message || 'Another device logged in', 'HIGH');
+    showSecurityBanner(message || '🔒 Your account was opened on another device. Only one session is allowed. Please login again.', () => {
+      clearSession('Session replaced');
+      window.location.href = 'student-login.html';
+    });
+  }
+
+  async function verifyServerSession() {
+    const token = localStorage.getItem('token');
+    const user = getCurrentUser();
+    if (!token || !validateToken(token) || user.role === 'admin') return;
+
+    try {
+      const r = await fetch(`${API}/security/session/verify`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
+      });
+      if (r.status === 401) {
+        const data = await r.json().catch(() => ({}));
+        if (data.code === 'SESSION_REPLACED') {
+          handleSessionReplaced(data.error);
+        } else {
+          handleSessionReplaced('Session expired. Please login again.');
+        }
+      }
+    } catch (e) { /* offline — skip */ }
+  }
+
+  function startSingleSessionGuard() {
+    const token = localStorage.getItem('token');
+    const user = getCurrentUser();
+    if (!token || user.role === 'admin') return;
+    verifyServerSession();
+    clearInterval(sessionGuardTimer);
+    sessionGuardTimer = setInterval(verifyServerSession, 20000);
+  }
+
+  // ── 13. AUTO-INIT ON PROTECTED PAGES ──────────────────────────────
+  function isProtectedStudentPage() {
+    const path = window.location.pathname.toLowerCase();
+    return /student-dashboard|topic|syllabus|module|project-detail|payment|mock-interview|study-bot/.test(path);
+  }
+
+  function autoInitProtectedPage() {
+    const token = localStorage.getItem('token');
+    const user = getCurrentUser();
+    if (!token || user.role === 'admin' || !isProtectedStudentPage()) return;
+
+    if (window.MorphedAuth?.requireLogin) {
+      MorphedAuth.requireLogin('student-login.html');
+    }
+    if (window.MorphedWatermark?.apply) {
+      MorphedWatermark.apply();
+      setInterval(() => MorphedWatermark.apply(), 60000);
+    }
+    startSingleSessionGuard();
+
+    const meta = getDeviceMeta();
+    fetch(`${API}/security/session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(meta)
+    }).catch(() => {});
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoInitProtectedPage);
+  } else {
+    autoInitProtectedPage();
+  }
 
 })();
