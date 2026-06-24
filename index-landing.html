@@ -981,12 +981,15 @@
         </div>
       </div>
       <div style="border-top:1px solid rgba(255,255,255,0.05);margin-top:2rem;padding-top:2rem;text-align:center;">
-        <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);">© 2024 Morphed Tech. All rights reserved.</p>
+        <p style="font-size:0.75rem;color:rgba(255,255,255,0.3);">© <span id="footer-year">2026</span> Morphed Tech. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
   <script>
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) footerYear.textContent = new Date().getFullYear();
+
     // Set countdown — date set dynamically after pricing loads, fallback to 3 days
     window._countdownDate = new Date().getTime() + (3 * 24 * 60 * 60 * 1000);
 

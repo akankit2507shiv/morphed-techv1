@@ -56,7 +56,7 @@ const sendOTPEmail = async (email, otp) => {
             </p>
           </div>
           <div class="footer">
-            <p>© 2024 Morphed Tech. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Morphed Tech. All rights reserved.</p>
             <p>Secure EdTech Platform</p>
           </div>
         </div>
