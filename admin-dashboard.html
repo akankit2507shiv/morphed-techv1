@@ -632,8 +632,8 @@
               : '<span class="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs">⏳ Pending</span>'}
           </td>
           <td class="py-4 px-4">
-            <button onclick="resetPassword(${jsId(s.id)})" class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs transition mr-2">Reset Password</button>
-            <button onclick="deleteStudent(${jsId(s.id)})" class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">Delete</button>
+            <button onclick='resetPassword(${jsId(s.id)})' class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs transition mr-2">Reset Password</button>
+            <button onclick='deleteStudent(${jsId(s.id)})' class="px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">Delete</button>
           </td>
         </tr>
       `).join('');
@@ -651,13 +651,22 @@
     }
 
     async function resetPassword(id) {
-      const newPassword = prompt('Enter new password for this student (min 6 characters):');
-      if (!newPassword || newPassword.length < 6) {
-        alert('❌ Password must be at least 6 characters');
+      const newPassword = prompt('Enter new password (min 8 chars, 1 uppercase, 1 number):');
+      if (!newPassword) return;
+      if (newPassword.length < 8) {
+        alert('❌ Password must be at least 8 characters');
+        return;
+      }
+      if (!/[A-Z]/.test(newPassword)) {
+        alert('❌ Password must contain at least 1 uppercase letter');
+        return;
+      }
+      if (!/[0-9]/.test(newPassword)) {
+        alert('❌ Password must contain at least 1 number');
         return;
       }
       try {
-        const response = await fetch(`${API}/admin/students/${id}/password`, {
+        const response = await fetch(`${API}/admin/students/${encodeURIComponent(id)}/password`, {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -665,11 +674,12 @@
           },
           body: JSON.stringify({ password: newPassword })
         });
+        const data = await response.json().catch(() => ({}));
         if (response.ok) {
           alert('✅ Password reset successfully!');
           showToast('✅ Password updated');
         } else {
-          alert('❌ Failed to reset password');
+          alert('❌ Failed to reset password: ' + (data.error || response.statusText));
         }
       } catch(e) {
         alert('❌ Error: ' + e.message);
@@ -713,8 +723,8 @@
           </td>
           <td class="py-4 px-4">
             ${s.enrollment_id
-              ? `<button onclick="openPayModal(${jsId(s.enrollment_id)},'${s.payment_status||'pending'}',${s.payment_amount||0},'${(s.transaction_id||'').replace(/'/g, "\\'")}')" class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs transition">Edit</button>`
-              : `<button onclick="createEnrollmentForStudent(${jsId(s.id)})" class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition">Add Payment</button>`}
+              ? `<button onclick='openPayModal(${jsId(s.enrollment_id)}, ${JSON.stringify(s.payment_status || 'pending')}, ${s.payment_amount || 0}, ${JSON.stringify(s.transaction_id || '')})' class="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded text-xs transition">Edit</button>`
+              : `<button onclick='createEnrollmentForStudent(${jsId(s.id)})' class="px-3 py-1 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded text-xs transition">Add Payment</button>`}
           </td>
         </tr>
       `).join('');
@@ -1392,7 +1402,7 @@
                 <span class="px-2 py-1 ${sc.bg} border ${sc.border} ${sc.color} rounded-full text-xs font-bold">${sc.icon} ${log.severity}</span>
               </td>
               <td class="py-3 px-4">
-                ${log.user_id ? `<button onclick="blockUser(${jsId(log.user_id)}, '${(log.user_email||'').replace(/'/g, "\\'")}')" class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Block</button>` : '—'}
+                ${log.user_id ? `<button onclick='blockUser(${jsId(log.user_id)}, ${JSON.stringify(log.user_email || '')})' class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Block</button>` : '—'}
               </td>
             </tr>`;
         }).join('');
@@ -1419,7 +1429,7 @@
             <td class="py-3 px-3 text-gray-300 text-xs">${s.device_type || 'Desktop'}</td>
             <td class="py-3 px-3 text-gray-400 text-xs">${new Date(s.last_active).toLocaleString()}</td>
             <td class="py-3 px-3">
-              <button onclick="blockUser(${jsId(s.user_id)}, '${(s.email||'').replace(/'/g, "\\'")}')" class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Force Logout</button>
+              <button onclick='blockUser(${jsId(s.user_id)}, ${JSON.stringify(s.email || '')})' class="px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded text-xs transition">🚫 Force Logout</button>
             </td>
           </tr>`).join('');
       } catch(e) {

@@ -327,6 +327,20 @@ app.get('/api/admin/students', authenticateToken, authenticateAdmin, async (req,
   catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 
+app.put('/api/admin/students/:id/password', authenticateToken, authenticateAdmin, async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    if (!/[A-Z]/.test(password)) return res.status(400).json({ error: 'Password must contain at least 1 uppercase letter' });
+    if (!/[0-9]/.test(password)) return res.status(400).json({ error: 'Password must contain at least 1 number' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const r = await DB.users.updatePassword(req.params.id, hashedPassword);
+    if (r.changes === 0) return res.status(404).json({ error: 'Student not found' });
+    await DB.sessions.deleteByUser(req.params.id);
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) { res.status(500).json({ error: 'Server error' }); }
+});
+
 app.put('/api/admin/students/:id', authenticateToken, authenticateAdmin, async (req, res) => {
   try {
     const { name, email, phone } = req.body;
@@ -342,17 +356,6 @@ app.delete('/api/admin/students/:id', authenticateToken, authenticateAdmin, asyn
     if (r.changes === 0) return res.status(404).json({ error: 'Student not found' });
     res.json({ message: 'Student deleted successfully' });
   } catch (error) { res.status(500).json({ error: 'Delete failed' }); }
-});
-
-app.put('/api/admin/students/:id/password', authenticateToken, authenticateAdmin, async (req, res) => {
-  try {
-    const { password } = req.body;
-    if (!password || password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const r = await DB.users.updatePassword(req.params.id, hashedPassword);
-    if (r.changes === 0) return res.status(404).json({ error: 'Student not found' });
-    res.json({ message: 'Password updated successfully' });
-  } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 
 app.put('/api/admin/enrollments/:id', authenticateToken, authenticateAdmin, async (req, res) => {
