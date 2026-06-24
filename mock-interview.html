@@ -179,7 +179,7 @@
         }
         if (user.role === 'admin') return true;
         if (r.ok && status.hasAccess) return true;
-        alert(status.error || 'AI Mock Interview is not available. Ask admin to unlock access.');
+        alert(status.error || 'AI Mock Interview is not available. Complete payment to unlock unlimited access.');
       } catch (e) {}
       window.location.href = 'student-dashboard.html';
       return false;
@@ -203,11 +203,12 @@
 
       if (status.fullAccess || status.accessType === 'admin') {
         badge.textContent = `${config.dailyLimit || status.dailyLimit || 3} mocks/day · Unlimited plan`;
+      } else if (status.hasActiveSession) {
+        badge.textContent = 'Free complete trial · Interview in progress';
       } else if (status.accessType === 'expired') {
-        badge.textContent = 'Free trials used · Ask admin to unlock';
+        badge.textContent = 'Free trial complete · Pay for unlimited';
       } else {
-        const left = status.freeRemaining ?? status.freeTrialLimit ?? 2;
-        badge.textContent = `${left} free mock${left === 1 ? '' : 's'} remaining`;
+        badge.textContent = '1 free complete trial · Full mock + feedback report';
       }
     }
 
@@ -264,16 +265,21 @@
           freeRemaining: config.freeRemaining,
           fullAccess: config.fullAccess,
           canStart: config.canStart,
-          accessType: config.accessType
+          canStartNew: config.canStartNew,
+          accessType: config.accessType,
+          hasActiveSession: config.hasActiveSession,
+          activeSessionId: config.activeSessionId
         };
         if (!config.geminiConfigured) {
           document.getElementById('setupError').textContent = '⚠️ Gemini API key not set on server. Ask admin to add GEMINI_API_KEY on Render.';
           document.getElementById('setupError').classList.remove('hidden');
           document.getElementById('startBtn').disabled = true;
-        } else if (config.canStart === false) {
-          document.getElementById('setupError').textContent = `You've used your ${config.freeTrialLimit || 2} free mock interviews. Ask admin to unlock unlimited access.`;
+        } else if (config.canStartNew === false && !config.hasActiveSession) {
+          document.getElementById('setupError').textContent = 'Your 1 free complete trial is used. Complete payment to unlock unlimited AI mock interviews.';
           document.getElementById('setupError').classList.remove('hidden');
           document.getElementById('startBtn').disabled = true;
+        } else if (config.hasActiveSession) {
+          document.getElementById('startBtn').textContent = 'Continue Mock Interview';
         }
         updateAccessBadge();
         renderInterviewerCards();
@@ -599,24 +605,29 @@
         document.getElementById('activeMeta').textContent = `${persona.title} · ${document.getElementById('intType').selectedOptions[0].text}`;
 
         document.getElementById('chatArea').innerHTML = '';
-        const firstMsg = (data.messages || []).find(m => m.role === 'interviewer');
-        if (firstMsg) await onInterviewerMessage(firstMsg.content);
-        else (data.messages || []).forEach(m => appendBubble(m.role, cleanSpeechText(m.content)));
+        const msgs = data.messages || [];
+        if (msgs.length > 1) {
+          msgs.forEach(m => {
+            if (m.role === 'coach') appendBubble('coach', cleanSpeechText(m.content));
+            else if (m.role === 'interviewer') appendBubble('interviewer', cleanSpeechText(m.content));
+            else appendBubble('student', m.content);
+          });
+          const lastInterviewer = [...msgs].reverse().find(m => m.role === 'interviewer');
+          if (lastInterviewer) {
+            lastQuestionText = cleanSpeechText(lastInterviewer.content);
+            document.getElementById('replayBtn').classList.remove('hidden');
+          }
+        } else {
+          const firstMsg = msgs.find(m => m.role === 'interviewer');
+          if (firstMsg) await onInterviewerMessage(firstMsg.content);
+          else msgs.forEach(m => appendBubble(m.role, cleanSpeechText(m.content)));
+        }
 
         document.getElementById('setupSection').classList.add('hidden');
         document.getElementById('chatSection').classList.remove('hidden');
         document.getElementById('feedbackSection').classList.add('hidden');
         document.getElementById('speakStatus').textContent = '👂 Your turn — answer now';
         showActiveVoice();
-        if (window.mockInterviewStatus && !window.mockInterviewStatus.fullAccess) {
-          window.mockInterviewStatus.lifetimeUsed = (window.mockInterviewStatus.lifetimeUsed || 0) + 1;
-          window.mockInterviewStatus.freeRemaining = Math.max(0, (window.mockInterviewStatus.freeTrialLimit || 2) - window.mockInterviewStatus.lifetimeUsed);
-          window.mockInterviewStatus.canStart = window.mockInterviewStatus.lifetimeUsed < (window.mockInterviewStatus.freeTrialLimit || 2);
-          if (window.mockInterviewStatus.accessType !== 'admin') {
-            window.mockInterviewStatus.accessType = window.mockInterviewStatus.canStart ? 'trial' : 'expired';
-          }
-          updateAccessBadge();
-        }
       } catch (e) {
         document.getElementById('setupError').textContent = e.message;
         document.getElementById('setupError').classList.remove('hidden');
@@ -764,10 +775,12 @@
           window.mockInterviewStatus = status;
           config = { ...config, ...status };
           updateAccessBadge();
-          if (!status.canStart && user.role !== 'admin') {
-            document.getElementById('setupError').textContent = `You've used your ${status.freeTrialLimit || 2} free mock interviews. Ask admin to unlock unlimited access.`;
+          if (!status.canStartNew && !status.hasActiveSession && user.role !== 'admin') {
+            document.getElementById('setupError').textContent = 'Your 1 free complete trial is used. Complete payment to unlock unlimited AI mock interviews.';
             document.getElementById('setupError').classList.remove('hidden');
             document.getElementById('startBtn').disabled = true;
+          } else if (status.hasActiveSession) {
+            document.getElementById('startBtn').textContent = 'Continue Mock Interview';
           }
         }
       } catch (e) {}

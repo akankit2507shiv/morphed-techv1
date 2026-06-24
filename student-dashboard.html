@@ -238,7 +238,7 @@
         <span id="mockInterviewSoonBadge" class="absolute top-3 right-3 text-xs px-2 py-0.5 bg-accent/20 text-accent rounded-full border border-accent/30 hidden">Coming Soon</span>
         <div class="text-5xl mb-4">🤖</div>
         <h3 class="text-2xl font-bold text-white mb-2">AI Mock Interview</h3>
-        <p class="text-gray-400 mb-4">Rahul & Priya personas · 1 free trial for new students</p>
+        <p class="text-gray-400 mb-4">Rahul & Priya personas · 1 free complete trial for every student</p>
         <span id="mockInterviewCta" class="text-accent font-semibold">Start Mock →</span>
       </div>
 
@@ -1217,11 +1217,14 @@
         if (status.fullAccess || status.accessType === 'admin') {
           cta.textContent = 'Start Mock → Unlimited access';
           cta.className = 'text-accent font-semibold';
+        } else if (status.hasActiveSession) {
+          cta.textContent = 'Continue Mock → Interview in progress';
+          cta.className = 'text-accent font-semibold';
         } else if (status.canStart) {
-          cta.textContent = `Start Mock → ${status.freeRemaining} free trial${status.freeRemaining === 1 ? '' : 's'} left`;
+          cta.textContent = 'Start Mock → 1 Free Complete Trial';
           cta.className = 'text-accent font-semibold';
         } else {
-          cta.textContent = 'View history — free trials used. Ask admin to unlock';
+          cta.textContent = 'View history → Unlock unlimited mocks';
           cta.className = 'text-yellow-400 font-semibold text-sm';
         }
       } else {

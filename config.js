@@ -99,7 +99,7 @@ const config = {
     // AI Mock Interview + Study Bot — control separately
     MOCK_INTERVIEW_COMING_SOON: process.env.MOCK_INTERVIEW_COMING_SOON === 'true',
     STUDY_BOT_COMING_SOON: process.env.STUDY_BOT_COMING_SOON === 'true' || (process.env.AI_FEATURES_COMING_SOON !== 'false' && process.env.STUDY_BOT_COMING_SOON !== 'false'),
-    AI_COMING_SOON_MESSAGE: process.env.AI_COMING_SOON_MESSAGE || 'Study Bot is coming soon. AI Mock Interview includes 1 free trial for new students.',
+    AI_COMING_SOON_MESSAGE: process.env.AI_COMING_SOON_MESSAGE || 'Study Bot is coming soon. AI Mock Interview includes 1 free complete trial for every student.',
   },
 };
 

@@ -832,6 +832,27 @@ const mockInterviews = {
       [userId]
     ))?.c || 0;
   },
+  async countCompletedByUser(userId) {
+    if (USE_MONGODB) {
+      return mongo.MockInterview.countDocuments({ user_id: toObjectId(userId), status: 'completed' });
+    }
+    return (await sqlGet(
+      `SELECT COUNT(*) as c FROM mock_interviews WHERE user_id = ? AND status = 'completed'`,
+      [userId]
+    ))?.c || 0;
+  },
+  async findActiveByUser(userId) {
+    if (USE_MONGODB) {
+      const row = await mongo.MockInterview.findOne({ user_id: toObjectId(userId), status: 'active' })
+        .sort({ created_at: -1 }).lean();
+      return formatMockSession(row);
+    }
+    const row = await sqlGet(
+      `SELECT * FROM mock_interviews WHERE user_id = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1`,
+      [userId]
+    );
+    return formatMockSession(row);
+  },
   async getHistoryByUser(userId, limit = 20) {
     if (USE_MONGODB) {
       const rows = await mongo.MockInterview.find({ user_id: toObjectId(userId) })

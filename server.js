@@ -695,23 +695,29 @@ async function getMockInterviewAccessStatus(userId, role) {
     };
   }
 
-  const [access, lifetimeUsed] = await Promise.all([
+  const [access, completedUsed, totalSessions, activeSession] = await Promise.all([
     DB.syllabusAccess.get(userId),
-    DB.mockInterviews.countByUser(userId)
+    DB.mockInterviews.countCompletedByUser(userId),
+    DB.mockInterviews.countByUser(userId),
+    DB.mockInterviews.findActiveByUser(userId)
   ]);
   const fullAccess = !!access.mock_interview_access;
-  const freeRemaining = Math.max(0, FREE_MOCK_TRIAL - lifetimeUsed);
-  const hasAccess = fullAccess || lifetimeUsed <= FREE_MOCK_TRIAL;
-  const canStart = fullAccess || lifetimeUsed < FREE_MOCK_TRIAL;
+  const freeRemaining = Math.max(0, FREE_MOCK_TRIAL - completedUsed);
+  const hasAccess = fullAccess || freeRemaining > 0 || totalSessions > 0;
+  const canStartNew = fullAccess || completedUsed < FREE_MOCK_TRIAL;
+  const canStart = canStartNew || !!activeSession;
 
   return {
     hasAccess,
     fullAccess,
     freeTrialLimit: FREE_MOCK_TRIAL,
-    lifetimeUsed,
+    lifetimeUsed: completedUsed,
     freeRemaining,
     canStart,
-    accessType: fullAccess ? 'full' : (freeRemaining > 0 ? 'trial' : 'expired')
+    canStartNew,
+    hasActiveSession: !!activeSession,
+    activeSessionId: activeSession?.id || null,
+    accessType: fullAccess ? 'full' : (freeRemaining > 0 || activeSession ? 'trial' : 'expired')
   };
 }
 
@@ -724,7 +730,7 @@ async function requireMockInterviewAccess(req, res, next) {
     const status = await getMockInterviewAccessStatus(req.user.id, req.user.role);
     if (!status.hasAccess) {
       return res.status(403).json({
-        error: `You've used your ${FREE_MOCK_TRIAL} free mock interviews. Ask admin to unlock unlimited access.`
+        error: `Your free complete trial is used. Complete payment to unlock unlimited AI mock interviews.`
       });
     }
     req.mockInterviewStatus = status;
@@ -779,7 +785,10 @@ app.get('/api/mock-interview/config', authenticateToken, requireMockInterviewAcc
     freeRemaining: status.freeRemaining,
     fullAccess: status.fullAccess,
     canStart: status.canStart,
-    accessType: status.accessType
+    canStartNew: status.canStartNew,
+    accessType: status.accessType,
+    hasActiveSession: status.hasActiveSession,
+    activeSessionId: status.activeSessionId
   });
 });
 
@@ -820,9 +829,13 @@ app.post('/api/mock-interview/start', authenticateToken, requireMockInterviewAcc
       return res.status(503).json({ error: 'AI mock interview is not configured yet. Admin must add GEMINI_API_KEY.' });
     }
     const status = req.mockInterviewStatus || await getMockInterviewAccessStatus(req.user.id, req.user.role);
-    if (!status.canStart) {
+    const active = await DB.mockInterviews.findActiveByUser(req.user.id);
+    if (active) {
+      return res.json(active);
+    }
+    if (!status.fullAccess && status.lifetimeUsed >= FREE_MOCK_TRIAL) {
       return res.status(403).json({
-        error: `You've used your ${FREE_MOCK_TRIAL} free mock interviews. Ask admin to unlock unlimited access.`
+        error: `Your ${FREE_MOCK_TRIAL} free complete trial is used. Pay once for unlimited AI mock interviews.`
       });
     }
     const { interviewer, experience_level, interview_type } = req.body;
